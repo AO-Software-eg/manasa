@@ -1,0 +1,4 @@
+/.next
+/backend/node_modules
+/node_modules
+next-env.d.ts
