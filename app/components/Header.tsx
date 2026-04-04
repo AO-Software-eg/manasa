@@ -71,7 +71,9 @@ function Header() {
     if (menuRef.current && !menuRef.current.contains(document.activeElement)) {
       setIsMenuOpen(false);
     }
-    setIsMenuOpen(!isMenuOpen)
+    else {
+      setIsMenuOpen(!isMenuOpen)
+    }
   };
 
   return (
