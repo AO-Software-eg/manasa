@@ -9,4 +9,15 @@ const db = new Pool({
     port: Number(process.env.DB_PORT)
 });
 
+export async function getImageLink(name: string): Promise<string | null>
+{
+    const query = "SELECT * FROM image_links WHERE name = $1";
+    const values = [name];
+
+    const res = await db.query(query, values);
+    const row = res.rows[0];
+
+    return row?.link ?? null;
+}
+
 export default db;
