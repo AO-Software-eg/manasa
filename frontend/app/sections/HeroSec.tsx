@@ -9,7 +9,7 @@ const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
 
 function HeroSec() {
   return (
-    <section className="relative w-full min-h-screen overflow-hidden flex items-center justify-center">
+    <section className="relative w-full mt-20 min-h-screen overflow-hidden flex items-center justify-center">
 
       {/* LEFT IMAGE */}
       <motion.div

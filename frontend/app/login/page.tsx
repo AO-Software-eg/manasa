@@ -17,11 +17,11 @@ function page() {
             <form action="/login" method="POST" className={`w-full ${cairo.className}`}>  
                 <div className='mb-4'>
                     <label htmlFor="email" className='block text-[#e6d3a3] mb-2'>البريد الإلكتروني</label>
-                    <input type="email" id="email" name="email" className='bg-[#1C1C18] rounded-lg  w-full outline-none  text-[#e6d3a3] placeholder:text-[#e6d3a3] border-2 border-[#e6d3a3]  p-2 placeholder:opacity-70' placeholder='مثال :   ex@gmail.com'/>
+                    <input type="email" id="email" name="email" className='bg-[#1C1C18] rounded-lg  w-full outline-none  text-[#e6d3a3] placeholder:text-[#e6d3a3] border-2 border-[#e6d3a3]  p-2 placeholder:opacity-70' />
                 </div>
                 <div className='mb-4'>
                     <label htmlFor="password" className='block text-[#e6d3a3] mb-2'>كلمة المرور</label>
-                    <input type="password" id="password" name="password" className='bg-[#1C1C18] rounded-lg w-full  outline-none  text-[#e6d3a3] placeholder:text-[#e6d3a3] border-2 border-[#e6d3a3] p-2 placeholder:opacity-70' placeholder='كلمة المرور (6 أحرف على الأقل)'/>
+                    <input type="password" id="password" name="password" className='bg-[#1C1C18] rounded-lg w-full  outline-none  text-[#e6d3a3] placeholder:text-[#e6d3a3] border-2 border-[#e6d3a3] p-2 placeholder:opacity-70' />
                     <span className='text-sm text-[#e6d3a3] mt-2 block'>هل نسيت كلمة السر ؟ <a href="/forgot-password" className='text-[#e6d3a3] underline'>إعادة تعيين</a></span>
                 </div>
                 <button type="submit" className='bg-[#e6d3a3] w-full text-[#1C1C18] rounded-lg font-bold py-2 px-4 rounded-lg hover:bg-[#d4c090] transition duration-200'>

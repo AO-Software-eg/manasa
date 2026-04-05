@@ -77,7 +77,7 @@ function Header() {
   };
 
   return (
-    <header className="relative  fi z-100 w-[70%] mx-auto p-3 mt-9 shadow-2xl border-2 border-[#3b3b34] text-[#e6d3a3] bg-[#1C1C18] rounded-3xl">
+    <header className="fixed translate-x-1/2 right-1/2  fi z-100 w-[70%] mx-auto p-3 mt-8  shadow-2xl shadow-black border-2 border-[#3b3b34] text-[#e6d3a3] bg-[#1C1C18] rounded-3xl">
       <nav className="flex justify-between items-center">
         <div className="absolute left-5 -top-10 pointer-events-none">
           <Image
@@ -88,7 +88,10 @@ function Header() {
           />
         </div>
 
-        <Origami />
+        <Link href={'/'} className="flex items-center gap-2">
+          <Origami />
+        </Link>
+
 
         <ul className="md:flex gap-5 hidden ">
           {listItems.map((item, i) => (
