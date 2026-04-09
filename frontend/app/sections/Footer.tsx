@@ -1,7 +1,7 @@
-"use client"
-import React from 'react'
-import Image from "next/image";
-import { motion } from "framer-motion";
+'use client';
+import React from 'react';
+import Image from 'next/image';
+import { motion } from 'framer-motion';
 
 function Footer() {
   return (
@@ -30,12 +30,10 @@ function Footer() {
         <p className="text-xl md:text-2xl font-semibold opacity-90 leading-relaxed">
           © 2024 في مادة التاريخ - جميع الحقوق محفوظة.
         </p>
-        <p className="text-lg md:text-xl mt-4 opacity-70">
-          شكراً لزيارتكم
-        </p>
+        <p className="text-lg md:text-xl mt-4 opacity-70">شكراً لزيارتكم</p>
       </motion.div>
     </section>
-  )
+  );
 }
 
-export default Footer
+export default Footer;

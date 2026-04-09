@@ -1,16 +1,15 @@
-"use client";
+'use client';
 
-import dynamic from "next/dynamic";
-import Image from "next/image";
-import { motion } from "framer-motion";
+import dynamic from 'next/dynamic';
+import Image from 'next/image';
+import { motion } from 'framer-motion';
 
 // ✅ Disable SSR for Lottie (important)
-const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
+const Lottie = dynamic(() => import('lottie-react'), { ssr: false });
 
 function HeroSec() {
   return (
     <section className="relative w-full mt-20 min-h-screen overflow-hidden flex items-center justify-center">
-
       {/* LEFT IMAGE */}
       <motion.div
         initial={{ x: -120, rotate: -12, opacity: 0 }}
@@ -49,8 +48,8 @@ function HeroSec() {
       <div className="relative z-10 flex flex-col items-center justify-center h-full text-center text-[#e6d3a3] px-4">
         <motion.h1
           className="text-6xl md:text-7xl font-bold mb-4"
-          initial={{ filter: "blur(20px)", opacity: 0 }}
-          animate={{ filter: "blur(0px)", opacity: 1 }}
+          initial={{ filter: 'blur(20px)', opacity: 0 }}
+          animate={{ filter: 'blur(0px)', opacity: 1 }}
           transition={{ duration: 1.2, delay: 0.3 }}
         >
           منصة السلطان
@@ -58,8 +57,8 @@ function HeroSec() {
 
         <motion.h2
           className="text-5xl md:text-6xl font-semibold"
-          initial={{ filter: "blur(20px)", opacity: 0 }}
-          animate={{ filter: "blur(0px)", opacity: 1 }}
+          initial={{ filter: 'blur(20px)', opacity: 0 }}
+          animate={{ filter: 'blur(0px)', opacity: 1 }}
           transition={{ duration: 1.2, delay: 0.6 }}
         >
           في مادة التاريخ
@@ -69,7 +68,7 @@ function HeroSec() {
       {/* LOTTIE ANIMATION */}
       <div className="absolute bottom-2 left-1/2 -translate-x-1/2">
         <Lottie
-          animationData={require("../../public/scrolldown.json")}
+          animationData={require('../../public/scrolldown.json')}
           loop
           autoplay
           style={{ width: 50, height: 50 }}

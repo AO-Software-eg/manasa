@@ -1,8 +1,8 @@
 import React from 'react';
 
 type Props = {
-  year: 'اولى ثانوي' | 'تانية ثانوي' | 'ثالثة ثانوي',
-}
+  year: 'اولى ثانوي' | 'تانية ثانوي' | 'ثالثة ثانوي';
+};
 
 function YearBox({ year }: Props) {
   return (
@@ -11,8 +11,7 @@ function YearBox({ year }: Props) {
         {year}
       </h1>
     </div>
-  )
+  );
 }
 
 export default YearBox;
-

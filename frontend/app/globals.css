@@ -1,17 +1,17 @@
-@import "tailwindcss";
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
 
 @custom-variant dark (&:is(.dark *));
 
 img {
   -webkit-user-drag: none;
-    user-select: none;
-    pointer-events: none;
+  user-select: none;
+  pointer-events: none;
 }
 ::selection {
   background: #585853;
-  color: #fff; 
+  color: #fff;
 }
 
 @theme inline {
@@ -138,11 +138,10 @@ img {
   }
 }
 
-
-button , a {
-  @apply  cursor-pointer;
+button,
+a {
+  @apply cursor-pointer;
 }
-
 
 .phone-input {
   @apply flex items-center w-full rounded-lg border-2 border-[#e6d3a3] bg-[#1C1C18];
