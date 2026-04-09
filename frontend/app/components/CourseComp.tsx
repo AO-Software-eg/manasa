@@ -2,16 +2,18 @@ import React from 'react';
 import Image from "next/image";
 import Link from "next/link";
 
-function CourseComp() {
+function CourseComp( { imageUrl }: { imageUrl: string | null } ) {
     return (
         <div className="w-full flex flex-col text-right rounded-2xl bg-[#e6d3a3]/20 overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-500 hover:scale-[1.02] border border-[#e6d3a3]/20">
-            <Image 
-                src="https://ytgu3s3xxa.ufs.sh/f/GNGTKtuqz7dpWEUWvnb4nk0XsiWCHZYLIQav8Dr29AeEFchx" 
-                alt="Course Image" 
-                width={500} 
-                height={350} 
-                className="w-full h-64 object-cover rounded-t-2xl brightness-90 hover:brightness-100 transition-all duration-300" 
-            />
+            {imageUrl &&
+                <Image 
+                    src={imageUrl}
+                    alt="Course Image" 
+                    width={500} 
+                    height={350} 
+                    className="w-full h-64 object-cover rounded-t-2xl brightness-90 hover:brightness-100 transition-all duration-300" 
+                />
+            }
             <div className="p-6 md:p-8 space-y-6 bg-[#e6d3a3]/10 backdrop-blur-md">
                 <h1 className="text-3xl md:text-4xl font-bold mb-4 text-[#e6d3a3] leading-tight">
                     كورس الشهر الأول

@@ -34,9 +34,9 @@ export default function Courses() {
         الكورسات
     </h1>
     <div className='w-full flex flex-col lg:flex-row items-center justify-center gap-10'>
-        <CourseComp />
-        <CourseComp />
-        <CourseComp />
+        <CourseComp imageUrl={courseImg}/>
+        <CourseComp imageUrl={courseImg}/>
+        <CourseComp imageUrl={courseImg}/>
     </div>
     
     </section> 
