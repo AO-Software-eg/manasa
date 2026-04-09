@@ -28,6 +28,7 @@
   "dependencies": {
     "body-parser": "^2.2.2",
     "cors": "^2.8.6",
-    "pg": "^8.20.0"
+    "pg": "^8.20.0",
+    "prettier": "^3.8.1"
   }
 }
