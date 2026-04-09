@@ -5,7 +5,7 @@ import CourseComp from '../components/CourseComp'
 
 
 export default function Courses() {
-  const [courseImg, setCourseImg] = useState<string | undefined>();
+  const [courseImg, setCourseImg] = useState<string | null>(null);
 
   useEffect(() => {
     async function getCourseImg() {
@@ -13,7 +13,12 @@ export default function Courses() {
           const response = await fetch("http://localhost:5000/images/course_image");
           const data = await response.json();
 
-          setCourseImg(data["imageUrl"]);
+          if (data["imageUrl"]) {
+            setCourseImg(data["imageUrl"]);
+          }
+          else {
+            setCourseImg(null);
+          }
       } 
       catch (err) {
           console.error(err);
