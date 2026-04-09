@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import CourseComp from '../components/CourseComp'
 
+import { API_URL } from '../config/config'
 
 export default function Courses() {
   const [courseImg, setCourseImg] = useState<string | null>(null);
@@ -10,7 +11,7 @@ export default function Courses() {
   useEffect(() => {
     async function getCourseImg() {
       try {
-          const response = await fetch("http://localhost:5000/images/course_image");
+          const response = await fetch(`${API_URL}/images/course_image`);
           const data = await response.json();
 
           if (data["imageUrl"]) {
