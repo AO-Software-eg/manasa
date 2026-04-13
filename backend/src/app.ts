@@ -3,6 +3,7 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import fs from 'fs/promises';
 import z from 'zod';
+import { hashPassword } from './hash.ts'
 
 import db, { getImageLink } from './database.ts';
 
@@ -67,6 +68,7 @@ app
       const data = req.body;
       signupSchema.parse(data);
 
+      const hash = await hashPassword(data.password);
     } 
     catch (err) {
       console.log(err);
