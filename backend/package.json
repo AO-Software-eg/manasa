@@ -14,8 +14,10 @@
     "lint": "eslint src/**/*.ts"
   },
   "dependencies": {
+    "argon2": "^0.44.0",
     "cors": "^2.8.6",
-    "pg": "^8.20.0"
+    "pg": "^8.20.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
