@@ -1,6 +1,19 @@
 import 'dotenv/config';
 import { Pool } from 'pg';
 
+export class DataIntegrityError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'DataIntegrityError';
+  }
+}
+
+export class NonUniqueDataError extends DataIntegrityError {
+  constructor(resultCount: number) {
+    super(`Expected one or zero results from query, but got ${resultCount}`);
+  }
+}
+
 const db = new Pool({
   user: process.env.DB_USER,
   host: process.env.DB_HOST,
@@ -14,6 +27,10 @@ export async function getImageLink(name: string): Promise<string | null> {
   const values = [name];
 
   const res = await db.query(query, values);
+  if (res.rowCount && res.rowCount > 1) {
+    throw new NonUniqueDataError(res.rowCount);
+  }
+
   const row = res.rows[0];
 
   return row?.link ?? null;
