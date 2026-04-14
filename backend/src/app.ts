@@ -2,7 +2,7 @@ import express, { type Request, type Response } from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import fs from 'fs/promises';
-import z from 'zod';
+import z, { ZodError } from 'zod';
 
 import { hashPassword, verifyPassword } from './hash.ts'
 import db, { getImageLink, getUserByEmail, insertUser, type User} from './database.ts';
@@ -116,9 +116,18 @@ app
       }
     }
     catch (err) {
-      console.log(err);
-      res.status(400).send();
-      return;
+      if (err instanceof ZodError) {
+        res.status(400).json({
+          'message': 'Invalid login data'
+        });
+        res.send();
+        return;
+      }
+      else {
+        console.log(err);
+        res.status(500).send();
+        return;
+      }
     }
 
     res.status(200).send();
