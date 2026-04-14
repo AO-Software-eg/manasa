@@ -1,13 +1,57 @@
+"use client";
 import Image from 'next/image';
 import Link from 'next/link';
 import { Cairo } from 'next/font/google';
+import { API_URL } from '../../config/config';
+import { toast } from 'sonner';
+import { useState } from 'react';
+import { FormEvent } from 'react';
 
 const cairo = Cairo({
   subsets: ['arabic'],
   weight: ['400', '700'],
 });
 
+
+
 function page() {
+
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+  });
+
+
+
+    const onsubmit = async (e: FormEvent<HTMLFormElement>) => {
+
+    e.preventDefault();
+    const data = new FormData(e.target as HTMLFormElement);
+    setFormData({
+      email: data.get('email') as string,
+      password: data.get('password') as string,
+    });
+    try {
+      const res = await fetch(`${API_URL}/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!res.ok) {
+        throw new Error(`Request Failed: ${res.status}`);
+      }
+
+      toast.success('تم الدخول بنجاح!');
+    } catch (err) {
+      console.error(err);
+      toast.error('حدث خطأ أثناء الدخول');
+    }
+  };
+
+
   return (
     <section className="w-full min-h-screen flex flex-row-reverse gap-10 lg:gap-20 p-5 items-center justify-center ">
       <div className="left-sec w-full bg-[#1C1C18] p-6 rounded-lg shadow-sm shadow-[#e6d3a3] border-2 border-[#e6d3a3] gap-10 flex flex-col text-cemter ">
@@ -16,6 +60,7 @@ function page() {
         </h1>
         <form
           action="/login"
+          onSubmit={onsubmit}
           method="POST"
           className={`w-full ${cairo.className}`}
         >
@@ -49,7 +94,8 @@ function page() {
           </div>
           <button
             type="submit"
-            className="bg-[#e6d3a3] w-full text-[#1C1C18] rounded-lg font-bold py-2 px-4 rounded-lg hover:bg-[#d4c090] transition duration-200"
+
+            className="bg-[#e6d3a3] w-full text-[#1C1C18] rounded-lg font-bold py-2 px-4  hover:bg-[#d4c090] transition duration-200"
           >
             تسجيل الدخول
           </button>
