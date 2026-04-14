@@ -5,7 +5,7 @@ import fs from 'fs/promises';
 import z from 'zod';
 import { hashPassword } from './hash.ts'
 
-import db, { getImageLink } from './database.ts';
+import db, { getImageLink, getUserByEmail} from './database.ts';
 
 const app = express();
 
@@ -68,7 +68,16 @@ app
       const data = req.body;
       signupSchema.parse(data);
 
-      const hash = await hashPassword(data.password);
+      const existingUser = await getUserByEmail(data.email);
+      if (existingUser) {
+        res.json({
+          'message': 'User already exists'
+        });
+
+        res.status(400).send();
+        return;
+      }
+
     } 
     catch (err) {
       console.log(err);

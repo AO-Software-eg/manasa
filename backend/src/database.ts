@@ -36,4 +36,17 @@ export async function getImageLink(name: string): Promise<string | null> {
   return row?.link ?? null;
 }
 
+export async function getUserByEmail(email: string) : Promise<Object | null> {
+  const query = 'SELECT * FROM users WHERE email = $1';
+  const values = [email];
+
+  const res = await db.query(query, values);
+  if (res.rowCount && res.rowCount > 1) {
+    throw new NonUniqueDataError(res.rowCount);
+  }
+
+  const row = res.rows[0];
+
+  return row ?? null;
+}
 export default db;
