@@ -49,4 +49,26 @@ export async function getUserByEmail(email: string) : Promise<Object | null> {
 
   return row ?? null;
 }
+
+export type User = {
+  email: string;
+  name: string;
+  studentPhone: string;
+  parentPhone: string;
+  specialization: string;
+  governorate: string;
+  year: string;
+  password: string; // hashed
+};
+
+export async function insertUser(user: User) {
+  const query = `INSERT INTO users(name, email, password, student_phone, parent_phone, year, governorate)
+                 VALUES($1, $2, $3, $4, $5, $6, $7)`;
+  const values = [
+    user.name, user.email, user.password, user.studentPhone, user.parentPhone, user.year, user.governorate
+  ];
+
+  await db.query(query, values);
+}
+
 export default db;

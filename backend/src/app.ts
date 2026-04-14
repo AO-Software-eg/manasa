@@ -5,7 +5,7 @@ import fs from 'fs/promises';
 import z from 'zod';
 import { hashPassword } from './hash.ts'
 
-import db, { getImageLink, getUserByEmail} from './database.ts';
+import db, { getImageLink, getUserByEmail, insertUser, type User} from './database.ts';
 
 const app = express();
 
@@ -78,6 +78,19 @@ app
         return;
       }
 
+      const password = await hashPassword(data.password);
+      const user: User = {
+        email: data.email,
+        name: data.name,
+        studentPhone: data.studentPhone,
+        parentPhone: data.parentPhone,
+        specialization: data.specialization,
+        governorate: data.governorate,
+        year: data.YearCombo,
+        password: password
+      };
+
+      insertUser(user);
     } 
     catch (err) {
       console.log(err);
