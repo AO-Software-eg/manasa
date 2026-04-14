@@ -1,4 +1,5 @@
 import express, { type Request, type Response } from 'express';
+import session from 'express-session'
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import fs from 'fs/promises';
@@ -100,7 +101,7 @@ app
 
       const existingUser = await getUserByEmail(data.email);
       if (!existingUser) {
-        res.status(400).json({
+        res.status(404).json({
           'message': 'User does not exist'
         });
         res.send();
