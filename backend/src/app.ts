@@ -79,7 +79,7 @@ app
     } 
     catch (err) {
       console.log(err);
-      res.status(415).send();
+      res.status(400).send();
       return;
     }
 
@@ -118,7 +118,7 @@ app
     }
     catch (err) {
       console.log(err);
-      res.status(415).send();
+      res.status(400).send();
       return;
     }
 
