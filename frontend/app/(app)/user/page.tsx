@@ -1,11 +1,8 @@
 import React from 'react'
+import { redirect } from 'next/navigation'
 
 function page() {
-  return (
-    <div className=' bg-[#1C1C18] w-[80%] mx-10 h-150 border-2 rounded-4xl border-[#3b3b34]/50 '>
-      <h1 className=''>user page</h1>
-    </div>
-  )
+  return redirect('/user/dashboard')
 }
 
 export default page

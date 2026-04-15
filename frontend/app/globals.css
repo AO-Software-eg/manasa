@@ -158,3 +158,33 @@ a {
 form div p {
   @apply text-red-500 mt-1 text-sm;
 }
+
+
+
+* {
+  --sb-track-color: #272722;
+  --sb-thumb-color: #4c4c3f;
+  --sb-size: 6px;
+}
+
+*::-webkit-scrollbar {
+  width: var(--sb-size)
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--sb-track-color);
+  border-radius: 3px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--sb-thumb-color);
+  border-radius: 3px;
+  
+}
+
+@supports not selector(::-webkit-scrollbar) {
+  * {
+    scrollbar-color: var(--sb-thumb-color)
+                     var(--sb-track-color);
+  }
+}

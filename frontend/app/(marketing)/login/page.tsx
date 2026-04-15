@@ -34,7 +34,7 @@ function page() {
 
       toast.success('تم الدخول بنجاح!');
 
-      router.push('/user');
+      router.push('/user/dashboard');
     } catch (err: any) {
       console.error(err);
 
