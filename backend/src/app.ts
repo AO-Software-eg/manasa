@@ -58,8 +58,6 @@ app
         res.status(400).json({
           'message': 'User already exists'
         });
-
-        res.send();
         return;
       }
 
@@ -98,12 +96,11 @@ app
       const data = req.body;
       validation.loginSchema.parse(data);
 
-      const existingUser = await getUserByEmail(data.email);
+      const existingUser: User | null = await getUserByEmail(data.email);
       if (!existingUser) {
-        res.status(400).json({
+        res.status(404).json({
           'message': 'User does not exist'
         });
-        res.send();
         return;
       }
 
@@ -111,7 +108,6 @@ app
         res.status(400).json({
           'message': 'Incorrect password'
         });
-        res.send();
         return;
       }
     }
@@ -120,7 +116,6 @@ app
         res.status(400).json({
           'message': 'Invalid login data'
         });
-        res.send();
         return;
       }
       else {
