@@ -1,14 +1,11 @@
 import React from 'react'
 
-import Courses from '@/app/(marketing)/sections/Courses'
-
 function page() {
   return (
     <div>
-      <Courses />
+      <h1>course data</h1>
     </div>
   )
 }
-
 
 export default page

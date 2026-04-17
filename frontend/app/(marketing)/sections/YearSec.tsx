@@ -14,13 +14,13 @@ function YearSec() {
         <ScrollArea className="w-full lg:w-11/12 mx-auto rounded-2xl border border-[#e6d3a3]/20 bg-[#e6d3a3]/10 backdrop-blur-md shadow-2xl hover:shadow-3xl transition-all duration-300">
           <div className="flex gap-6 md:gap-8 p-6 md:p-8 pb-6 md:pb-8">
             <div className="shrink-0">
-              <YearBox year="اولى ثانوي" />
+              <YearBox year="اولى ثانوي" link='g1' />
             </div>
             <div className="shrink-0">
-              <YearBox year="تانية ثانوي" />
+              <YearBox year="تانية ثانوي" link='g2' />
             </div>
             <div className="shrink-0">
-              <YearBox year="ثالثة ثانوي" />
+              <YearBox year="ثالثة ثانوي" link='g3' />
             </div>
           </div>
           <ScrollBar
