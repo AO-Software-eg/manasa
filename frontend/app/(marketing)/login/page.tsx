@@ -30,7 +30,7 @@ function page() {
 
 
     try {
-      const res = await api.post('/login', payload)
+      const res = await api.post('/login', payload, {withCredentials: true})
 
       toast.success('تم الدخول بنجاح!');
 
