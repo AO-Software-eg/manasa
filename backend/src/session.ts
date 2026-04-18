@@ -7,7 +7,11 @@ if (!process.env.SESSION_KEY) {
 export const sessionObject = session({
   secret: process.env.SESSION_KEY,
   resave: false,
-  saveUninitialized: true,
+  saveUninitialized: false, // only create the cookie once we modify the session
+  cookie: {
+    secure: process.env.NODE_ENV == 'production',
+    httpOnly: true
+  }
 });
 
 type UserSessionData = {
