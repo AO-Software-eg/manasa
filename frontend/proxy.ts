@@ -8,4 +8,6 @@ export default function proxy(request: NextRequest) {
   return NextResponse.rewrite(url);
 }
 
-export const config = {};
+export const config = {
+  matcher: '/login',
+};
