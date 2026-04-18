@@ -9,9 +9,13 @@ import { hashPassword, verifyPassword } from './hash.ts'
 import db, { getImageLink, getUserByEmail, insertUser, type User} from './database.ts';
 import * as validation from './validation.ts'
 
+type UserSessionData = {
+  id: number
+};
+
 declare module 'express-session' {
   interface SessionData {
-    user: string;
+    user: UserSessionData;
   }
 }
 
@@ -89,6 +93,7 @@ app
 
       const passwordHash = await hashPassword(data.password);
       const user: User = {
+        id: -1, // Doesn't matter, database creates the id
         email: data.email,
         name: data.name,
         studentPhone: data.studentPhone,
@@ -118,8 +123,6 @@ app
       return;
     }
 
-    console.log(req.session.user);
-
     if (req.session.user) {
       res.status(400).json({
         'message': 'User is already logged in'
@@ -131,22 +134,24 @@ app
       const data = req.body;
       validation.loginSchema.parse(data);
 
-      const existingUser: User | null = await getUserByEmail(data.email);
-      if (!existingUser) {
+      const user: User | null = await getUserByEmail(data.email);
+      if (!user) {
         res.status(404).json({
           'message': 'User does not exist'
         });
         return;
       }
 
-      if (await verifyPassword(existingUser.passwordHash, data.password) == false) {
+      if (await verifyPassword(user.passwordHash, data.password) == false) {
         res.status(400).json({
           'message': 'Incorrect password'
         });
         return;
       }
 
-      req.session.user = 'my user';
+      req.session.user = {
+        id: user.id
+      };
     }
     catch (err) {
       if (err instanceof ZodError) {
