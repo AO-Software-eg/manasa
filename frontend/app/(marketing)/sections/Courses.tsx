@@ -26,7 +26,7 @@ export default function Courses() {
     }
 
     getCourseImg();
-  });
+  }, []);
 
   return (
     <section className="w-full min-h-screen flex mt-20 flex-col gap-20 p-5 items-center justify-center">

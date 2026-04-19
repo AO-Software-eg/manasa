@@ -23,8 +23,7 @@ import { useForm } from 'react-hook-form';
 
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Toast } from 'radix-ui';
-import { request } from 'node:https';
+import { useRouter } from 'next/navigation';
 
 import { api } from '../hooks/api';
 
@@ -72,6 +71,8 @@ function Page() {
     },
   });
 
+  const router = useRouter();
+
   const onsubmit = async (data: Infer) => {
     console.log('valid data', data);
 
@@ -79,6 +80,9 @@ function Page() {
       const res = await api.post('/signup', data);
 
       toast.success('تم إنشاء الحساب بنجاح!');
+      form.reset();
+      router.push('/login');
+
     } catch (err) {
       console.error(err);
       toast.error('حدث خطأ اثناء انشاء الحساب');

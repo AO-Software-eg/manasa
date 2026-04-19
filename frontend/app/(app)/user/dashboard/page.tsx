@@ -1,6 +1,7 @@
+'use client';
 import CardLayout from '@/app/components/CardLayout';
 import { ChevronLeft } from 'lucide-react';
-
+import { useAuth } from './../../../hooks/useAuth';
 import RecentActivityCard from '@/app/components/RecentActivityCard';
 
 const activityData = [
@@ -127,12 +128,15 @@ export const dashboardData = {
 };
 
 function page() {
+
+  const { loggedIn, isLoading, userData } = useAuth();
+
   return (
     <div className="lg:grid flex flex-col lg:grid-cols-3  lg:col-span-3 gap-4 w-full">
       <CardLayout classname="col-span-1 lg:col-span-3 bg-linear-to-r from-[#1C1C18]/80 via-[#2a2a25]/80 to-[#3b3b34]/80 backdrop-blur-sm border-[#3b3b34]/50 text-transparent bg-clip-text">
-        <h1 className="text-4xl font-bold text-white drop-shadow-lg">
-          اهلا أستاذ محمد 👋
-        </h1>
+      {
+        loggedIn && userData ? `مرحبًا، ${userData.name}` : 'لوحة التحكم'
+      }
       </CardLayout>
       {dashboardData.stats.map((card) => (
         <CardLayout key={card.id}>

@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
+import { useAuth } from '../hooks/useAuth';
 import {
   Menu,
   BellRing,
@@ -32,6 +33,7 @@ const navItems = [
 ];
 
 function SideNav() {
+  const { loggedIn, isLoading, userData } = useAuth();
   const path = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
@@ -63,9 +65,9 @@ function SideNav() {
         <Link href={'/user/profile'}>
           <div className="flex justify-between mb-10 cursor-pointer gap-4 py-3 px-6 bg-[#525248] rounded-lg border border-[#3b3b34]/50 items-center">
             <div className="flex flex-col ">
-              <h1 className="max-w-30 text-nowrap overflow-hidden text-ellipsis ">
-                محمد محمود احمد عبدالرحمن
-              </h1>
+              {
+                loggedIn && userData ? userData.name : '...'
+              }
               <h2 className="text-sm text-white max-w-30 text-nowrap overflow-hidden text-ellipsis">
                 مدرس تاريخ
               </h2>
@@ -90,11 +92,10 @@ function SideNav() {
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`block px-4 py-2 rounded transition ${
-                    isActive(item.href)
+                  className={`block px-4 py-2 rounded transition ${isActive(item.href)
                       ? 'bg-[#3b3b34]'
                       : 'hover:bg-[#2a2a25] hover:border-2 hover:border-[#3b3b34]/50'
-                  } flex items-center gap-3`}
+                    } flex items-center gap-3`}
                 >
                   <Icon size={20} />
                   {item.name}
@@ -183,9 +184,8 @@ function SideNav() {
       {/* Mobile sidebar */}
       <aside
         ref={menuRef}
-        className={`fixed top-0 right-0 h-screen w-[80%] bg-[#1C1C18] text-[#e6d3a3] p-4 z-50 transform transition-transform duration-300 border-2 border-[#3b3b34]/50 shadow-sm shadow-[#e6d3a3]/20 ${
-          isMenuOpen ? 'translate-x-0' : 'translate-x-full'
-        } lg:hidden`}
+        className={`fixed top-0 right-0 h-screen w-[80%] bg-[#1C1C18] text-[#e6d3a3] p-4 z-50 transform transition-transform duration-300 border-2 border-[#3b3b34]/50 shadow-sm shadow-[#e6d3a3]/20 ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'
+          } lg:hidden`}
       >
         <Link href={'/user/profile'} onClick={() => setIsMenuOpen(false)}>
           <div className="flex justify-between mb-10 cursor-pointer gap-4 py-3 px-6 bg-[#525248] rounded-lg border border-[#3b3b34]/50 items-center">
@@ -219,11 +219,10 @@ function SideNav() {
                   key={item.name}
                   href={item.href}
                   onClick={() => setIsMenuOpen(false)}
-                  className={`block px-4 py-2 rounded transition ${
-                    isActive(item.href)
+                  className={`block px-4 py-2 rounded transition ${isActive(item.href)
                       ? 'bg-[#3b3b34]'
                       : 'hover:bg-[#2a2a25] hover:border-2 hover:border-[#3b3b34]/50'
-                  } flex items-center gap-3`}
+                    } flex items-center gap-3`}
                 >
                   <Icon size={20} />
                   {item.name}
