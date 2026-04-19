@@ -43,6 +43,11 @@ app
   });
 
 app.route('/me').get(async (req: Request, res: Response) => {
+  if (!req.session.user) {
+    res.status(401).send();
+    return;
+  }
+
   res.status(200).json({
     sessionData: req.session.user,
   });

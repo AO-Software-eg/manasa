@@ -14,16 +14,10 @@ export default async function proxy(request: NextRequest) {
       }});
 
       console.log(res.data);
-      if (res.data.sessionData) {
-        url.pathname = '/';
-        return NextResponse.redirect(url);
-      }
-    } catch (err: any) {
-      console.log(err);
-
-      // An error occured, redirect to home
       url.pathname = '/';
       return NextResponse.redirect(url);
+    } catch (err: any) {
+      console.log(err);
     }
   }
 
