@@ -1,10 +1,32 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { api } from './app/(marketing)/hooks/api';
 
-// This function can be marked `async` if using `await` inside
-export default function proxy(request: NextRequest) {
+export default async function proxy(request: NextRequest) {
   const url = request.nextUrl.clone();
-  console.log(url);
+
+  const cookie = request.cookies.get('connect.sid');
+  if (cookie) {
+    // The cookie could be for an invalid session, check /me to know if we are logged in
+    try {
+      const res = await api.get('/me', { headers: {
+        'Cookie': `connect.sid=${cookie.value}`
+      }});
+
+      console.log(res.data);
+      if (res.data.sessionData) {
+        url.pathname = '/';
+        return NextResponse.redirect(url);
+      }
+    } catch (err: any) {
+      console.log(err);
+
+      // An error occured, redirect to home
+      url.pathname = '/';
+      return NextResponse.redirect(url);
+    }
+  }
+
   return NextResponse.rewrite(url);
 }
 
