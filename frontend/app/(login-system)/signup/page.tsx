@@ -74,6 +74,7 @@ function Page() {
 
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const onsubmit = async (data: Infer) => {
     console.log('valid data', data);
@@ -201,7 +202,7 @@ function Page() {
             </label>
             <input
               {...form.register('password')}
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               id="password"
               name="password"
               minLength={6}
@@ -236,22 +237,22 @@ function Page() {
             </label>
             <input
               {...form.register('confirmPassword')}
-              type="password"
+              type={showConfirmPassword ? 'text' : 'password'}
               id="confirmPassword"
               name="confirmPassword"
               className="rounded-lg bg-[#1C1C18] w-full outline-none text-[#e6d3a3] border-2 border-[#e6d3a3] p-2"
             />
-            {showPassword ? (
+            {showConfirmPassword ? (
               <EyeOff
                 size={20}
                 className="absolute top-1/2 left-3 -translate-y-1/2 cursor-pointer text-[#e6d3a3]"
-                onClick={() => setShowPassword(false)}
+                onClick={() => setShowConfirmPassword(false)}
               />
             ) : (
               <Eye
                 size={20}
                 className="absolute top-1/2 left-3 -translate-y-1/2 cursor-pointer text-[#e6d3a3]"
-                onClick={() => setShowPassword(true)}
+                onClick={() => setShowConfirmPassword(true)}
               />
             )}
             {form.formState.errors.password && (
