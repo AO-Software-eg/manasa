@@ -1,9 +1,11 @@
 import WhyUs from './sections/WhyUs';
 import HeroSec from './sections/HeroSec';
 import YearSec from './sections/YearSec';
-import Courses from './sections/Courses';
+
 import Cta from './sections/Cta';
 import Testimonials from './sections/Testimonials';
+import { lazy } from 'react';
+const Courses = lazy(() => import('./sections/Courses'));
 
 export default function Home() {
   return (

@@ -184,3 +184,16 @@ form div p {
     scrollbar-color: var(--sb-thumb-color) var(--sb-track-color);
   }
 }
+
+
+.truncate-text {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  line-height: 1.6;
+  max-height: calc(1.6em * 4); /* مهم جدًا */
+}

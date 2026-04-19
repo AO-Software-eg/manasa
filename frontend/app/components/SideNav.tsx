@@ -65,9 +65,11 @@ function SideNav() {
         <Link href={'/user/profile'}>
           <div className="flex justify-between mb-10 cursor-pointer gap-4 py-3 px-6 bg-[#525248] rounded-lg border border-[#3b3b34]/50 items-center">
             <div className="flex flex-col ">
-              {
+              <h1 className=' max-w-30 text-nowrap overflow-hidden text-ellipsis '>
+                  {
                 loggedIn && userData ? userData.name : '...'
               }
+              </h1>
               <h2 className="text-sm text-white max-w-30 text-nowrap overflow-hidden text-ellipsis">
                 مدرس تاريخ
               </h2>

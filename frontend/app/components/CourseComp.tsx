@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import ExpandableText from './EcalpsedTxt';
 
 type Course = {
   id: string;
@@ -32,9 +33,7 @@ function CourseComp({ imageUrl, title, id, description, price, tags }: Course) {
         <h1 className="text-3xl md:text-4xl font-bold mb-4 text-[#e6d3a3] leading-tight">
           {title}
         </h1>
-        <h2 className="text-lg md:text-xl text-[#e6d3a3]/90 leading-relaxed mb-6">
-          {description}
-        </h2>
+        <ExpandableText text={description} />
         <p className="text-2xl font-bold text-white mb-6">{price}</p>
         <Link href={`/user/courses/${id}`}>
           <button className="w-full px-6 mb-5 py-4 rounded-xl text-xl font-semibold bg-[#e6d3a3] hover:bg-[#d4c38c] text-white shadow-xl hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300 cursor-pointer">
