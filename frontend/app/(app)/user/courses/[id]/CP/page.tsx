@@ -2,7 +2,9 @@
 
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import CourseAssetAccordion, { CourseAsset } from '@/app/components/CourseAssetAccordion';
+import CourseAssetAccordion, {
+  CourseAsset,
+} from '@/app/components/CourseAssetAccordion';
 import { courses } from '@/data/courses';
 import BackButton from '@/app/components/BackBtn';
 
@@ -44,8 +46,9 @@ export default function CoursePage() {
         type: 'lesson',
         duration: '45 دقيقة',
         description: 'مقدمة عن موضوع الدرس الأول وأهم المفاهيم الأساسية',
-        content: 'يتناول هذا الدرس الأساسيات المهمة التي ستحتاجها في هذا الكورس. سنغطي المفاهيم الأساسية والمصطلحات الرئيسية.',
-        videoUrl: '#',
+        content:
+          'يتناول هذا الدرس الأساسيات المهمة التي ستحتاجها في هذا الكورس. سنغطي المفاهيم الأساسية والمصطلحات الرئيسية.',
+        videoUrl: `/user/courses/${courseId}/videos/1`,
       },
       {
         id: '2',
@@ -67,8 +70,9 @@ export default function CoursePage() {
         type: 'lesson',
         duration: '50 دقيقة',
         description: 'تطبيق عملي للمفاهيم التي تم تعلمها في الحصة الأولى',
-        content: 'في هذا الدرس سنطبق ما تعلمناه عمليًا من خلال أمثلة واقعية وتمارين تفاعلية.',
-        videoUrl: '#',
+        content:
+          'في هذا الدرس سنطبق ما تعلمناه عمليًا من خلال أمثلة واقعية وتمارين تفاعلية.',
+        videoUrl: `/user/courses/${courseId}/videos/2`,
       },
       {
         id: '5',

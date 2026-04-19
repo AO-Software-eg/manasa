@@ -5,8 +5,10 @@ import Link from 'next/link';
 import { Cairo } from 'next/font/google';
 import { FormEvent } from 'react';
 import { toast } from 'sonner';
-import { api } from '../hooks/api';
+import { api } from '../../(marketing)/hooks/api';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { Eye, EyeOff } from 'lucide-react';
 
 const cairo = Cairo({
   subsets: ['arabic'],
@@ -15,6 +17,7 @@ const cairo = Cairo({
 
 function page() {
   const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
 
   const onsubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -61,12 +64,29 @@ function page() {
             <label htmlFor="password" className="block text-[#e6d3a3] mb-2">
               كلمة المرور
             </label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              className="bg-[#1C1C18] rounded-lg w-full  outline-none  text-[#e6d3a3] placeholder:text-[#e6d3a3] border-2 border-[#e6d3a3] p-2 placeholder:opacity-70"
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                id="password"
+                name="password"
+                onKeyUp={() => setShowPassword(false)}
+                className="bg-[#1C1C18] rounded-lg w-full  outline-none  text-[#e6d3a3] placeholder:text-[#e6d3a3] border-2 border-[#e6d3a3] p-2 placeholder:opacity-70"
+              />
+              {showPassword ? (
+                <EyeOff
+                  size={20}
+                  className="absolute top-1/2 left-3 -translate-y-1/2 cursor-pointer text-[#e6d3a3]"
+                  onClick={() => setShowPassword(false)}
+                />
+              ) : (
+                <Eye
+                  size={20}
+                  className="absolute top-1/2 left-3 -translate-y-1/2 cursor-pointer text-[#e6d3a3]"
+                  onClick={() => setShowPassword(true)}
+                />
+              )}
+            </div>
+
             <span className="text-sm text-[#e6d3a3] mt-2 block">
               هل نسيت كلمة السر ؟{' '}
               <a href="/forgot-password" className="text-[#e6d3a3] underline">

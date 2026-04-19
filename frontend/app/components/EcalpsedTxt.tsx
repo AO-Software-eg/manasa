@@ -7,7 +7,9 @@ export default function ExpandableText({ text }: { text: string }) {
 
   return (
     <div>
-      <p className={`text-lg text-gray-300 py-6 ${!expanded ? 'truncate-text' : ''}`}>
+      <p
+        className={`text-lg text-gray-300 py-6 ${!expanded ? 'truncate-text' : ''}`}
+      >
         {text}
       </p>
 

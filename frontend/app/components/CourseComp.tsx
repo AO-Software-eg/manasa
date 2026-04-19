@@ -13,7 +13,7 @@ type Course = {
 
 function CourseComp({ imageUrl, title, id, description, price, tags }: Course) {
   return (
-    <div className="w-full flex flex-col text-right rounded-2xl bg-[#e6d3a3]/20 overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-500 hover:scale-[1.02] border border-[#e6d3a3]/20">
+    <div className="w-full max-h-fit flex flex-col text-right rounded-2xl bg-[#e6d3a3]/20 overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-500 hover:scale-[1.02] border border-[#e6d3a3]/20">
       <div className="w-full h-64 relative">
         <div className="absolute inset-0 animate-pulse bg-[#e6d3a3] rounded-t-2xl" />
         {imageUrl && (

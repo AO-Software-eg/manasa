@@ -78,10 +78,6 @@ function Header() {
     }
   };
 
-  if (isLoading) {
-    return <header>Loading...</header>;
-  }
-
   return (
     <>
       {!isUserPage && (
@@ -140,25 +136,33 @@ function Header() {
                   ))}
                 </div>
                 <div className="flex gap-2">
-                  {
-                    loggedIn ? (
-                    <button className="px-4 cursor-pointer py-2 bg-[#3b3b34] rounded-lg text-sm hover:bg-[#5a5a52] transition" onClick={() => setIsMenuOpen(false)}>
+                  {loggedIn ? (
+                    <button
+                      className="px-4 cursor-pointer py-2 bg-[#3b3b34] rounded-lg text-sm hover:bg-[#5a5a52] transition"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
                       <Link href={'/user'}>اذهب الى التطبيق</Link>
-                     
-                    </button>    
-                    )
-                      : (
-                        <><Link href={'/login'} onClick={() => setIsMenuOpen(false)}>
-                          <button className="px-4 cursor-pointer py-2 bg-[#3b3b34] rounded-lg text-sm hover:bg-[#5a5a52] transition">
-                            تسجيل الدخول
-                          </button>
-                        </Link><Link href={'/signup'} onClick={() => setIsMenuOpen(false)}>
-                            <button className="px-4 cursor-pointer py-2 bg-none border-2 border-[#e6d3a3] box-border rounded-lg text-sm hover:bg-[#5a5a52] transition">
-                              إنشاء حساب
-                            </button>
-                          </Link></>
-                      )
-                  }
+                    </button>
+                  ) : (
+                    <>
+                      <Link
+                        href={'/login'}
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <button className="px-4 cursor-pointer py-2 bg-[#3b3b34] rounded-lg text-sm hover:bg-[#5a5a52] transition">
+                          تسجيل الدخول
+                        </button>
+                      </Link>
+                      <Link
+                        href={'/signup'}
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <button className="px-4 cursor-pointer py-2 bg-none border-2 border-[#e6d3a3] box-border rounded-lg text-sm hover:bg-[#5a5a52] transition">
+                          إنشاء حساب
+                        </button>
+                      </Link>
+                    </>
+                  )}
                 </div>
               </motion.div>
             )}

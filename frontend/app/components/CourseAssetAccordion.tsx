@@ -21,7 +21,9 @@ interface CourseAssetAccordionProps {
   assets: CourseAsset[];
 }
 
-export default function CourseAssetAccordion({ assets }: CourseAssetAccordionProps) {
+export default function CourseAssetAccordion({
+  assets,
+}: CourseAssetAccordionProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const toggleExpand = (id: string) => {
@@ -95,7 +97,9 @@ export default function CourseAssetAccordion({ assets }: CourseAssetAccordionPro
                 {asset.title}
               </h3>
               {asset.duration && (
-                <span className="text-sm text-[#e6d3a3]/70">{asset.duration}</span>
+                <span className="text-sm text-[#e6d3a3]/70">
+                  {asset.duration}
+                </span>
               )}
             </div>
 

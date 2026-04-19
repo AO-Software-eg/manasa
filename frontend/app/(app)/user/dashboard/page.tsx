@@ -129,20 +129,19 @@ export const dashboardData = {
 };
 
 function page() {
-
   const { loggedIn, isLoading, userData } = useAuth();
 
   return (
     <div className="lg:grid flex flex-col lg:grid-cols-3  lg:col-span-3 gap-4 w-full">
       <CardLayout classname="col-span-1 lg:col-span-3 bg-linear-to-r from-[#1C1C18]/80 via-[#2a2a25]/80 to-[#3b3b34]/80 backdrop-blur-sm border-[#3b3b34]/50 text-transparent bg-clip-text">
         <h1 className="text-3xl font-bold">
-            {
-        loggedIn && userData ? ( 
-          <span className='text-white'>
-            مرحباً، <span className='text-[#e6d3a3]'> {userData.name} !</span>
-          </span>
-         ) : 'لوحة التحكم'
-      }
+          {loggedIn && userData ? (
+            <span className="text-white">
+              مرحباً، <span className="text-[#e6d3a3]"> {userData.name} !</span>
+            </span>
+          ) : (
+            'لوحة التحكم'
+          )}
         </h1>
       </CardLayout>
       {dashboardData.stats.map((card) => (

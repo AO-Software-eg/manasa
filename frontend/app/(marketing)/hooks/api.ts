@@ -9,11 +9,13 @@ export const api = axios.create({
 export async function getSessionData(): Promise<Object | null> {
   try {
     const res = await api.get('/me', {
-      withCredentials: true
+      withCredentials: true,
     });
 
     if (!res.data.sessionData) {
-      throw new Error('Invalid /me response, status 200 but session data is undefined.');
+      throw new Error(
+        'Invalid /me response, status 200 but session data is undefined.',
+      );
     }
 
     return res.data.sessionData;

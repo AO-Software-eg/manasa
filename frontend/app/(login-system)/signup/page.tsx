@@ -25,7 +25,7 @@ import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 
-import { api } from '../hooks/api';
+import { api } from '@/app/hooks/api';
 
 const cairo = Cairo({ subsets: ['arabic'], weight: ['400', '700'] });
 
@@ -82,7 +82,6 @@ function Page() {
       toast.success('تم إنشاء الحساب بنجاح!');
       form.reset();
       router.push('/login');
-
     } catch (err) {
       console.error(err);
       toast.error('حدث خطأ اثناء انشاء الحساب');

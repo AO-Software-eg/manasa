@@ -1,4 +1,3 @@
-
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { api } from './app/(marketing)/hooks/api';
@@ -32,22 +31,16 @@ export default async function proxy(request: NextRequest) {
     if (loggedIn) {
       url.pathname = '/user';
       return NextResponse.redirect(url);
-      
     }
-    
-  } else if (url.pathname.startsWith('/user') ) {
+  } else if (url.pathname.startsWith('/user')) {
     if (!loggedIn) {
       url.pathname = '/login';
       return NextResponse.redirect(url);
     }
   }
 
-
-
   return NextResponse.rewrite(url);
 }
-
-
 
 export const config = {
   matcher: ['/login', '/user/:path*', '/signup'],
