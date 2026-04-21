@@ -3,16 +3,19 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import fs from 'fs/promises';
 import z, { ZodError } from 'zod';
+import jwt from 'jsonwebtoken';
 
 import { hashPassword, verifyPassword } from './hash.ts';
 import * as db from './database.ts';
 import * as validation from './validation.ts';
-import { sessionObject } from './session.ts';
+import * as auth from './auth.ts'
+import cookieParser from 'cookie-parser'
 
 const app = express();
+app.use(cookieParser());
 
 if (!process.env.FRONTEND_LOCAL_URL) {
-  throw new Error('Frontend server URL not set, no authorized origin.');
+  throw new Error('Frontend server URL not set in environment variables, no authorized origin.');
 }
 
 app.use(
@@ -21,7 +24,6 @@ app.use(
     credentials: true,
   }),
 );
-app.use(sessionObject);
 
 // Routes
 app
@@ -47,14 +49,17 @@ app
   });
 
 app.route('/me').get(async (req: Request, res: Response) => {
-  if (!req.session.user) {
+  if (!req.cookies.user_token) {
     res.status(401).send();
-    return;
   }
 
-  res.status(200).json({
-    sessionData: req.session.user,
-  });
+  try {
+    const payload = auth.verifyToken(req.cookies.user_token);
+    res.status(200).send();
+  } catch (err: any) {
+    res.status(401).send();
+  }
+
 });
 
 app
@@ -108,13 +113,6 @@ app
       return;
     }
 
-    if (req.session.user) {
-      res.status(400).json({
-        message: 'User is already logged in',
-      });
-      return;
-    }
-
     try {
       const data = req.body;
       validation.loginSchema.parse(data);
@@ -134,11 +132,17 @@ app
         return;
       }
 
-      req.session.user = {
+      const token = auth.signToken({
         id: user.id,
         name: user.name,
-        email: user.email,
-      };
+        email: user.email
+      });
+
+      res.cookie('user_token', token, {
+        httpOnly: true,
+        sameSite: 'strict',
+        secure: process.env.NODE_ENV == 'production',
+      });
     } catch (err) {
       if (err instanceof ZodError) {
         res.status(400).json({
