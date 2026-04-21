@@ -11,9 +11,13 @@ import { sessionObject } from './session.ts';
 
 const app = express();
 
+if (!process.env.FRONTEND_LOCAL_URL) {
+  throw new Error('Frontend server URL not set, no authorized origin.');
+}
+
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: process.env.FRONTEND_LOCAL_URL,
     credentials: true,
   }),
 );
