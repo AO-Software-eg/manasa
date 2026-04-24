@@ -189,6 +189,24 @@ app.route('/course/:courseId').get(async (req: Request, res: Response) => {
   return res.status(200).json('Yay response');
 });
 
+<<<<<<< Updated upstream
+=======
+app.route('/course/:courseId').get(async (req: Request, res: Response) => {
+  const courseId = req.params.courseId;
+
+  if (typeof courseId !== 'string') {
+    return res.status(401).json({ message: 'Invalid course ID paramater' });
+  }
+  if (/^\d+$/.test(courseId) === false) {
+    return res.status(401).json({ message: 'Invalid course ID paramater' });
+  }
+
+  db.getCourseById(Number(courseId));
+
+  return res.status(200).json('Yay response');
+});
+
+>>>>>>> Stashed changes
 app.route('/video/:videoId').get(async (req: Request, res: Response) => {
   if (!req.cookies.user_token) {
     return res.status(401).json({ message: 'Unauthorized' });
