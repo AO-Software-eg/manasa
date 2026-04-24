@@ -73,7 +73,7 @@ app.route('/me').get(async (req: Request, res: Response) => {
       name: payload.name,
     };
 
-    res.status(200).json(JSON.stringify(data));
+    res.status(200).json(data);
   } catch (err: any) {
     res.status(401).send();
   }
