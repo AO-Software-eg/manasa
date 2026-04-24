@@ -160,8 +160,6 @@ app
     res.status(200).send();
   });
 
-app.route('/course/:courseId').get(async (req: Request, res: Response) => {});
-
 app.route('/video/:videoId').get(async (req: Request, res: Response) => {
   if (!req.cookies.user_token) {
     return res.status(401).json({ message: 'Unauthorized' });
