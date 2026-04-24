@@ -101,7 +101,7 @@ app
 
       const passwordHash = await hashPassword(data.password);
       const user: db.User = {
-        id: -1, // Doesn't matter, database creates the id
+        id: '', // Doesn't matter, database creates the id
         email: data.email,
         name: data.name,
         studentPhone: data.studentPhone,
