@@ -196,32 +196,34 @@ function Page() {
           </div>
 
           {/* Password */}
-          <div className="mb-4 relative">
+          <div className="mb-4 ">
             <label htmlFor="password" className="block text-[#e6d3a3] mb-2">
               كلمة المرور
             </label>
-            <input
-              {...form.register('password')}
-              type={showPassword ? 'text' : 'password'}
-              id="password"
-              name="password"
-              minLength={6}
-              className="rounded-lg bg-[#1C1C18] w-full outline-none text-[#e6d3a3] placeholder:text-[#e6d3a3] border-2 border-[#e6d3a3] p-2 placeholder:opacity-70"
-              placeholder="كلمة المرور (6 أحرف على الأقل)"
-            />
-            {showPassword ? (
-              <EyeOff
-                size={20}
-                className="absolute top-1/2 left-3 -translate-y-1/2 cursor-pointer text-[#e6d3a3]"
-                onClick={() => setShowPassword(false)}
+            <div className=" w-full relative flex items-center justify-center">
+              <input
+                {...form.register('password')}
+                type={showPassword ? 'text' : 'password'}
+                id="password"
+                name="password"
+                minLength={6}
+                className="rounded-lg bg-[#1C1C18] w-full outline-none text-[#e6d3a3] placeholder:text-[#e6d3a3] border-2 border-[#e6d3a3] p-2 placeholder:opacity-70"
+                placeholder="كلمة المرور (6 أحرف على الأقل)"
               />
-            ) : (
-              <Eye
-                size={20}
-                className="absolute top-1/2 left-3 -translate-y-1/2 cursor-pointer text-[#e6d3a3]"
-                onClick={() => setShowPassword(true)}
-              />
-            )}
+              {showPassword ? (
+                <EyeOff
+                  size={20}
+                  className="absolute top-1/2 left-3 -translate-y-1/2 cursor-pointer text-[#e6d3a3]"
+                  onClick={() => setShowPassword(false)}
+                />
+              ) : (
+                <Eye
+                  size={20}
+                  className="absolute top-1/2 left-3 -translate-y-1/2 cursor-pointer text-[#e6d3a3]"
+                  onClick={() => setShowPassword(true)}
+                />
+              )}
+            </div>
             {form.formState.errors.password && (
               <p>{form.formState.errors.password?.message}</p>
             )}
@@ -235,26 +237,28 @@ function Page() {
             >
               تأكيد كلمة المرور
             </label>
-            <input
-              {...form.register('confirmPassword')}
-              type={showConfirmPassword ? 'text' : 'password'}
-              id="confirmPassword"
-              name="confirmPassword"
-              className="rounded-lg bg-[#1C1C18] w-full outline-none text-[#e6d3a3] border-2 border-[#e6d3a3] p-2"
-            />
-            {showConfirmPassword ? (
-              <EyeOff
-                size={20}
-                className="absolute top-1/2 left-3 -translate-y-1/2 cursor-pointer text-[#e6d3a3]"
-                onClick={() => setShowConfirmPassword(false)}
+            <div className=" w-full relative flex items-center justify-center">
+              <input
+                {...form.register('confirmPassword')}
+                type={showConfirmPassword ? 'text' : 'password'}
+                id="confirmPassword"
+                name="confirmPassword"
+                className="rounded-lg bg-[#1C1C18] w-full outline-none text-[#e6d3a3] border-2 border-[#e6d3a3] p-2"
               />
-            ) : (
-              <Eye
-                size={20}
-                className="absolute top-1/2 left-3 -translate-y-1/2 cursor-pointer text-[#e6d3a3]"
-                onClick={() => setShowConfirmPassword(true)}
-              />
-            )}
+              {showConfirmPassword ? (
+                <EyeOff
+                  size={20}
+                  className="absolute top-1/2 left-3 -translate-y-1/2 cursor-pointer text-[#e6d3a3]"
+                  onClick={() => setShowConfirmPassword(false)}
+                />
+              ) : (
+                <Eye
+                  size={20}
+                  className="absolute top-1/2 left-3 -translate-y-1/2 cursor-pointer text-[#e6d3a3]"
+                  onClick={() => setShowConfirmPassword(true)}
+                />
+              )}
+            </div>
             {form.formState.errors.password && (
               <p>{form.formState.errors.password?.message}</p>
             )}
@@ -277,7 +281,7 @@ function Page() {
             </Link>
           </span>
         </form>
-      </div>
+      </div >
 
       <div className="right-sec w-full hidden lg:block">
         <Image
@@ -288,7 +292,7 @@ function Page() {
           className="w-full h-auto"
         />
       </div>
-    </section>
+    </section >
   );
 }
 
@@ -578,11 +582,10 @@ function PhoneInput({
                   key={c}
                   type="button"
                   onClick={() => handleCountrySelect(c)}
-                  className={`w-full text-left flex items-center justify-between px-3 py-2 text-sm cursor-pointer hover:bg-[#2a2a25] transition-colors ${
-                    c === selectedCountry
-                      ? 'bg-[#2a2a25] text-[#e6d3a3]'
-                      : 'text-[#e6d3a3]/80'
-                  }`}
+                  className={`w-full text-left flex items-center justify-between px-3 py-2 text-sm cursor-pointer hover:bg-[#2a2a25] transition-colors ${c === selectedCountry
+                    ? 'bg-[#2a2a25] text-[#e6d3a3]'
+                    : 'text-[#e6d3a3]/80'
+                    }`}
                 >
                   <span className="font-medium">{c}</span>
                   <span className="text-[#e6d3a3]/50">

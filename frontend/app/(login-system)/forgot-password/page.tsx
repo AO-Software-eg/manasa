@@ -54,7 +54,7 @@ export default function Page() {
   return (
     <div
       dir="rtl"
-      className={`min-h-screen flex items-center justify-center bg-[${BG}] text-[${GOLD}] p-6 ${cairo.className}`}
+      className={`min-h-screen mt-15 flex items-center justify-center bg-[${BG}] text-[${GOLD}] p-6 ${cairo.className}`}
     >
       <div className="w-full max-w-md space-y-6">
         {/* Step Indicator */}
