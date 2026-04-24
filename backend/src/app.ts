@@ -57,7 +57,23 @@ app.route('/me').get(async (req: Request, res: Response) => {
 
   try {
     const payload = auth.verifyToken(req.cookies.user_token);
-    res.status(200).send();
+    if (!payload.id) {
+      throw new Error('Expected id in token.');
+    }
+    if (!payload.name) {
+      throw new Error('Expected name in token.');
+    }
+    if (!payload.email) {
+      throw new Error('Expected email in token.');
+    }
+
+    const data = {
+      id: payload.id,
+      email: payload.email,
+      name: payload.name,
+    };
+
+    res.status(200).json(JSON.stringify(data));
   } catch (err: any) {
     res.status(401).send();
   }
