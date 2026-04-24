@@ -103,11 +103,7 @@ export async function getCourseById(id: number) {
 
   validation.courseSchema.parse(row);
 
-  const course: Course = row;
-
-  console.log(course);
-
-  return null;
+  return row;
 }
 
 export default db;
