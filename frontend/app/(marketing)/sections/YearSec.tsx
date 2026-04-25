@@ -1,12 +1,45 @@
+'use client';
+
+import { useEffect, useRef } from 'react';
+import { annotate } from 'rough-notation';
 import YearBox from '../../components/YearBox';
 import { ScrollArea, ScrollBar } from '../../../ui/scroll-area';
 
 function YearSec() {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    if (!sectionRef.current || !titleRef.current) return;
+
+    const annotation = annotate(titleRef.current, {
+      type: 'underline',
+      color: '#e6d3a3',
+      strokeWidth: 3,
+    });
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          annotation.show();
+        }
+      },
+      { threshold: 0.4 }
+    );
+
+    observer.observe(sectionRef.current);
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <section className="w-full relative bg-[#0d0d0d] py-16 md:py-24 ">
+    <section
+      ref={sectionRef}
+      className="w-full relative bg-[#0d0d0d] py-16 md:py-24"
+    >
       <div className="container mx-auto px-4 md:px-8 max-w-7xl">
         <h1 className="text-5xl md:text-6xl font-bold text-center mb-16 text-[#e6d3a3] leading-tight">
-          السنوات الدراسية
+          <span ref={titleRef}>السنوات الدراسية</span>
         </h1>
 
         <ScrollArea className="w-full lg:w-11/12 mx-auto rounded-2xl border border-[#e6d3a3]/20 bg-[#e6d3a3]/10 backdrop-blur-md shadow-2xl hover:shadow-3xl transition-all duration-300">
@@ -21,9 +54,10 @@ function YearSec() {
               <YearBox year="ثالثة ثانوي" link="g3" />
             </div>
           </div>
+
           <ScrollBar
             orientation="horizontal"
-            className="[&amp;_track]:bg-[#e6d3a3]/20 [&amp;_thumb]:bg-[#e6d3a3]/70 hover:[&amp;_thumb]:bg-[#e6d3a3]/90 h-2 rounded-full transition-all duration-200"
+            className="[&_track]:bg-[#e6d3a3]/20 [&_thumb]:bg-[#e6d3a3]/70 hover:[&_thumb]:bg-[#e6d3a3]/90 h-2 rounded-full transition-all duration-200"
           />
         </ScrollArea>
       </div>

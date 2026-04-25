@@ -17,7 +17,6 @@ export default function Courses() {
       <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-10">
         {courses.map((course) => (
           <CourseComp
-            Loading={loading}
             key={course.id}
             id={course.id}
             title={course.title}

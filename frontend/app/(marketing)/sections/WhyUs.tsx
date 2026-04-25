@@ -1,4 +1,6 @@
-import React from 'react';
+'use client';
+
+import React, { useEffect, useRef } from 'react';
 import {
   BookOpen,
   Headphones,
@@ -8,6 +10,7 @@ import {
   Users,
   Target,
 } from 'lucide-react';
+import { annotate } from 'rough-notation';
 
 const reasons = [
   {
@@ -49,15 +52,57 @@ const reasons = [
 ];
 
 function WhyUs() {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLSpanElement>(null);
+  const descRef = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    if (!sectionRef.current || !titleRef.current || !descRef.current) return;
+
+    const titleAnnotation = annotate(titleRef.current, {
+      type: 'underline',
+      color: '#e6d3a3',
+      strokeWidth: 3,
+    });
+
+    const descAnnotation = annotate(descRef.current, {
+      type: 'highlight',
+      color: '#e6d3a3',
+    });
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          titleAnnotation.show();
+          setTimeout(() => descAnnotation.show(), 300); // sequence
+        }
+      },
+      { threshold: 0.4 }
+    );
+
+    observer.observe(sectionRef.current);
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <section className="w-full py-24 px-6 flex flex-col items-center">
+    <section
+      ref={sectionRef}
+      className="w-full py-24 px-6 flex flex-col items-center"
+    >
       {/* Title */}
       <div className="text-center max-w-2xl mb-16">
         <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-          لماذا تختارنا؟
+          لماذا{' '}
+          <span ref={titleRef}>تختارنا؟</span>
         </h1>
-        <p className="text-gray-400 text-lg">
-          منصة تعليمية متكاملة تساعدك على فهم التاريخ بطريقة حديثة وفعالة ,مع دعم مستمر ومحتوى عالي الجودة يناسب جميع المستويات.
+
+        <p className="text-white/70 text-lg mt-10">
+          منصة تعليمية{' '}
+          <span ref={descRef}>
+            متكاملة تساعدك على فهم التاريخ بطريقة حديثة وفعالة
+          </span>{' '}
+          ، مع دعم مستمر ومحتوى عالي الجودة يناسب جميع المستويات.
         </p>
       </div>
 
@@ -71,17 +116,14 @@ function WhyUs() {
               className="group bg-white/5 border border-white/10 rounded-2xl p-6 
               hover:bg-white/10 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl"
             >
-              {/* Icon */}
               <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-[#e6d3a3]/20 mb-4">
                 <Icon className="text-[#e6d3a3]" size={24} />
               </div>
 
-              {/* Title */}
               <h3 className="text-xl font-bold text-white mb-2">
                 {reason.title}
               </h3>
 
-              {/* Description */}
               <p className="text-gray-400 leading-relaxed text-sm">
                 {reason.description}
               </p>

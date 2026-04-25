@@ -71,6 +71,7 @@ app.route('/me').get(async (req: Request, res: Response) => {
       id: payload.id,
       email: payload.email,
       name: payload.name,
+      year: payload.year,
     };
 
     res.status(200).json(data);
