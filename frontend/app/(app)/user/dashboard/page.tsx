@@ -3,27 +3,8 @@ import CardLayout from '@/app/components/CardLayout';
 import { ChevronLeft } from 'lucide-react';
 import { useAuth } from './../../../hooks/useAuth';
 import RecentActivityCard from '@/app/components/RecentActivityCard';
-import { Span } from 'next/dist/trace';
 
-const activityData = [
-  {
-    id: 1,
-    text: 'سارة محمود أكملت اختبار الفلسفة بنجاح',
-    time: 'منذ 5 دقائق',
-  },
-  {
-    id: 2,
-    text: 'طالب جديد انضم لكورس تاريخ مصر القديمة',
-    time: 'منذ 10 دقائق',
-  },
-  {
-    id: 3,
-    text: 'ليلى عمر سجلت في كورس جديد',
-    time: 'منذ ساعة',
-  },
-];
-
-const popularCourses = [
+const subscribedCourses = [
   {
     id: 1,
     title: 'الفلسفة اليونانية: العقل والمنطق',
@@ -40,16 +21,16 @@ const popularCourses = [
   },
   {
     id: 3,
-    title: 'الفلسفة اليونانية: العقل والمنطق',
-    lessons: 12,
-    level: 'المستوى المتقدم',
+    title: 'مقدمة في علم النفس السلوكي',
+    lessons: 18,
+    level: 'المستوى المبتدئ',
     image: 'https://ytgu3s3xxa.ufs.sh/f/GNGTKtuqz7dpN7hTMsp8yEIH9Fkio41AhsfSRzt5p3POKvbB',
   },
   {
     id: 4,
-    title: 'تاريخ مصر القديمة: عصر الأهرام',
-    lessons: 30,
-    level: 'المستوى المتوسط',
+    title: 'الرياضيات المتقدمة: التفاضل والتكامل',
+    lessons: 25,
+    level: 'المستوى المتقدم',
     image: 'https://ytgu3s3xxa.ufs.sh/f/GNGTKtuqz7dpN7hTMsp8yEIH9Fkio41AhsfSRzt5p3POKvbB',
   },
 ];
@@ -57,50 +38,48 @@ const popularCourses = [
 export const dashboardData = {
   stats: [
     {
-      id: 'revenue',
-      title: 'الأرباح',
-      value: '٢٠٠ ج.م',
-      change: '+23%',
-      icon: 'money',
+      id: 'progress',
+      title: 'نسبة التقدم',
+      value: '٦٨٪',
+      change: '+5%',
+      icon: 'progress',
       className: 'col-span-1',
     },
     {
       id: 'courses',
-      title: 'عدد الكورسات',
-      value: '٢٤',
+      title: 'الكورسات المسجلة',
+      value: '٦',
       change: 'نشاطك',
       icon: 'courses',
       className: 'col-span-1',
     },
     {
-      id: 'students',
-      title: 'الطلاب',
-      value: '١,٢٨٤',
-      change: '+12%',
-      icon: 'users',
+      id: 'certificates',
+      title: 'الشهادات المكتسبة',
+      value: '٣',
+      change: '+١ جديدة',
+      icon: 'certificate',
       className: 'col-span-1',
     },
   ],
 
-  
-
   courses: {
     id: 'coursesList',
-    title: 'المقررات الأكثر تفاعلاً',
+    title: 'كورساتي المسجل بها',
     className: 'col-span-1 lg:col-span-1',
     items: [
       {
         id: 1,
         title: 'الفلسفة اليونانية: العقل والمنطق',
         lessons: 10,
-        students: 120,
+        progress: 70,
         level: 'متوسط',
       },
       {
         id: 2,
         title: 'تاريخ مصر القديمة: عصر الأهرام',
         lessons: 12,
-        students: 95,
+        progress: 45,
         level: 'مبتدئ',
       },
     ],
@@ -135,7 +114,7 @@ function page() {
         <div className="flex flex-col gap-6">
           {/* Header */}
           <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-semibold">المقررات الأكثر تفاعلاً</h1>
+            <h1 className="text-2xl font-semibold">كورساتي المسجل بها</h1>
 
             <a className="flex flex-row-reverse items-center gap-1 hover:underline group cursor-pointer">
               <ChevronLeft className="group-hover:-translate-x-1 transition-all" />
@@ -145,7 +124,7 @@ function page() {
 
           {/* Cards */}
           <div className="flex flex-col gap-4 max-h-80 overflow-y-scroll ">
-            {popularCourses.map((course) => (
+            {subscribedCourses.map((course) => (
               <CardLayout
                 key={course.id}
                 classname="flex items-center  justify-between p-4 rounded-2xl bg-[#1a1a1a] hover:bg-[#222] transition"
@@ -179,7 +158,7 @@ function page() {
           </div>
         </div>
 
-        <RecentActivityCard title=""  />
+        <RecentActivityCard title="" />
       </div>
     </div>
   );

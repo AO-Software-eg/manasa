@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '../hooks/useAuth';
+import { api } from '../hooks/api';
 import {
   Menu,
   BellRing,
@@ -27,7 +28,7 @@ const navGroups = [
     label: 'القائمة الرئيسية',
     items: [
       { name: 'الرئيسية', href: '/user/dashboard', icon: Home },
-      { name: 'الدروس', href: '/user/courses', icon: BookOpen, badge: '12' },
+      { name: 'الدروس', href: '/user/courses', icon: BookOpen , badge: true},
       { name: 'المحفظة', href: '/user/wallet', icon: Wallet },
       { name: 'التاريخ', href: '/user/history', icon: Clock },
     ],
@@ -50,7 +51,11 @@ const socialLinks = [
 
 function UserAvatar({ name }: { name: string }) {
   const initials = name
-    ? name.split(' ').slice(0, 2).map((w) => w[0]).join('')
+    ? name
+      .split(' ')
+      .slice(0, 2)
+      .map((w) => w[0])
+      .join('')
     : '؟';
   return (
     <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-[#3d3928] to-[#5a5032] flex items-center justify-center text-[#e6d3a3] text-sm font-bold flex-shrink-0">
@@ -59,7 +64,13 @@ function UserAvatar({ name }: { name: string }) {
   );
 }
 
-function SideNav({collapsed , setCollapsed}: { collapsed: boolean; setCollapsed: React.Dispatch<React.SetStateAction<boolean>> }) {
+function SideNav({
+  collapsed,
+  setCollapsed,
+}: {
+  collapsed: boolean;
+  setCollapsed: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
   const { loggedIn, userData } = useAuth();
   const path = usePathname();
 
@@ -71,13 +82,32 @@ function SideNav({collapsed , setCollapsed}: { collapsed: boolean; setCollapsed:
 
   const isActive = (href: string) => path.startsWith(href);
   const userName = loggedIn && userData ? userData.name : '...';
+  const [courses, setCourses] = useState<{ id: number; title: string }[] | null>(null);
+  const coursesCount = courses?.length || 0;
+
+  useEffect(() => {
+    async function fetchCourses() {
+      try {
+        const res = await api.get('/courses');
+        setCourses(res.data.data);
+
+      } catch (error) {
+        console.error('Error fetching courses:', error);
+      }
+    }
+
+    fetchCourses();
+  }, []);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setIsMenuOpen(false);
       }
-      if (notifRef.current && !notifRef.current.contains(event.target as Node)) {
+      if (
+        notifRef.current &&
+        !notifRef.current.contains(event.target as Node)
+      ) {
         setIsNotifOpen(false);
       }
     }
@@ -89,7 +119,9 @@ function SideNav({collapsed , setCollapsed}: { collapsed: boolean; setCollapsed:
     <>
       {/* ─── Desktop Header ─── */}
       <header className="hidden lg:flex fixed top-0 right-0 left-0 z-50 h-12 bg-[#141412] border-b border-[#1f1f1c] items-center justify-between px-4">
-        <span className="text-[#e6d3a3] font-semibold text-sm">منصة التعلم</span>
+        <span className="text-[#e6d3a3] font-semibold text-sm">
+          منصة التعلم
+        </span>
         <div className="flex items-center gap-1">
           <button className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-[#1c1c18] text-[#9a9080] hover:text-[#e6d3a3] transition-colors">
             <Search size={18} />
@@ -106,9 +138,8 @@ function SideNav({collapsed , setCollapsed}: { collapsed: boolean; setCollapsed:
 
       {/* ─── Desktop Sidebar ─── */}
       <aside
-        className={`relative hidden lg:flex flex-col h-screen  pt-12 bg-[#141412] text-[#e6d3a3] border-l border-[#1f1f1c] transition-all duration-300 ${
-          collapsed ? 'w-[68px]' : 'w-[230px]'
-        }`}
+        className={`relative hidden lg:flex flex-col h-screen  pt-12 bg-[#141412] text-[#e6d3a3] border-l border-[#1f1f1c] transition-all duration-300 ${collapsed ? 'w-[68px]' : 'w-[230px]'
+          }`}
       >
         {/* Collapse toggle */}
         <button
@@ -123,21 +154,17 @@ function SideNav({collapsed , setCollapsed}: { collapsed: boolean; setCollapsed:
         <div className="p-3 border-b border-[#1f1f1c]">
           <Link href="/user/profile">
             <div
-              className={`flex items-center gap-2.5 p-2.5 rounded-xl bg-[#1c1c18] border border-[#2a2a22] cursor-pointer hover:bg-[#222219] transition-colors ${
-                collapsed ? 'justify-center' : ''
-              }`}
+              className={`flex items-center gap-2.5 p-2.5 rounded-xl cursor-pointer hover:bg-[#222219] transition-colors ${collapsed ? 'justify-center' : 'bg-[#1c1c18] border border-[#2a2a22] '
+                }`}
             >
               <UserAvatar name={userName} />
               {!collapsed && (
-                <>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[13px] font-semibold text-[#e6d3a3] truncate leading-tight">
-                      {userName}
-                    </p>
-                    <p className="text-[11px] text-[#7a7060] mt-0.5">طالب مميز</p>
-                  </div>
-                  <div className="w-2 h-2 rounded-full bg-green-400 flex-shrink-0 shadow-[0_0_6px_rgba(74,222,128,0.4)]" />
-                </>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[13px] font-semibold text-[#e6d3a3] truncate leading-tight">
+                    {userName}
+                  </p>
+                  <p className="text-[11px] text-[#7a7060] mt-0.5">طالب مميز</p>
+                </div>
               )}
             </div>
           </Link>
@@ -160,22 +187,26 @@ function SideNav({collapsed , setCollapsed}: { collapsed: boolean; setCollapsed:
                     <li key={item.href}>
                       <Link
                         href={item.href}
-                        className={`relative flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium transition-all ${
-                          collapsed ? 'justify-center' : ''
-                        } ${
-                          active
+                        className={`relative flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium transition-all ${collapsed ? 'justify-center' : ''
+                          } ${active
                             ? 'bg-[#252520] text-[#e6d3a3]'
                             : 'text-[#7a7060] hover:bg-[#1c1c18] hover:text-[#c4b48a]'
-                        }`}
+                          }`}
                       >
                         {active && (
                           <span className="absolute right-0 top-1/2 -translate-y-1/2 w-[3px] h-[18px] bg-[#c4a95a] rounded-r-none rounded-l-sm" />
                         )}
-                        <Icon size={17} className="flex-shrink-0" strokeWidth={active ? 2.2 : 1.8} />
-                        {!collapsed && <span className="flex-1">{item.name}</span>}
+                        <Icon
+                          size={17}
+                          className="flex-shrink-0"
+                          strokeWidth={active ? 2.2 : 1.8}
+                        />
+                        {!collapsed && (
+                          <span className="flex-1">{item.name}</span>
+                        )}
                         {!collapsed && item.badge && (
                           <span className="bg-[#2a2820] text-[#c4a95a] text-[10px] font-semibold px-1.5 py-0.5 rounded-full">
-                            {item.badge}
+                            {coursesCount}
                           </span>
                         )}
                       </Link>
@@ -214,7 +245,9 @@ function SideNav({collapsed , setCollapsed}: { collapsed: boolean; setCollapsed:
           <Menu size={20} />
         </button>
 
-        <span className="text-[#e6d3a3] font-semibold text-sm">منصة التعلم</span>
+        <span className="text-[#e6d3a3] font-semibold text-sm">
+          منصة التعلم
+        </span>
 
         <div className="flex items-center gap-1">
           <button className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-[#1c1c18] text-[#9a9080] hover:text-[#e6d3a3] transition-colors">
@@ -238,7 +271,9 @@ function SideNav({collapsed , setCollapsed}: { collapsed: boolean; setCollapsed:
             className="bg-[#141412] w-[90%] max-w-sm rounded-2xl border border-[#2a2a22] shadow-2xl overflow-hidden"
           >
             <div className="flex items-center justify-between px-4 py-3 border-b border-[#1f1f1c]">
-              <h2 className="text-[#e6d3a3] font-semibold text-sm">الإشعارات</h2>
+              <h2 className="text-[#e6d3a3] font-semibold text-sm">
+                الإشعارات
+              </h2>
               <button
                 onClick={() => setIsNotifOpen(false)}
                 className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#1c1c18] text-[#7a7060] hover:text-[#e6d3a3] transition-colors"
@@ -264,9 +299,8 @@ function SideNav({collapsed , setCollapsed}: { collapsed: boolean; setCollapsed:
       {/* ─── Mobile Sidebar Drawer ─── */}
       <aside
         ref={menuRef}
-        className={`fixed top-0 right-0 h-screen w-[80%] max-w-[280px] bg-[#141412] text-[#e6d3a3] z-50 flex flex-col transform transition-transform duration-300 ease-out ${
-          isMenuOpen ? 'translate-x-0' : 'translate-x-full'
-        } lg:hidden`}
+        className={`fixed top-0 right-0 h-screen w-[80%] max-w-[280px] bg-[#141412] text-[#e6d3a3] z-50 flex flex-col transform transition-transform duration-300 ease-out ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'
+          } lg:hidden`}
       >
         {/* Drawer header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-[#1f1f1c]">
@@ -280,7 +314,9 @@ function SideNav({collapsed , setCollapsed}: { collapsed: boolean; setCollapsed:
             <div className="flex items-center gap-2.5 bg-[#1c1c18] px-3 py-2 rounded-xl border border-[#2a2a22]">
               <UserAvatar name={userName} />
               <div>
-                <p className="text-[13px] font-semibold text-[#e6d3a3] leading-tight">{userName}</p>
+                <p className="text-[13px] font-semibold text-[#e6d3a3] leading-tight">
+                  {userName}
+                </p>
                 <p className="text-[11px] text-[#7a7060]">طالب مميز</p>
               </div>
             </div>
@@ -303,20 +339,19 @@ function SideNav({collapsed , setCollapsed}: { collapsed: boolean; setCollapsed:
                       <Link
                         href={item.href}
                         onClick={() => setIsMenuOpen(false)}
-                        className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all ${
-                          active
+                        className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all ${active
                             ? 'bg-[#252520] text-[#e6d3a3]'
                             : 'text-[#7a7060] hover:bg-[#1c1c18] hover:text-[#c4b48a]'
-                        }`}
+                          }`}
                       >
                         {active && (
                           <span className="absolute right-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-[#c4a95a] rounded-r-none rounded-l-sm" />
                         )}
                         <Icon size={18} strokeWidth={active ? 2.2 : 1.8} />
                         <span className="flex-1">{item.name}</span>
-                        {item.badge && (
+                        { item.badge && coursesCount > 0 && (
                           <span className="bg-[#2a2820] text-[#c4a95a] text-[10px] font-semibold px-1.5 py-0.5 rounded-full">
-                            {item.badge}
+                            {coursesCount}
                           </span>
                         )}
                       </Link>
