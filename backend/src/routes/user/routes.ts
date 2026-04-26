@@ -85,6 +85,11 @@ router
         id: user.id,
         name: user.name,
         email: user.email,
+        year: user.year,
+        specialization: user.specialization,
+        studentphone: user.studentPhone,
+        governorate: user.governorate,
+
       });
 
       res.cookie('user_token', token, {
@@ -110,7 +115,7 @@ router
 
 router.route('/logout').post(async (req: Request, res: Response) => {
   if (!req.cookies.user_token) {
-    res.status(401).json({ message: 'No login token found' });
+     res.status(401).json({ message: 'No login token found' });
   }
 
   res.cookie('user_token', '', {
@@ -123,7 +128,7 @@ router.route('/logout').post(async (req: Request, res: Response) => {
 
 router.route('/me').get(async (req: Request, res: Response) => {
   if (!req.cookies.user_token) {
-    res.status(401).send();
+      res.status(401).send(); // end the request , return was not added
   }
 
   try {
@@ -138,16 +143,21 @@ router.route('/me').get(async (req: Request, res: Response) => {
       throw new Error('Expected email in token.');
     }
 
+
+
     const data = {
       id: payload.id,
       email: payload.email,
       name: payload.name,
       year: payload.year,
+      specialization: payload.specialization,
+      studentPhone: payload.studentphone,
+      governorate: payload.governorate,
     };
 
     res.status(200).json(data);
   } catch (err: any) {
-    res.status(401).send();
+     res.status(401).send();
   }
 });
 
