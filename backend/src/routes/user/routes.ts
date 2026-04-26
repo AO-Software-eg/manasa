@@ -42,8 +42,8 @@ router
         passwordHash: passwordHash,
       };
 
-      db.insertUser(user);
     } catch (err) {
+      await db.insertUser(user);
       console.log(err);
       res.status(400).send();
       return;
