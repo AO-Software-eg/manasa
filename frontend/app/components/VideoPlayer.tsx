@@ -8,7 +8,7 @@ export default function VideoPlayer() {
 
   useEffect(() => {
     async function loadVideo() {
-      const res = await api.get('/video/2d076a459fca4e82a5f68bbb25a51fce', {
+      const res = await api.get('/videos/2d076a459fca4e82a5f68bbb25a51fce', {
         withCredentials: true,
       });
 
