@@ -108,6 +108,19 @@ router
     res.status(200).send();
   });
 
+router.route('/logout').post(async (req: Request, res: Response) => {
+  if (!req.cookies.user_token) {
+    res.status(401).json({ message: 'No login token found' });
+  }
+
+  res.cookie('user_token', '', {
+    expires: new Date(0),
+    path: '/',
+  });
+
+  res.status(200).json({ message: 'Logged out successfully' });
+});
+
 router.route('/me').get(async (req: Request, res: Response) => {
   if (!req.cookies.user_token) {
     res.status(401).send();
