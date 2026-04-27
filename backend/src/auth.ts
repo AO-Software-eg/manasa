@@ -7,7 +7,7 @@ if (!process.env.TOKEN_SECRET_KEY) {
 const TOKEN_SECRET_KEY: string = process.env.TOKEN_SECRET_KEY;
 
 type JwtPayload = {
-  userId: string;
+  id: string;
   email?: string;
   name?: string;
 };

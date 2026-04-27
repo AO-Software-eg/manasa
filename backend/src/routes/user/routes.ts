@@ -77,7 +77,7 @@ router
       }
 
       const token = auth.signToken({
-        userId: user.id,
+        id: user.id,
         name: user.name,
         email: user.email,
       });
