@@ -87,6 +87,7 @@ router
         secure: true,
         sameSite: 'none',
         path: '/',
+        expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
       });
     } catch (err) {
       if (err instanceof ZodError) {
