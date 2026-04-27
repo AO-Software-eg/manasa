@@ -126,6 +126,10 @@ router.route('/me').get(async (req: Request, res: Response) => {
     }
 
     const user: db.User | null = await db.getUserByEmail(payload.email);
+    if (user?.passwordHash) {
+      user.passwordHash = '';
+    }
+
     if (!user) {
       return res.status(500).json({ message: 'User not found' });
     }
