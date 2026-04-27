@@ -1,47 +1,31 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { api } from './app/(marketing)/hooks/api';
 
-async function isLoggedIn(request: NextRequest): Promise<boolean> {
-  const sessionCookie = request.cookies.get('user_token');
-
-  if (sessionCookie) {
-    try {
-      const res = await api.get('/me', {
-        headers: {
-          Cookie: `user_token=${sessionCookie.value}`,
-        },
-      });
-
-      return true;
-    } catch (err: any) {
-      console.log(err);
-      return false;
-    }
-  }
-
-  return false;
+function isLoggedIn(request: NextRequest): boolean {
+  return !!request.cookies.get('user_token');
 }
 
-export default async function proxy(request: NextRequest) {
+export default function middleware(request: NextRequest) {
   const url = request.nextUrl.clone();
-  const loggedIn = await isLoggedIn(request);
+  const loggedIn = isLoggedIn(request);
 
-  if (url.pathname == '/login' || url.pathname == '/signup') {
+  if (url.pathname === '/login' || url.pathname === '/signup') {
     if (loggedIn) {
       url.pathname = '/user';
       return NextResponse.redirect(url);
     }
-  } else if (url.pathname.startsWith('/user')) {
+  }
+
+  if (url.pathname.startsWith('/user')) {
     if (!loggedIn) {
       url.pathname = '/login';
       return NextResponse.redirect(url);
     }
   }
 
-  return NextResponse.rewrite(url);
+  return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/login', '/user/:path*', '/signup'],
+  matcher: ['/login', '/signup', '/user/:path*'],
 };
