@@ -30,13 +30,13 @@ function AIInsights() {
       </p>
 
       <div className="text-sm flex flex-col gap-2">
-        <p>
+        <p className='text-white'>
            <span className="text-[#e6d3a3]">أضعف أسبوع:</span> {weakest.week}
         </p>
-        <p>
+        <p className='text-white'>
            <span className="text-[#e6d3a3]">التقدير:</span> {weakest.grade}%
         </p>
-        <p>
+        <p className='text-white'>
            <span className="text-[#e6d3a3]">نصيحة:</span> راجع الدرس المرتبط
           بهذا الأسبوع + حل تمارين إضافية
         </p>
