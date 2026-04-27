@@ -51,7 +51,7 @@ export async function getImageLink(name: string): Promise<string | null> {
   return row?.link ?? null;
 }
 
-export async function getUserByEmail(email: string): Promise<User | null> {
+export async function getUserByEmail(email: string): Promise<User> {
   const query = 'SELECT * FROM users WHERE email = $1';
   const values = [email];
 
