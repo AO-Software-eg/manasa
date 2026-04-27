@@ -84,8 +84,10 @@ router
 
       res.cookie('user_token', token, {
         httpOnly: true,
-        sameSite: 'strict',
-        secure: process.env.NODE_ENV == 'production',
+        secure: true,
+        sameSite: 'none',
+        path: '/',
+        expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
       });
     } catch (err) {
       if (err instanceof ZodError) {
@@ -105,12 +107,13 @@ router.route('/logout').post(async (req: Request, res: Response) => {
   if (!req.cookies.user_token) {
     return res.status(401).json({ message: 'No login token found' });
   }
-
   res.cookie('user_token', '', {
     expires: new Date(0),
+    httpOnly: true,
+    secure: true,
+    sameSite: 'none',
     path: '/',
   });
-
   return res.status(200).json({ message: 'Logged out successfully' });
 });
 
@@ -133,7 +136,7 @@ router.route('/me').get(async (req: Request, res: Response) => {
     return res.status(200).json(user);
   } catch (err: any) {
     if (err instanceof db.RowNotFoundError) {
-      res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: 'User not found' });
     }
     return res.status(500).send();
   }

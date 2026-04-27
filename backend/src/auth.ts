@@ -6,17 +6,31 @@ if (!process.env.TOKEN_SECRET_KEY) {
 
 const TOKEN_SECRET_KEY: string = process.env.TOKEN_SECRET_KEY;
 
-export function signToken(payload: object) {
-  const token = jwt.sign(payload, TOKEN_SECRET_KEY);
-  return token;
+type JwtPayload = {
+  id: string;
+  email?: string;
+  name?: string;
+};
+
+export function signToken(payload: JwtPayload) {
+  return jwt.sign(payload, TOKEN_SECRET_KEY, {
+    expiresIn: '7d',
+    algorithm: 'HS256',
+  });
 }
 
-// Also returns the decoded payload
-export function verifyToken(token: string) {
-  const payload = jwt.verify(token, TOKEN_SECRET_KEY);
-  if (typeof payload === 'string') {
-    // We should only use objects, enforce
-    throw new Error('JWT payload is a string, expected an object.');
+export function verifyToken(token: string): JwtPayload {
+  try {
+    const payload = jwt.verify(token, TOKEN_SECRET_KEY, {
+      algorithms: ['HS256'],
+    });
+
+    if (typeof payload === 'string') {
+      throw new Error('Invalid token payload');
+    }
+
+    return payload as JwtPayload;
+  } catch (err) {
+    throw new Error('Invalid or expired token');
   }
-  return payload;
 }

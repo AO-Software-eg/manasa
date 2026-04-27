@@ -7,18 +7,26 @@ import apiRouter from './routes/index.ts';
 const app = express();
 app.use(cookieParser());
 
-if (!process.env.FRONTEND_LOCAL_URL) {
-  throw new Error(
-    'Frontend server URL not set in environment variables, no authorized origin.',
-  );
-}
+const allowedOrigins = [
+  process.env.FRONTEND_LOCAL_URL,
+  'http://localhost:3000',
+];
 
 app.use(
   cors({
-    origin: process.env.FRONTEND_LOCAL_URL,
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     credentials: true,
   }),
 );
+
+
+app.use(express.json());
 
 app.use('/', apiRouter);
 
