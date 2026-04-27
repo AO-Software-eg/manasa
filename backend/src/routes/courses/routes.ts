@@ -11,7 +11,7 @@ router.route('/').get(async (req: Request, res: Response) => {
       .json({ message: 'Courses retrieval successful', data: courses });
   } catch (err: any) {
     console.log(err);
-    res.status(500).send();
+    return res.status(500).send();
   }
 });
 
@@ -33,7 +33,7 @@ router.route('/:courseId').get(async (req: Request, res: Response) => {
     return res.status(200).json({ message: 'Found course', data: course });
   } catch (err: any) {
     console.log(err);
-    res.status(500).send();
+    return res.status(500).send();
   }
 });
 
@@ -59,7 +59,7 @@ router.route('/:courseId/lectures').get(async (req: Request, res: Response) => {
       .json({ message: 'Found course lectures', data: lectures });
   } catch (err: any) {
     console.log(err);
-    res.status(500).send();
+    return res.status(500).send();
   }
 });
 
