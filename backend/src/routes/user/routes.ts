@@ -126,29 +126,16 @@ router.route('/me').get(async (req: Request, res: Response) => {
 
   try {
     const payload = auth.verifyToken(req.cookies.user_token);
-    if (!payload.id) {
-      throw new Error('Expected id in token.');
-    }
-    if (!payload.name) {
-      throw new Error('Expected name in token.');
-    }
     if (!payload.email) {
-      throw new Error('Expected email in token.');
+      return res.status(500).json({ message: 'Email not found in token' });
     }
 
+    const user: db.User | null = await db.getUserByEmail(payload.email);
+    if (!user) {
+      return res.status(500).json({ message: 'User not found' });
+    }
 
-
-    const data = {
-      id: payload.id,
-      email: payload.email,
-      name: payload.name,
-      year: payload.year,
-      specialization: payload.specialization,
-      studentPhone: payload.studentphone,
-      governorate: payload.governorate,
-    };
-
-    return res.status(200).json(data);
+    return res.status(200).json(user);
   } catch (err: any) {
     return res.status(500).send();
   }
