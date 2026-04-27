@@ -51,6 +51,14 @@ export async function getImageLink(name: string): Promise<string | null> {
   return row?.link ?? null;
 }
 
+export async function isUserFound(email: string): Promise<boolean> {
+  const query = 'SELECT 1 FROM users WHERE email = $1';
+  const values = [email];
+
+  const res = await db.query(query, values);
+  return res.rowCount != 0;
+}
+
 export async function getUserByEmail(email: string): Promise<User> {
   const query = 'SELECT * FROM users WHERE email = $1';
   const values = [email];
