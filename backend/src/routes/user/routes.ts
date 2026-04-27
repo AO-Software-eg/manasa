@@ -80,11 +80,6 @@ router
         id: user.id,
         name: user.name,
         email: user.email,
-        year: user.year,
-        specialization: user.specialization,
-        studentphone: user.studentPhone,
-        governorate: user.governorate,
-
       });
 
       res.cookie('user_token', token, {
