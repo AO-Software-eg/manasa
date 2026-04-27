@@ -5,7 +5,9 @@ import '../../globals.css';
 import { Cairo } from 'next/font/google';
 import { AuthProvider } from '@/context/AuthContext';
 import Chatbot from '@/app/components/Chatbot';
-import { useState } from 'react';
+import { useState , useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { api } from '@/app/hooks/api';
 
 const cairo = Cairo({
   subsets: ['arabic'],
@@ -18,6 +20,16 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const [collapsed, setCollapsed] = useState(false);
+    const router = useRouter();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api.get('/me')
+      .then(() => setLoading(false))
+      .catch(() => router.replace('/login'));
+  }, []);
+
+  if (loading) return <div>Loading...</div>;
 
   return (
     <div
