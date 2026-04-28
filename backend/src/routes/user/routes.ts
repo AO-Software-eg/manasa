@@ -23,7 +23,7 @@ router
       const userExists: boolean = await db.isUserFound(data.email);
       if (userExists) {
         return res.status(400).json({
-          message: 'User already exists',
+          message: 'المستخدم موجود بالفعل',
         });
       }
 
@@ -47,7 +47,9 @@ router
       if (err instanceof ZodError) {
         return res.status(400).send();
       } else {
-        return res.status(500).send();
+           return res.status(500).json({
+          message: err instanceof Error ? err.message : 'حدث خطأ ما !',
+        });
       }
     }
   });
@@ -66,13 +68,13 @@ router
       const user: db.User | null = await db.getUserByEmail(data.email);
       if (!user) {
         return res.status(404).json({
-          message: 'User does not exist',
+          message: 'المستخدم غير موجود',
         });
       }
 
       if ((await verifyPassword(user.passwordHash, data.password)) == false) {
         return res.status(400).json({
-          message: 'Incorrect password',
+          message: 'كلمة سر غير صحيحه',
         });
       }
 
@@ -91,11 +93,13 @@ router
     } catch (err) {
       if (err instanceof ZodError) {
         return res.status(400).json({
-          message: 'Invalid login data',
+          message: 'بيانات غير صحيحه',
         });
       } else {
         console.log(err);
-        return res.status(500).send();
+        return res.status(500).json({
+          message: err instanceof Error ? err.message : 'حدث خطأ ما !',
+        });
       }
     }
 
@@ -104,7 +108,7 @@ router
 
 router.route('/logout').post(async (req: Request, res: Response) => {
   if (!req.cookies.user_token) {
-    return res.status(401).json({ message: 'No login token found' });
+    return res.status(401).json({ message: 'لا يوجد حساب مسجل' });
   }
 
   res.cookie('user_token', '', {
@@ -112,7 +116,7 @@ router.route('/logout').post(async (req: Request, res: Response) => {
     path: '/',
   });
 
-  return res.status(200).json({ message: 'Logged out successfully' });
+  return res.status(200).json({ message: 'تم تسجيل الخروج بنجاح' });
 });
 
 router.route('/me').get(async (req: Request, res: Response) => {
@@ -134,7 +138,7 @@ router.route('/me').get(async (req: Request, res: Response) => {
     return res.status(200).json(user);
   } catch (err: any) {
     if (err instanceof db.RowNotFoundError) {
-      res.status(404).json({ message: 'User not found' });
+      res.status(404).json({ message: 'المستخدم غير موجود' });
     }
     return res.status(500).send();
   }

@@ -13,7 +13,7 @@ export class DataIntegrityError extends Error {
 
 export class NonUniqueDataError extends DataIntegrityError {
   constructor(resultCount: number) {
-    super(`Expected one or zero results from query, but got ${resultCount}`);
+    super(`متوقع نتيجة واحدة أو لا شيء من الاستعلام، ولكن تم العثور على ${resultCount}`);
   }
 }
 
@@ -68,7 +68,7 @@ export async function getUserByEmail(email: string): Promise<User> {
     throw new NonUniqueDataError(res.rowCount);
   }
   if (res.rowCount == 0) {
-    throw new RowNotFoundError(`User with email ${email} was not found`);
+    throw new RowNotFoundError(`المستخدم ذو البريد الإلكتروني ${email} غير موجود`);
   }
 
   const row = res.rows[0];
@@ -114,7 +114,7 @@ export async function getCourseById(id: number): Promise<Course> {
     throw new NonUniqueDataError(res.rowCount);
   }
   if (res.rowCount == 0) {
-    throw new RowNotFoundError(`Course with ID ${id} not found`);
+    throw new RowNotFoundError(`الدورة التدريبية ذات المعرف ${id} غير موجودة`);
   }
 
   const row = res.rows[0];
@@ -141,7 +141,7 @@ export async function getCourseLectures(courseId: number): Promise<Lecture[]> {
 
   const existsRes = await db.query(existsQuery, existsQueryValues);
   if (existsRes.rowCount == 0) {
-    throw new RowNotFoundError(`Course with ID ${courseId} not found`);
+    throw new RowNotFoundError(`الدورة التدريبية ذات المعرف ${courseId} غير موجودة`);
   }
 
   const query = 'SELECT * FROM lectures WHERE course_id=$1';
@@ -163,7 +163,7 @@ export async function getLectureVideos(
 
   const existsRes = await db.query(existsQuery, existsQueryValues);
   if (existsRes.rowCount == 0) {
-    throw new RowNotFoundError(`Lecture with ID ${lectureId} not found`);
+    throw new RowNotFoundError(`المحاضرة ذات المعرف ${lectureId} غير موجودة`);
   }
 
   const query = 'SELECT * FROM lecture_videos WHERE lecture_id=$1';

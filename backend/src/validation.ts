@@ -39,7 +39,6 @@ export const lectureSchema = z.object({
 export const lectureVideoSchema = z.object({
   id: z.string(),
   lecture_id: z.string(),
-
   title: z.string(),
   video_id: z.string(),
 });
