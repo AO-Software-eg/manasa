@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Cairo } from 'next/font/google';
 import { FormEvent } from 'react';
 import { toast } from 'sonner';
-import { api } from '../../(marketing)/hooks/api';
+import { api } from '../../hooks/api';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';

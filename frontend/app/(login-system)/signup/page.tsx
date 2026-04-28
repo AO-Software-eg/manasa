@@ -85,9 +85,12 @@ function Page() {
       toast.success('تم إنشاء الحساب بنجاح!');
       form.reset();
       router.push('/login');
-    } catch (err) {
-      console.error(err);
-      toast.error('حدث خطأ اثناء انشاء الحساب');
+    } catch (err: any) {
+      console.log(err.response?.data?.message );
+
+      const message = err.response?.data?.message || 'حدث خطأ أثناء الدخول';
+
+      toast.error(message);
     }
   };
 

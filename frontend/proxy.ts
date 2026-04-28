@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { api } from './app/(marketing)/hooks/api';
+import { api } from './app/hooks/api';
 
 async function isLoggedIn(request: NextRequest): Promise<boolean> {
   const sessionCookie = request.cookies.get('user_token');
