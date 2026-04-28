@@ -19,7 +19,7 @@ export async function getSessionData(): Promise<Object | null> {
     }
 
     return res.data.sessionData;
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.log(err);
 
     return null;

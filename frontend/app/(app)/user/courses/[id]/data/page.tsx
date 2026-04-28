@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { api } from '@/app/hooks/api';
 import BackButton from '@/app/components/BackBtn';
+import { lecture } from '@/types';
 
 export default function CoursePage() {
   const params = useParams();
@@ -15,7 +16,7 @@ export default function CoursePage() {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [assets, setAssets] = useState<any>([]);
+  const [assets, setAssets] = useState<lecture[]>([]);
 
   useEffect(() => {
     const fetchCourses = async () => {

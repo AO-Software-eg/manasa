@@ -55,7 +55,7 @@ function Header() {
   const menuRef = useRef<HTMLDivElement>(null);
   const path = usePathname();
   const isUserPage = path.startsWith('/user');
-  const { loggedIn, isLoading, userData } = useAuth();
+  const { loggedIn } = useAuth();
 
 
 

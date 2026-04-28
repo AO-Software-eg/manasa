@@ -2,17 +2,18 @@
 
 import { useEffect, useState, createContext } from 'react';
 import { api } from '@/app/hooks/api';
+import { userData } from '@/types';
 
 type AuthContextType = {
   loggedIn: boolean | null;
-  setLoggedIn: (value: boolean) => void;
   isLoading: boolean;
   userData?: any;
 };
 
+
+
 export const AuthContext = createContext<AuthContextType>({
   loggedIn: null,
-  setLoggedIn: () => {},
   isLoading: true,
   userData: undefined,
 });
@@ -20,13 +21,13 @@ export const AuthContext = createContext<AuthContextType>({
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loggedIn, setLoggedIn] = useState<boolean | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [userData, setUserData] = useState<any>(null);
+  const [userData, setUserData] = useState<userData>();
 
   useEffect(() => {
     const authCheck = async () => {
       try {
         const res = await api.get('/me');
-        console.log('res:', res.data); 
+        console.log('res:', res.data);
         console.log('loggedIn:', !!res.data);
         setUserData(res.data);
         setLoggedIn(!!res.data);
@@ -35,7 +36,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setLoggedIn(false);
       } finally {
         setIsLoading(false);
-        console.log('isLoading set to false'); // does this run?
       }
     };
     authCheck();
@@ -43,7 +43,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <AuthContext.Provider
-      value={{ loggedIn, setLoggedIn, isLoading, userData }}
+      value={{ loggedIn, isLoading, userData }}
     >
       {children}
     </AuthContext.Provider>

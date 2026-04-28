@@ -77,7 +77,7 @@ function WhyUs() {
           setTimeout(() => descAnnotation.show(), 300); // sequence
         }
       },
-      { threshold: 0.4 }
+      { threshold: 0.4 },
     );
 
     observer.observe(sectionRef.current);
@@ -93,8 +93,7 @@ function WhyUs() {
       {/* Title */}
       <div className="text-center max-w-2xl mb-16">
         <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-          لماذا{' '}
-          <span ref={titleRef}>تختارنا؟</span>
+          لماذا <span ref={titleRef}>تختارنا؟</span>
         </h1>
 
         <p className="text-white/70 text-lg mt-10">
@@ -113,8 +112,7 @@ function WhyUs() {
           return (
             <div
               key={index}
-              className="group bg-white/5 border border-white/10 rounded-2xl p-6 
-              hover:bg-white/10 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl"
+              className="group bg-white/5 border border-white/10 rounded-2xl p-6  hover:bg-white/10 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl"
             >
               <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-[#e6d3a3]/20 mb-4">
                 <Icon className="text-[#e6d3a3]" size={24} />

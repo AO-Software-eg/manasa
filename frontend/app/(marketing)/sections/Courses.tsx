@@ -16,7 +16,7 @@ export default function Courses() {
         الكورسات
       </h1>
       <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-10">
-        {courses.map((course) => (
+        {courses && courses.map((course) => (
           <CourseComp
             key={course.id}
             id={course.id}

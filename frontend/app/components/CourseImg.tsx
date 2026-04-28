@@ -1,12 +1,11 @@
 'use client';
-import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { api } from './../hooks/api';
+import { courses } from '@/types';
 import { useCourses } from '../hooks/useCourses';
 
 export default function CourseImage({ title }: { title: string }) {
- const { courses } = useCourses();
- const course = courses.find((c: any) => c.title === title);
+  const { courses } = useCourses();
+  const course = courses?.find((c: courses) => c.title === title);
 
   return (
     <Image

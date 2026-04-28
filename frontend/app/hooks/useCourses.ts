@@ -1,9 +1,10 @@
 "use client";
 import { useEffect, useState } from 'react';
 import { api } from '@/app/hooks/api';
+import { courses } from '@/types';
 
 export function useCourses() {
-  const [courses, setCourses] = useState<any[]>([]);
+  const [courses, setCourses] = useState<courses[]>();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

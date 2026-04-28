@@ -3,7 +3,7 @@ import BackButton from '@/app/components/BackBtn';
 import ExpandableText from '@/app/components/EcalpsedTxt';
 import Link from 'next/link';
 import { api } from '@/app/hooks/api';
-
+import { courses } from '@/types';
 
 export default async function CoursePage({
   params,
@@ -14,7 +14,7 @@ export default async function CoursePage({
   const courses = res.data.data || [];
   const { id } = await params;
 
-  const course = courses.find((c: any) => c.id === id);
+  const course = courses.find((c: courses) => c.id === id);
 
   if (!course) {
     return <h1>course not found</h1>;

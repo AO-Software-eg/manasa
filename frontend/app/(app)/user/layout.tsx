@@ -31,7 +31,7 @@ export default function DashboardLayout({
 
         {/* Main */}
         <main
-          className="flex-1  mt-16 p-4 lg:h-[calc(105dvh-4rem)] lg:overflow-y-auto overflow-x-hidden"
+          className="flex-1  mt-16 p-4 lg:h-[calc(102dvh-5rem)] lg:overflow-y-auto overflow-x-hidden"
         >
           {children}
         </main>

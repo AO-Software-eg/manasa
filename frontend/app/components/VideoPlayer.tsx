@@ -1,7 +1,3 @@
-'use client';
-import { useEffect, useState } from 'react';
-
-import { api } from '@/app/hooks/api';
 
 export default function VideoPlayer({ videoData }: { videoData: any }) {
 

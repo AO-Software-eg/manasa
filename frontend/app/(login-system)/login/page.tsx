@@ -36,7 +36,7 @@ function page() {
 
       router.push(redirect);
     } catch (err: any) {
-      console.error(err);
+      console.log(err.response?.data?.message );
 
       const message = err.response?.data?.message || 'حدث خطأ أثناء الدخول';
 

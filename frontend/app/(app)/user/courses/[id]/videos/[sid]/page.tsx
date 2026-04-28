@@ -3,10 +3,11 @@ import VideoPlayer from '@/app/components/VideoPlayer';
 import { useEffect, useState } from 'react';
 import { api } from '@/app/hooks/api';
 import { useParams } from 'next/navigation';
+import { lectureVideoSchema } from '@/types';
 
 
 function page() {
-  const [videoData, setVideoData] = useState<any>(null);
+  const [videoData, setVideoData] = useState<lectureVideoSchema | null>(null);
   const { sid } = useParams();
 
   useEffect(() => {

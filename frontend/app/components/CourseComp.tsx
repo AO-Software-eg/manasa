@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 type Props = {
   id: string;
   title: string;
-  description: string;
+  description: string | null;
   price: number;
   imageUrl: string;
   instructor?: string;
