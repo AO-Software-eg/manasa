@@ -1,10 +1,10 @@
 'use client';
 import Image from 'next/image';
 import { courses } from '@/types';
-import { useCourses } from '../hooks/useCourses';
+import { useCourses } from '../hooks/queries/useCourses';
 
 export default function CourseImage({ title }: { title: string }) {
-  const { courses } = useCourses();
+  const { data: courses } = useCourses();
   const course = courses?.find((c: courses) => c.title === title);
 
   return (

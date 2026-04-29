@@ -3,7 +3,6 @@
 import SideNav from '../../components/SideNav';
 import '../../globals.css';
 import { Cairo } from 'next/font/google';
-import { AuthProvider } from '@/context/AuthContext';
 import Chatbot from '@/app/components/Chatbot';
 import { useState } from 'react';
 
@@ -23,8 +22,7 @@ export default function DashboardLayout({
     <div
       className={`min-h-screen flex bg-[#0d0d0d] text-white ${cairo.className}`}
     >
-      <AuthProvider>
-        {/* Sidebar */}
+   
         <SideNav collapsed={collapsed} setCollapsed={setCollapsed} />
 
         <Chatbot />
@@ -35,7 +33,7 @@ export default function DashboardLayout({
         >
           {children}
         </main>
-      </AuthProvider>
+    
     </div>
   );
 }

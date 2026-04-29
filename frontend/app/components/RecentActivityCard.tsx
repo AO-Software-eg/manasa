@@ -2,7 +2,6 @@
 import { ResponsiveContainer, LineChart, Line, XAxis, Tooltip } from 'recharts';
 import { TrendingUp } from 'lucide-react';
 
-// Dummy Data
 const data = [
   { week: '1', grade: 60 },
   { week: '2', grade: 72 },

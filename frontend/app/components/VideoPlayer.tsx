@@ -1,9 +1,9 @@
+type vidData = {
+  otp: string;
+  playbackInfo: string;
+};
 
-export default function VideoPlayer({ videoData }: { videoData: any }) {
-
-
-  if (!videoData) return <p>Loading...</p>;
-
+export default function VideoPlayer({ videoData }: { videoData: vidData }) {
   return (
     <iframe
       src={`https://player.vdocipher.com/v2/?otp=${videoData.otp}&playbackInfo=${videoData.playbackInfo}`}
