@@ -1,67 +1,49 @@
 'use client';
-
-import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { api } from '@/app/hooks/api';
+import { courses } from '@/types';
 import BackButton from '@/app/components/BackBtn';
 import { lecture } from '@/types';
+import { useCourses } from '@/app/hooks/queries/useCourses';
+import { useLectures } from '@/app/hooks/queries/useLectures';
+import LoadingComp from '@/app/components/LoadingComp';
 
 export default function CoursePage() {
   const params = useParams();
   const router = useRouter();
-  const [courses, setCourses] = useState<any[]>([]);
-  const courseId = params.id;
-  const course = courses.find((c) => c.id === courseId);
+  const courseId = Array.isArray(params.id) ? params.id[0] : params.id;
 
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [assets, setAssets] = useState<lecture[]>([]);
+  // ✅ hooks before any return
+  const { data: courses, isLoading: coursesLoading, isError: coursesError } = useCourses();
+  const { data: assets = [], isLoading: assetsLoading, isError: assetsError, refetch } = useLectures(courseId ?? '');
 
-  useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        const res = await api.get('/courses');
-        setCourses(res.data.data || []);
-      } catch (error) {
-        console.error('Error fetching courses:', error);
-      }
-    };
+  if (!courseId) return null;
 
-    fetchCourses();
-  }, []);
+  if (coursesLoading || assetsLoading) return <LoadingComp />;
 
-  useEffect(() => {
-    const fetchAssets = async () => {
-      if (!course) return;
-      try {
-        const res = await api.get(`/courses/${course.id}/lectures`);
-        setAssets(res.data.data || []);
-        console.log('res :', res.data);
-      } catch (error) {
-        console.error('Error fetching assets:', error);
-      }
-    };
+  if (coursesError || assetsError) return (
+    <div className="flex flex-col items-center justify-center min-h-screen gap-4">
+      <p className="text-red-500">حدث خطأ أثناء تحميل البيانات</p>
+      <button
+        onClick={() => refetch()}
+        className="px-4 py-2 bg-blue-500 text-white rounded"
+      >
+        إعادة المحاولة
+      </button>
+    </div>
+  );
 
-    fetchAssets();
-  }, [course]);
-
-  if (!course) {
-    return null;
-  }
+  const course = courses?.find((c: courses) => c.id === courseId);
+  if (!course) return null;
 
   return (
     <div className="w-full min-h-screen p-5 md:p-8">
       <div className="max-w-4xl mx-auto mt-20">
-        {/* Header Section */}
         <div className="mb-12">
           <BackButton route="/" />
           <h1 className="text-4xl md:text-5xl font-bold text-[#e6d3a3] text-right leading-tight">
             {course.title}
           </h1>
         </div>
-
-        {/* Course Assets Section */}
         <div>
           <h2 className="text-2xl md:text-3xl font-bold text-[#E5E5E5] text-right mb-8">
             محتوى الكورس
@@ -72,14 +54,12 @@ export default function CoursePage() {
                 لا توجد مواد متاحة
               </p>
             ) : (
-              assets.map((asset: any) => (
+              assets.map((asset: lecture) => (
                 <div key={asset.id}>
                   <h1>{asset.title}</h1>
                   <button
                     onClick={() =>
-                      router.push(
-                        `/user/courses/${courseId}/videos/${asset.id}`,
-                      )
+                      router.push(`/user/courses/${courseId}/videos/${asset.id}`)
                     }
                   >
                     video of {asset.title}
@@ -88,7 +68,6 @@ export default function CoursePage() {
               ))
             )}
           </div>
-          {/* <CourseAssetAccordion assets={'l'} /> */}
         </div>
       </div>
     </div>

@@ -1,35 +1,42 @@
 "use client";
+
 import VideoPlayer from '@/app/components/VideoPlayer';
-import { useEffect, useState } from 'react';
-import { api } from '@/app/hooks/api';
+import { useVideo } from '@/app/hooks/queries/useLectures';
 import { useParams } from 'next/navigation';
-import { lectureVideoSchema } from '@/types';
+import LoadingComp from '@/app/components/LoadingComp';
 
 
-function page() {
-  const [videoData, setVideoData] = useState<lectureVideoSchema | null>(null);
-  const { sid } = useParams();
 
-  useEffect(() => {
-    async function loadVideo() {
-      const res = await api.get(`/lectures/${sid}/videos`);
-      const data = res.data.data[0].video_id;
-      const vidData = await api.get(`/videos/${data}`)
-      console.log('video data:', vidData.data);
+export default function Page() {
+  const params = useParams();
+  const sid = Array.isArray(params.sid) ? params.sid[0] : params.sid;
 
-      setVideoData(vidData.data);
-    }
+  const { data: videoData, isLoading, isError, error, refetch } = useVideo(sid ?? '');
 
-    loadVideo();
-  }, []);
+  if (!sid) return null;
 
+  if (isLoading) return <LoadingComp />;
+
+  if (isError) return (
+    <div className="flex flex-col items-center justify-center min-h-screen gap-4">
+      <p className="text-red-500">
+        {error instanceof Error ? error.message : 'فشل تحميل الفيديو'}
+      </p>
+      <button
+        onClick={() => refetch()}
+        className="px-4 py-2 bg-blue-500 text-white rounded"
+      >
+        أعد المحاولة
+      </button>
+    </div>
+  );
+
+  if (!videoData) return null;
 
   return (
-    <div className=" w-full min-h-screen flex items-center justify-center flex-col gap-8">
+    <div className="w-full min-h-screen flex items-center justify-center flex-col gap-8">
       <h1>video page</h1>
       <VideoPlayer videoData={videoData} />
     </div>
   );
 }
-
-export default page;

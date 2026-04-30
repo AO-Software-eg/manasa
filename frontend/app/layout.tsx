@@ -4,8 +4,8 @@ import Header from './components/Header';
 import { Aref_Ruqaa, Geist } from 'next/font/google';
 import Footer from './components/Footer';
 import { cn } from '@/lib/utils';
+import Providers from './providers';
 import { Toaster } from '@/components/ui/sonner';
-import { AuthProvider } from '@/context/AuthContext';
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-sans' });
 
@@ -38,14 +38,14 @@ export default function RootLayout({
       )}
     >
       <body className="min-h-full flex bg-[#1C1C18]  flex-col">
-        <AuthProvider>
+        <Providers>
           <Toaster richColors position="top-right" />
           <Header />
 
           {children}
 
-          <Footer />
-        </AuthProvider>
+          <Footer /> 
+        </Providers>
       </body>
     </html>
   );

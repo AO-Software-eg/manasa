@@ -1,7 +1,6 @@
 "use client";
-
 import { useAuth } from "../hooks/useAuth";
-import { useCourses } from "../hooks/useCourses";
+import { useCourses } from "../hooks/queries/useCourses";
 import CardLayout from "./CardLayout";
 import RecentActivityCard from "./RecentActivityCard";
 import CourseComp from "./CourseComp";
@@ -9,7 +8,7 @@ import Link from "next/link";
 
 function StudentHome() {
     const { userData, isLoading } = useAuth();
-    const { courses, loading } = useCourses();
+    const { data: courses,  isLoading: Loading } = useCourses();
 
     if (isLoading) return null;
 
@@ -50,7 +49,7 @@ function StudentHome() {
                     <h2 className="text-lg text-white font-semibold">كورساتي</h2>
                 </div>
 
-                {loading ? (
+                {Loading ? (
                     <p className="text-gray-400">جاري التحميل...</p>
                 ) : courses?.length ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
