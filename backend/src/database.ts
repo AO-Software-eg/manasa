@@ -13,7 +13,9 @@ export class DataIntegrityError extends Error {
 
 export class NonUniqueDataError extends DataIntegrityError {
   constructor(resultCount: number) {
-    super(`متوقع نتيجة واحدة أو لا شيء من الاستعلام، ولكن تم العثور على ${resultCount}`);
+    super(
+      `متوقع نتيجة واحدة أو لا شيء من الاستعلام، ولكن تم العثور على ${resultCount}`,
+    );
   }
 }
 
@@ -68,7 +70,9 @@ export async function getUserByEmail(email: string): Promise<User> {
     throw new NonUniqueDataError(res.rowCount);
   }
   if (res.rowCount == 0) {
-    throw new RowNotFoundError(`المستخدم ذو البريد الإلكتروني ${email} غير موجود`);
+    throw new RowNotFoundError(
+      `المستخدم ذو البريد الإلكتروني ${email} غير موجود`,
+    );
   }
 
   const row = res.rows[0];
@@ -141,15 +145,26 @@ export async function getCourseLectures(courseId: number): Promise<Lecture[]> {
 
   const existsRes = await db.query(existsQuery, existsQueryValues);
   if (existsRes.rowCount == 0) {
-    throw new RowNotFoundError(`الدورة التدريبية ذات المعرف ${courseId} غير موجودة`);
+    throw new RowNotFoundError(
+      `الدورة التدريبية ذات المعرف ${courseId} غير موجودة`,
+    );
   }
 
-  const query = 'SELECT * FROM lectures WHERE course_id=$1';
+  const schema = validation.lectureSchema.extend({
+    videos: z.array(
+      z.object({
+        title: z.string(),
+        video_id: z.string(),
+      }),
+    ),
+  });
+
+  const query = `SELECT l.*, json_agg(json_build_object('video_id', v.video_id, 'title', v.title)) AS videos FROM lectures AS l JOIN lecture_videos as v ON v.lecture_id = l.id WHERE l.course_id = $1 GROUP BY l.id;`;
   const values = [courseId];
 
   const res = await db.query(query, values);
   for (const lecture of res.rows) {
-    validation.lectureSchema.parse(lecture);
+    schema.parse(lecture);
   }
 
   return res.rows;
