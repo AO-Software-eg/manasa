@@ -150,8 +150,6 @@ export async function getCourseLectures(courseId: number): Promise<Lecture[]> {
     );
   }
 
-  //  const query =
-  //    'SELECT l.*, v.title AS video_title, v.video_id AS video_id FROM lectures AS l JOIN lecture_videos as v ON v.lecture_id = l.id WHERE l.course_id = $1;';
   const schema = validation.lectureSchema.extend({
     videos: z.array(
       z.object({
