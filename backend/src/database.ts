@@ -220,7 +220,18 @@ export async function getExamQuestions(
     throw new RowNotFoundError(`الأمتحان ذو المعرف ${examId} غير موجود`);
   }
 
-  const query = 'SELECT * FROM questions WHERE exam_id=$1';
+  const query = `
+  SELECT q.*, 
+         COALESCE(
+           json_agg(
+             json_build_object('id', qc.id, 'choice_text', qc.choice_text)
+           ) FILTER (WHERE qc.id IS NOT NULL), '[]'
+         ) AS choices
+  FROM questions q
+  LEFT JOIN question_choices qc ON q.id = qc.question_id
+  WHERE q.exam_id = $1
+  GROUP BY q.id;
+  `;
   const values = [examId];
 
   const res = await db.query(query, values);
