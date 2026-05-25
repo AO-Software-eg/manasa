@@ -38,6 +38,7 @@ export type User = z.infer<typeof validation.userSchema>;
 export type Course = z.infer<typeof validation.courseSchema>;
 export type Lecture = z.infer<typeof validation.lectureSchema>;
 export type LectureVideo = z.infer<typeof validation.lectureVideoSchema>;
+export type ExamQuestion = z.infer<typeof validation.examQuestionSchema>;
 
 export async function getImageLink(name: string): Promise<string | null> {
   const query = 'SELECT * FROM image_links WHERE name = $1';
@@ -159,7 +160,23 @@ export async function getCourseLectures(courseId: number): Promise<Lecture[]> {
     ),
   });
 
-  const query = `SELECT l.*, json_agg(json_build_object('video_id', v.video_id, 'title', v.title)) AS videos FROM lectures AS l JOIN lecture_videos as v ON v.lecture_id = l.id WHERE l.course_id = $1 GROUP BY l.id;`;
+  const query = `
+  SELECT 
+    l.*, 
+    COALESCE(
+      json_agg(DISTINCT json_build_object('video_id', v.video_id, 'title', v.title)::jsonb) 
+      FILTER (WHERE v.id IS NOT NULL), '[]'
+    ) AS videos,
+    COALESCE(
+      json_agg(DISTINCT json_build_object('id', e.id, 'title', e.title)::jsonb)
+      FILTER (WHERE e.id IS NOT NULL), '[]'
+    ) AS exams
+  FROM lectures AS l 
+  LEFT JOIN lecture_videos AS v ON v.lecture_id = l.id
+  LEFT JOIN exams AS e ON e.lecture_id = l.id
+  WHERE l.course_id = $1 
+  GROUP BY l.id;
+  `;
   const values = [courseId];
 
   const res = await db.query(query, values);
@@ -187,6 +204,28 @@ export async function getLectureVideos(
   const res = await db.query(query, values);
   for (const video of res.rows) {
     validation.lectureVideoSchema.parse(video);
+  }
+
+  return res.rows;
+}
+
+export async function getExamQuestions(
+  examId: number,
+): Promise<ExamQuestion[]> {
+  const existsQuery = 'SELECT 1 FROM exams WHERE id=$1';
+  const existsQueryValues = [examId];
+
+  const existsRes = await db.query(existsQuery, existsQueryValues);
+  if (existsRes.rowCount == 0) {
+    throw new RowNotFoundError(`الأمتحان ذو المعرف ${examId} غير موجود`);
+  }
+
+  const query = 'SELECT * FROM questions WHERE exam_id=$1';
+  const values = [examId];
+
+  const res = await db.query(query, values);
+  for (const question of res.rows) {
+    validation.examQuestionSchema.parse(question);
   }
 
   return res.rows;
