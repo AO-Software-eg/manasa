@@ -43,9 +43,15 @@ export const lectureVideoSchema = z.object({
   video_id: z.string(),
 });
 
+export const examQuestionChoiceSchema = z.object({
+  id: z.any(),
+  choice_text: z.string(),
+});
+
 export const examQuestionSchema = z.object({
   id: z.string(),
   question: z.string(),
+  choices: examQuestionChoiceSchema.array(),
 });
 
 export const loginSchema = z.object({
