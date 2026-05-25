@@ -159,7 +159,23 @@ export async function getCourseLectures(courseId: number): Promise<Lecture[]> {
     ),
   });
 
-  const query = `SELECT l.*, json_agg(json_build_object('video_id', v.video_id, 'title', v.title)) AS videos FROM lectures AS l JOIN lecture_videos as v ON v.lecture_id = l.id WHERE l.course_id = $1 GROUP BY l.id;`;
+  const query = `
+  SELECT 
+    l.*, 
+    COALESCE(
+      json_agg(DISTINCT json_build_object('video_id', v.video_id, 'title', v.title)::jsonb) 
+      FILTER (WHERE v.id IS NOT NULL), '[]'
+    ) AS videos,
+    COALESCE(
+      json_agg(DISTINCT json_build_object('id', e.id, 'title', e.title)::jsonb)
+      FILTER (WHERE e.id IS NOT NULL), '[]'
+    ) AS exams
+  FROM lectures AS l 
+  LEFT JOIN lecture_videos AS v ON v.lecture_id = l.id
+  LEFT JOIN exams AS e ON e.lecture_id = l.id
+  WHERE l.course_id = $1 
+  GROUP BY l.id;
+  `;
   const values = [courseId];
 
   const res = await db.query(query, values);
