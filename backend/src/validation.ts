@@ -43,6 +43,11 @@ export const lectureVideoSchema = z.object({
   video_id: z.string(),
 });
 
+export const examQuestionSchema = z.object({
+  id: z.string(),
+  question: z.string(),
+});
+
 export const loginSchema = z.object({
   email: z.email(),
   password: z.string().min(MIN_PASSWORD_LENGTH),

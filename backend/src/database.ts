@@ -38,6 +38,7 @@ export type User = z.infer<typeof validation.userSchema>;
 export type Course = z.infer<typeof validation.courseSchema>;
 export type Lecture = z.infer<typeof validation.lectureSchema>;
 export type LectureVideo = z.infer<typeof validation.lectureVideoSchema>;
+export type ExamQuestion = z.infer<typeof validation.examQuestionSchema>;
 
 export async function getImageLink(name: string): Promise<string | null> {
   const query = 'SELECT * FROM image_links WHERE name = $1';
@@ -203,6 +204,28 @@ export async function getLectureVideos(
   const res = await db.query(query, values);
   for (const video of res.rows) {
     validation.lectureVideoSchema.parse(video);
+  }
+
+  return res.rows;
+}
+
+export async function getExamQuestions(
+  examId: number,
+): Promise<ExamQuestion[]> {
+  const existsQuery = 'SELECT 1 FROM exams WHERE id=$1';
+  const existsQueryValues = [examId];
+
+  const existsRes = await db.query(existsQuery, existsQueryValues);
+  if (existsRes.rowCount == 0) {
+    throw new RowNotFoundError(`الأمتحان ذو المعرف ${examId} غير موجود`);
+  }
+
+  const query = 'SELECT * FROM questions WHERE exam_id=$1';
+  const values = [examId];
+
+  const res = await db.query(query, values);
+  for (const question of res.rows) {
+    validation.examQuestionSchema.parse(question);
   }
 
   return res.rows;
