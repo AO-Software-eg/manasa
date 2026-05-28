@@ -154,6 +154,7 @@ export async function getCourseLectures(courseId: number): Promise<Lecture[]> {
   const schema = validation.lectureSchema.extend({
     videos: z.array(
       z.object({
+        id: z.number(),
         title: z.string(),
         video_id: z.string(),
       }),
@@ -164,7 +165,7 @@ export async function getCourseLectures(courseId: number): Promise<Lecture[]> {
   SELECT 
     l.*, 
     COALESCE(
-      json_agg(DISTINCT json_build_object('video_id', v.video_id, 'title', v.title)::jsonb) 
+      json_agg(DISTINCT json_build_object('id', v.id ,'video_id', v.video_id, 'title', v.title)::jsonb) 
       FILTER (WHERE v.id IS NOT NULL), '[]'
     ) AS videos,
     COALESCE(

@@ -12,7 +12,6 @@ export default function CoursePage() {
   const router = useRouter();
   const courseId = Array.isArray(params.id) ? params.id[0] : params.id;
 
-  // ✅ hooks before any return
   const { data: courses, isLoading: coursesLoading, isError: coursesError } = useCourses();
   const { data: assets = [], isLoading: assetsLoading, isError: assetsError, refetch } = useLectures(courseId ?? '');
 
@@ -55,15 +54,38 @@ export default function CoursePage() {
               </p>
             ) : (
               assets.map((asset: lecture) => (
-                <div key={asset.id}>
-                  <h1>{asset.title}</h1>
-                  <button
-                    onClick={() =>
-                      router.push(`/user/courses/${courseId}/videos/${asset.id}`)
-                    }
-                  >
-                    video of {asset.title}
-                  </button>
+                <div key={asset.id} className="flex flex-col gap-3">
+                  <h1 className="text-xl font-bold">{asset.title}</h1>
+
+                  {/* Videos */}
+                  {asset.videos.map((video) => (
+                    <button
+                      key={video.video_id}
+                      onClick={() =>
+                        router.push(
+                          `/user/courses/${courseId}/lectures/${asset.id}/videos/${video.id}`
+                        )
+                      }
+                      className="bg-blue-500 text-white px-4 py-2 rounded"
+                    >
+                      مشاهدة {video.title}
+                    </button>
+                  ))}
+
+                  {/* Exams */}
+                  {asset.exams.map((exam) => (
+                    <button
+                      key={exam.id}
+                      onClick={() =>
+                        router.push(
+                          `/user/courses/${courseId}/lectures/${asset.id}/exams/${exam.id}`
+                        )
+                      }
+                      className="bg-green-500 text-white px-4 py-2 rounded"
+                    >
+                      اختبار {exam.title}
+                    </button>
+                  ))}
                 </div>
               ))
             )}
