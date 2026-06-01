@@ -3,12 +3,13 @@
 import React, { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { annotate } from 'rough-notation';
-import { useAuth } from '@/app/hooks/useAuth';
+import { useMe } from '@/app/hooks/queries/useMe';
 
 function Cta() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLSpanElement>(null);
-  const { loggedIn } = useAuth();
+  const { data: userData, isError } = useMe();
+  const loggedIn = !isError && !!userData;
 
   useEffect(() => {
     if (!sectionRef.current || !textRef.current) return;

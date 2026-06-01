@@ -1,5 +1,6 @@
 "use client";
 import { lazy, Suspense, useEffect, useState } from "react";
+import spinnerAnimation from "@/public/Spinner.json";
 
 const Lottie = lazy(() => import("lottie-react"));
 
@@ -137,7 +138,7 @@ function LoadingComp() {
           }
         >
           <Lottie
-            animationData={require("@/public/Spinner.json")}
+            animationData={spinnerAnimation}
             loop
             autoplay
             style={{ width: 80, height: 80, filter: "sepia(1) saturate(1.5) hue-rotate(5deg) brightness(1.1)" }}

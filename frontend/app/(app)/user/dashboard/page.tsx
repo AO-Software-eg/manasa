@@ -1,7 +1,7 @@
 'use client';
 import CardLayout from '@/app/components/CardLayout';
 import { ChevronLeft } from 'lucide-react';
-import { useAuth } from './../../../hooks/useAuth';
+import { useMe } from '@/app/hooks/queries/useMe';
 import RecentActivityCard from '@/app/components/RecentActivityCard';
 
 const subscribedCourses = [
@@ -87,13 +87,14 @@ export const dashboardData = {
 };
 
 function page() {
-  const { loggedIn, isLoading, userData } = useAuth();
+  const { data: userData , isError } = useMe();
+
 
   return (
     <div className="lg:grid flex flex-col lg:grid-cols-3  lg:col-span-3 gap-4 w-full">
-      <CardLayout classname="col-span-1 lg:col-span-3 bg-linear-to-r from-[#1C1C18]/80 via-[#2a2a25]/80 to-[#3b3b34]/80 backdrop-blur-sm border-[#3b3b34]/50 text-transparent bg-clip-text">
+      <CardLayout classname="col-span-1 lg:col-span-3 bg-linear-to-r from-[#1C1C18]/80 via-[#2a2a25]/80 to-[#3b3b34]/80  border-[#3b3b34]/50 text-transparent bg-clip-text">
         <h1 className="text-3xl font-bold">
-          {loggedIn && userData ? (
+          {  userData ? (
             <span className="text-white">
               مرحباً، <span className="text-[#e6d3a3]"> {userData.name} !</span>
             </span>
@@ -117,7 +118,7 @@ function page() {
             <h1 className="text-2xl font-semibold">كورساتي المسجل بها</h1>
 
             <a className="flex flex-row-reverse items-center gap-1 hover:underline group cursor-pointer">
-              <ChevronLeft className="group-hover:-translate-x-1 transition-all" />
+              <ChevronLeft className="group-hover:-translate-x-1 transition-transform" />
               عرض الكل
             </a>
           </div>

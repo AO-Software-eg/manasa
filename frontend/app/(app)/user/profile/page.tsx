@@ -1,13 +1,13 @@
 "use client";
-import { useAuth } from "@/app/hooks/useAuth";
+import { useMe } from "@/app/hooks/queries/useMe";
 import { api } from "@/app/hooks/api";
 import UploadImage from "@/app/components/UploadImage";
 import CardLayout from "@/app/components/CardLayout";
 import { useState } from "react";
-import { Camera, LogOut, Mail, Phone, BookOpen, MapPin, Hash , Edit } from "lucide-react";
+import { Camera, LogOut, Mail, Phone, BookOpen, MapPin, Hash, Edit } from "lucide-react";
 
 function page() {
-  const { userData } = useAuth();
+
   const [showUpload, setShowUpload] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
@@ -16,12 +16,16 @@ function page() {
     setShowUpload(false);
   };
 
+  const { data: userData, isLoading } = useMe();
+
+  if (isLoading) return null;
+
   const initials = userData?.name
     ? userData.name
-        .split(" ")
-        .map((n: string) => n[0])
-        .slice(0, 2)
-        .join("")
+      .split(" ")
+      .map((n: string) => n[0])
+      .slice(0, 2)
+      .join("")
     : "U";
 
   const infoFields = [
@@ -37,7 +41,7 @@ function page() {
 
   return (
     <div className="flex flex-col gap-4 w-full mt-10" dir="rtl">
-  
+
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Left col — avatar card */}

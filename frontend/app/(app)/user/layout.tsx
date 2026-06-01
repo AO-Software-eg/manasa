@@ -28,7 +28,7 @@ export default function DashboardLayout({
       {!isExamPage && (
         <>
           <SideNav collapsed={collapsed} setCollapsed={setCollapsed} />
-          <Chatbot />
+          {/* <Chatbot /> */}
         </>
       )}
 

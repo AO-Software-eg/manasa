@@ -1,40 +1,41 @@
 "use client";
-import { useAuth } from "../hooks/useAuth";
+import { useMe } from "../hooks/queries/useMe";
 import { useCourses } from "../hooks/queries/useCourses";
 import CardLayout from "./CardLayout";
 import RecentActivityCard from "./RecentActivityCard";
 import CourseComp from "./CourseComp";
 import Link from "next/link";
+import { courses } from "@/types";
 
 function StudentHome() {
-    const { userData, isLoading } = useAuth();
-    const { data: courses,  isLoading: Loading } = useCourses();
+    const { data: userData, isLoading } = useMe();
+    const { data: courses, isLoading: Loading } = useCourses();
 
     if (isLoading) return null;
 
     return (
         <div className="w-full max-w-6xl mt-26 mx-auto px-4 py-6 space-y-6" dir="rtl">
 
-            {/* 👋 Header نفس ستايل الداشبورد */}
+            {/*  Header نفس ستايل الداشبورد */}
             <CardLayout classname="bg-linear-to-r from-[#1C1C18]/80 via-[#2a2a25]/80 to-[#3b3b34]/80 backdrop-blur-sm border-[#3b3b34]/50 flex flex-row justify-between items-center ">
-            <div>
-                        <h1 className="text-2xl font-bold text-white">
-                    أهلاً بعودتك،{" "}
-                    <span className="text-[#e6d3a3]">
-                        {userData?.name || "طالب"}
-                    </span>
-               
-                </h1>
-                <p className="text-gray-400 text-sm mt-1">
-                    كمل من حيث توقفت 👇
-                </p>
-            </div>
-                     <button
-                        className="px-4 cursor-pointer py-2 text-white bg-[#e6d3a3]/50 rounded-lg text-sm hover:bg-[#5a5a52] transition"
-                        
-                    >
-                        <Link href={'/user'}>اذهب الى التطبيق</Link>
-                    </button>
+                <div>
+                    <h1 className="text-2xl font-bold text-white">
+                        أهلاً بعودتك،{" "}
+                        <span className="text-[#e6d3a3]">
+                            {userData?.name || "طالب"}
+                        </span>
+
+                    </h1>
+                    <p className="text-gray-400 text-sm mt-1">
+                        كمل من حيث توقفت 👇
+                    </p>
+                </div>
+                <button
+                    className="px-4 cursor-pointer py-2 text-white bg-[#e6d3a3]/50 rounded-lg text-sm hover:bg-[#5a5a52] transition"
+
+                >
+                    <Link href={'/user'}>اذهب الى التطبيق</Link>
+                </button>
             </CardLayout>
 
             {/* ▶️ Continue Learning */}
@@ -53,7 +54,7 @@ function StudentHome() {
                     <p className="text-gray-400">جاري التحميل...</p>
                 ) : courses?.length ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {courses.map((course: any) => (
+                        {courses.map((course: courses) => (
                             <CourseComp
                                 key={course.id}
                                 id={course.id}
@@ -61,6 +62,7 @@ function StudentHome() {
                                 description={course.description}
                                 price={course.price}
                                 imageUrl={course.image_url}
+                                index={0}
                             />
                         ))}
                     </div>
