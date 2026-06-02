@@ -1,8 +1,11 @@
 "use client";
-import { lazy, Suspense, useEffect, useState } from "react";
+import {  Suspense, useEffect, useState } from "react";
 import spinnerAnimation from "@/public/Spinner.json";
+import dynamic from "next/dynamic";
 
-const Lottie = lazy(() => import("lottie-react"));
+const Lottie = dynamic(() => import("lottie-react"), {
+  ssr: false,
+});
 
 function LoadingComp() {
   const [visible, setVisible] = useState(false);

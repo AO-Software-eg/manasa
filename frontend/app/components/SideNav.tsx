@@ -20,6 +20,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Search,
+  BookMarked
 } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 
@@ -29,6 +30,7 @@ const navGroups = [
     items: [
       { name: 'الرئيسية', href: '/user/dashboard', icon: Home },
       { name: 'الدروس', href: '/user/courses', icon: BookOpen , badge: true},
+      { name: 'اشتراكاتي', href: '/user/mycourses', icon: BookMarked , badge: true},
       { name: 'المحفظة', href: '/user/wallet', icon: Wallet },
       { name: 'التاريخ', href: '/user/history', icon: Clock },
     ],
@@ -152,7 +154,7 @@ function SideNav({
                   <p className="text-[13px] font-semibold text-[#e6d3a3] truncate leading-tight">
                     {userName}
                   </p>
-                  <p className="text-[11px] text-[#7a7060] mt-0.5">طالب مميز</p>
+                  <p className="text-[11px] text-[#7a7060] mt-0.5"> {userName && userData?.year}</p>
                 </div>
               )}
             </div>
@@ -193,7 +195,7 @@ function SideNav({
                         {!collapsed && (
                           <span className="flex-1">{item.name}</span>
                         )}
-                        {!collapsed && item.badge && (
+                        {!collapsed && item.badge && item.name === "الدروس" && (
                           <span className="bg-[#2a2820] text-[#c4a95a] text-[10px] font-semibold px-1.5 py-0.5 rounded-full">
                             {coursesCount}
                           </span>
@@ -306,7 +308,7 @@ function SideNav({
                 <p className="text-[13px] font-semibold text-[#e6d3a3] leading-tight">
                   {userName}
                 </p>
-                <p className="text-[11px] text-[#7a7060]">طالب مميز</p>
+                <p className="text-[11px] text-[#7a7060]">{userName && userData?.year}</p>
               </div>
             </div>
           </Link>

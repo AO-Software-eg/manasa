@@ -69,7 +69,7 @@ export default function CourseComp({
                 <Link
                   href={`/login?redirect=/user/courses/${id}`}
                   className="w-full py-3 rounded-lg bg-[#e6d3a3] text-[#1C1C18] font-semibold 
-        hover:bg-[#d4c38c] transition-all duration-300 shadow-md hover:shadow-lg"
+        hover:bg-[#d4c38c] transition-all duration-300 shadow-md hover:shadow-lg text-center"
                 >
                   ابدأ الآن
                 </Link>

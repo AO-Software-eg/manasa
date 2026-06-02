@@ -3,13 +3,13 @@ import { useMe } from "../hooks/queries/useMe";
 import { useCourses } from "../hooks/queries/useCourses";
 import CardLayout from "./CardLayout";
 import RecentActivityCard from "./RecentActivityCard";
-import CourseComp from "./CourseComp";
+
+import Courses from "../(marketing)/sections/Courses";
 import Link from "next/link";
-import { courses } from "@/types";
+
 
 function StudentHome() {
     const { data: userData, isLoading } = useMe();
-    const { data: courses, isLoading: Loading } = useCourses();
 
     if (isLoading) return null;
 
@@ -38,39 +38,20 @@ function StudentHome() {
                 </button>
             </CardLayout>
 
-            {/* ▶️ Continue Learning */}
+   
             <CardLayout>
                 <h2 className="text-lg text-white font-semibold mb-4">استكمل التعلم</h2>
                 <RecentActivityCard title="" />
             </CardLayout>
 
-            {/* 📚 Courses */}
-            <CardLayout>
-                <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-lg text-white font-semibold">كورساتي</h2>
-                </div>
 
-                {Loading ? (
-                    <p className="text-gray-400">جاري التحميل...</p>
-                ) : courses?.length ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {courses.map((course: courses) => (
-                            <CourseComp
-                                key={course.id}
-                                id={course.id}
-                                title={course.title}
-                                description={course.description}
-                                price={course.price}
-                                imageUrl={course.image_url}
-                                index={0}
-                            />
-                        ))}
-                    </div>
-                ) : (
-                    <p className="text-gray-400">
-                        لم تشترك في أي كورسات بعد
-                    </p>
-                )}
+            <CardLayout>
+
+
+                
+                    <Courses />
+                
+                 
             </CardLayout>
         </div>
     );

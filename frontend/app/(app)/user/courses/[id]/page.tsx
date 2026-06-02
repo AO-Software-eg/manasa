@@ -1,4 +1,4 @@
-'use client'; // ✅ add this
+'use client'; 
 
 import CourseImage from '@/app/components/CourseImg';
 import BackButton from '@/app/components/BackBtn';
