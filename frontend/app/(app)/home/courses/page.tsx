@@ -6,9 +6,8 @@ async function page() {
 
 
   return (
-    <div>
+   
       <Courses />
-    </div>
   );
 }
 
