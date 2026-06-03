@@ -107,8 +107,6 @@ export async function getCourseById(id: number): Promise<SelectCourse> {
 
   if (res.length == 0) {
     throw new RowNotFoundError(`الدورة التدريبية ذات المعرف ${id} غير موجودة`);
-  } else if (res.length > 1) {
-    throw new NonUniqueDataError(res.length);
   }
 
   return res[0];
