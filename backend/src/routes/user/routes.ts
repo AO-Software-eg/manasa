@@ -46,7 +46,7 @@ router
       if (err instanceof ZodError) {
         return res.status(400).send();
       } else {
-           return res.status(500).json({
+        return res.status(500).json({
           message: err instanceof Error ? err.message : 'حدث خطأ ما !',
         });
       }
@@ -64,11 +64,6 @@ router
       const data = req.body;
       validation.loginSchema.parse(data);
 
-      if (!user) {
-        return res.status(404).json({
-          message: 'المستخدم غير موجود',
-        });
-      }
       const user: db.SelectUser = await db.getUserByEmail(data.email);
 
       if ((await verifyPassword(user.password, data.password)) == false) {
@@ -93,6 +88,10 @@ router
       if (err instanceof ZodError) {
         return res.status(400).json({
           message: 'بيانات غير صحيحه',
+        });
+      } else if (err instanceof db.RowNotFoundError) {
+        return res.status(404).json({
+          message: 'المستخدم غير موجود',
         });
       } else {
         console.log(err);
