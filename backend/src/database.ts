@@ -1,10 +1,7 @@
 import 'dotenv/config';
-import { Pool } from 'pg';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { eq } from 'drizzle-orm';
-import z from 'zod';
 
-import * as validation from './validation.ts';
 import * as schema from '../drizzle/schema.ts';
 import * as schemaRelations from '../drizzle/relations.ts';
 
