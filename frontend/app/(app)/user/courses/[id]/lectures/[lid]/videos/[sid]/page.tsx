@@ -8,10 +8,21 @@ import LoadingComp from '@/app/components/LoadingComp';
 
 
 export default function Page() {
-  const params = useParams();
-  const sid = Array.isArray(params.sid) ? params.sid[0] : params.sid;
+ const params = useParams();
 
-  const { data: videoData, isLoading, isError, error, refetch } = useVideo(sid ?? '');
+const lid = Array.isArray(params.lid)
+  ? params.lid[0]
+  : params.lid;
+
+const sid = Array.isArray(params.sid)
+  ? params.sid[0]
+  : params.sid;
+
+const { data: videoData, isLoading, isError, error, refetch  } = useVideo(
+  lid ?? '',
+  sid ?? ''
+);
+
 
   if (!sid) return null;
 

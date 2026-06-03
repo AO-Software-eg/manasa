@@ -1,7 +1,11 @@
 "use client";
-import { lazy, Suspense, useEffect, useState } from "react";
+import {  Suspense, useEffect, useState } from "react";
+import spinnerAnimation from "@/public/Spinner.json";
+import dynamic from "next/dynamic";
 
-const Lottie = lazy(() => import("lottie-react"));
+const Lottie = dynamic(() => import("lottie-react"), {
+  ssr: false,
+});
 
 function LoadingComp() {
   const [visible, setVisible] = useState(false);
@@ -137,7 +141,7 @@ function LoadingComp() {
           }
         >
           <Lottie
-            animationData={require("@/public/Spinner.json")}
+            animationData={spinnerAnimation}
             loop
             autoplay
             style={{ width: 80, height: 80, filter: "sepia(1) saturate(1.5) hue-rotate(5deg) brightness(1.1)" }}

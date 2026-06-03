@@ -1,4 +1,4 @@
-'use client'; // ✅ add this
+'use client'; 
 
 import CourseImage from '@/app/components/CourseImg';
 import BackButton from '@/app/components/BackBtn';
@@ -59,7 +59,7 @@ function CourseData({ course }: CourseDataProps) {
             قم بشراء الكورس للوصول إلى جميع الدروس والمواد
           </p>
           <div className="flex justify-center items-center w-full">
-            <Link href={`/user/courses/${course.id}/data`}>
+            <Link href={`/user/courses/${course.id}/lectures`}>
               <button className="px-12 py-4 mx-auto bg-[#e6d3a3]/20 hover:bg-[#e6d3a3]/30 border-2 border-[#e6d3a3] text-[#e6d3a3] font-bold text-lg rounded-full shadow-lg hover:shadow-[#e6d3a3]/25 transform hover:scale-105 transition-all">
                 شراء الكورس
               </button>
