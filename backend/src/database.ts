@@ -1,8 +1,9 @@
 import 'dotenv/config';
-import { Pool } from 'pg';
-import z from 'zod';
+import { drizzle } from 'drizzle-orm/node-postgres';
+import { eq } from 'drizzle-orm';
 
-import * as validation from './validation.ts';
+import * as schema from '../drizzle/schema.ts';
+import * as schemaRelations from '../drizzle/relations.ts';
 
 export class DataIntegrityError extends Error {
   constructor(message: string) {
@@ -26,220 +27,170 @@ export class RowNotFoundError extends Error {
   }
 }
 
-const db = new Pool({
-  user: process.env.DB_USER,
-  host: process.env.DB_HOST,
-  database: process.env.DB_NAME,
-  password: process.env.DB_PASSWORD,
-  port: Number(process.env.DB_PORT),
+if (!process.env.DB_URL) {
+  throw new Error('DB_URL not set in .env');
+}
+
+const db = drizzle(process.env.DB_URL!, {
+  schema: { ...schema, ...schemaRelations },
 });
 
-export type User = z.infer<typeof validation.userSchema>;
-export type Course = z.infer<typeof validation.courseSchema>;
-export type Lecture = z.infer<typeof validation.lectureSchema>;
-export type LectureVideo = z.infer<typeof validation.lectureVideoSchema>;
-export type ExamQuestion = z.infer<typeof validation.examQuestionSchema>;
+export type SelectUser = typeof schema.users.$inferSelect;
+export type InsertUser = typeof schema.users.$inferInsert;
 
-export async function getImageLink(name: string): Promise<string | null> {
-  const query = 'SELECT * FROM image_links WHERE name = $1';
-  const values = [name];
+export type SelectCourse = typeof schema.courses.$inferSelect;
+export type InsertCourse = typeof schema.courses.$inferInsert;
 
-  const res = await db.query(query, values);
-  if (res.rowCount && res.rowCount > 1) {
-    throw new NonUniqueDataError(res.rowCount);
-  }
+export type SelectLecture = typeof schema.lectures.$inferSelect;
+export type InsertLecture = typeof schema.lectures.$inferInsert;
 
-  const row = res.rows[0];
+export type SelectLectureVideo = typeof schema.lectureVideos.$inferSelect;
+export type InsertLectureVideo = typeof schema.lectureVideos.$inferInsert;
 
-  return row?.link ?? null;
-}
+export type SelectExam = typeof schema.exams.$inferSelect;
+export type InsertExam = typeof schema.exams.$inferInsert;
+
+export type SelectQuestion = typeof schema.questions.$inferSelect;
+export type InsertQuestion = typeof schema.questions.$inferInsert;
+
+export type SelectQuestionChoice = typeof schema.questionChoices.$inferSelect;
+export type InsertQuestionChoice = typeof schema.questionChoices.$inferInsert;
+
+export type RelationLecture = Awaited<
+  ReturnType<typeof getCourseLectures>
+>[number];
+
+export type RelationExamQuestions = Awaited<
+  ReturnType<typeof getExamQuestions>
+>[number];
 
 export async function isUserFound(email: string): Promise<boolean> {
-  const query = 'SELECT 1 FROM users WHERE email = $1';
-  const values = [email];
+  const res = await db
+    .select()
+    .from(schema.users)
+    .where(eq(schema.users.email, email));
 
-  const res = await db.query(query, values);
-  return res.rowCount != 0;
+  return res.length != 0;
 }
 
-export async function getUserByEmail(email: string): Promise<User> {
-  const query = 'SELECT * FROM users WHERE email = $1';
-  const values = [email];
+export async function getUserByEmail(email: string): Promise<SelectUser> {
+  const res = await db
+    .select()
+    .from(schema.users)
+    .where(eq(schema.users.email, email))
+    .limit(2); // We test for uniqueness only
 
-  const res = await db.query(query, values);
-  if (res.rowCount && res.rowCount > 1) {
-    throw new NonUniqueDataError(res.rowCount);
-  }
-  if (res.rowCount == 0) {
+  if (res.length == 0) {
     throw new RowNotFoundError(
       `المستخدم ذو البريد الإلكتروني ${email} غير موجود`,
     );
+  } else if (res.length > 1) {
+    throw new NonUniqueDataError(res.length);
   }
 
-  const row = res.rows[0];
-
-  const user: User = {
-    id: row.id,
-    email: row.email,
-    passwordHash: row.password,
-    specialization: row.specialization,
-    governorate: row.governorate,
-    parentPhone: row.parent_phone,
-    studentPhone: row.student_phone,
-    year: row.year,
-    name: row.name,
-  };
-
-  return user;
+  return res[0];
 }
 
-export async function insertUser(user: User) {
-  const query = `INSERT INTO users(name, email, password, student_phone, parent_phone, specialization, year, governorate)
-                 VALUES($1, $2, $3, $4, $5, $6, $7, $8)`;
-  const values = [
-    user.name,
-    user.email,
-    user.passwordHash,
-    user.studentPhone,
-    user.parentPhone,
-    user.specialization,
-    user.year,
-    user.governorate,
-  ];
-
-  await db.query(query, values);
+export async function insertUser(user: InsertUser) {
+  await db.insert(schema.users).values(user);
 }
 
-export async function getCourseById(id: number): Promise<Course> {
-  const query = 'SELECT * FROM courses WHERE id = $1';
-  const values = [id];
+export async function getCourseById(id: number): Promise<SelectCourse> {
+  const res = await db
+    .select()
+    .from(schema.courses)
+    .where(eq(schema.courses.id, id));
 
-  const res = await db.query(query, values);
-  if (res.rowCount && res.rowCount > 1) {
-    throw new NonUniqueDataError(res.rowCount);
-  }
-  if (res.rowCount == 0) {
+  if (res.length == 0) {
     throw new RowNotFoundError(`الدورة التدريبية ذات المعرف ${id} غير موجودة`);
   }
 
-  const row = res.rows[0];
-
-  validation.courseSchema.parse(row);
-
-  return row;
+  return res[0];
 }
 
-export async function getAllCourses(): Promise<Course[]> {
-  const query = 'SELECT * FROM courses';
+export async function getAllCourses(): Promise<SelectCourse[]> {
+  const res = await db.select().from(schema.courses);
 
-  const res = await db.query(query);
-  for (const course of res.rows) {
-    validation.courseSchema.parse(course);
-  }
-
-  return res.rows;
+  return res;
 }
 
-export async function getCourseLectures(courseId: number): Promise<Lecture[]> {
-  const existsQuery = 'SELECT 1 FROM courses WHERE id=$1';
-  const existsQueryValues = [courseId];
+export async function getCourseLectures(courseId: number) {
+  const existsRes = await db
+    .select()
+    .from(schema.courses)
+    .where(eq(schema.courses.id, courseId));
 
-  const existsRes = await db.query(existsQuery, existsQueryValues);
-  if (existsRes.rowCount == 0) {
+  if (existsRes.length == 0) {
     throw new RowNotFoundError(
       `الدورة التدريبية ذات المعرف ${courseId} غير موجودة`,
     );
   }
 
-  const schema = validation.lectureSchema.extend({
-    videos: z.array(
-      z.object({
-        title: z.string(),
-        video_id: z.string(),
-      }),
-    ),
+  const res = await db.query.lectures.findMany({
+    where: (lectures, { eq }) => eq(lectures.courseId, courseId),
+    with: {
+      lectureVideos: {
+        columns: {
+          id: true,
+          videoId: true,
+          title: true,
+        },
+      },
+      exams: {
+        columns: {
+          id: true,
+          title: true,
+        },
+      },
+    },
   });
 
-  const query = `
-  SELECT 
-    l.*, 
-    COALESCE(
-      json_agg(DISTINCT json_build_object('video_id', v.video_id, 'title', v.title)::jsonb) 
-      FILTER (WHERE v.id IS NOT NULL), '[]'
-    ) AS videos,
-    COALESCE(
-      json_agg(DISTINCT json_build_object('id', e.id, 'title', e.title)::jsonb)
-      FILTER (WHERE e.id IS NOT NULL), '[]'
-    ) AS exams
-  FROM lectures AS l 
-  LEFT JOIN lecture_videos AS v ON v.lecture_id = l.id
-  LEFT JOIN exams AS e ON e.lecture_id = l.id
-  WHERE l.course_id = $1 
-  GROUP BY l.id;
-  `;
-  const values = [courseId];
-
-  const res = await db.query(query, values);
-  for (const lecture of res.rows) {
-    schema.parse(lecture);
-  }
-
-  return res.rows;
+  return res;
 }
 
 export async function getLectureVideos(
   lectureId: number,
-): Promise<LectureVideo[]> {
-  const existsQuery = 'SELECT 1 FROM lectures WHERE id=$1';
-  const existsQueryValues = [lectureId];
+): Promise<SelectLectureVideo[]> {
+  const existsRes = await db
+    .select()
+    .from(schema.lectures)
+    .where(eq(schema.lectures.id, lectureId));
 
-  const existsRes = await db.query(existsQuery, existsQueryValues);
-  if (existsRes.rowCount == 0) {
+  if (existsRes.length == 0) {
     throw new RowNotFoundError(`المحاضرة ذات المعرف ${lectureId} غير موجودة`);
   }
 
-  const query = 'SELECT * FROM lecture_videos WHERE lecture_id=$1';
-  const values = [lectureId];
+  const res = await db
+    .select()
+    .from(schema.lectureVideos)
+    .where(eq(schema.lectureVideos.lectureId, lectureId));
 
-  const res = await db.query(query, values);
-  for (const video of res.rows) {
-    validation.lectureVideoSchema.parse(video);
-  }
-
-  return res.rows;
+  return res;
 }
 
-export async function getExamQuestions(
-  examId: number,
-): Promise<ExamQuestion[]> {
-  const existsQuery = 'SELECT 1 FROM exams WHERE id=$1';
-  const existsQueryValues = [examId];
+export async function getExamQuestions(examId: number) {
+  const existsRes = await db
+    .select()
+    .from(schema.exams)
+    .where(eq(schema.exams.id, examId));
 
-  const existsRes = await db.query(existsQuery, existsQueryValues);
-  if (existsRes.rowCount == 0) {
+  if (existsRes.length == 0) {
     throw new RowNotFoundError(`الأمتحان ذو المعرف ${examId} غير موجود`);
   }
 
-  const query = `
-  SELECT q.*, 
-         COALESCE(
-           json_agg(
-             json_build_object('id', qc.id, 'choice_text', qc.choice_text)
-           ) FILTER (WHERE qc.id IS NOT NULL), '[]'
-         ) AS choices
-  FROM questions q
-  LEFT JOIN question_choices qc ON q.id = qc.question_id
-  WHERE q.exam_id = $1
-  GROUP BY q.id;
-  `;
-  const values = [examId];
+  const res = await db.query.questions.findMany({
+    where: (questions, { eq }) => eq(questions.examId, examId),
+    with: {
+      questionChoices: {
+        columns: {
+          id: true,
+          choiceText: true,
+        },
+      },
+    },
+  });
 
-  const res = await db.query(query, values);
-  for (const question of res.rows) {
-    validation.examQuestionSchema.parse(question);
-  }
-
-  return res.rows;
+  return res;
 }
 
 export default db;

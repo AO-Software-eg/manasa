@@ -1,4 +1,5 @@
 'use client';
+
 import { useParams, useRouter } from 'next/navigation';
 import { courses } from '@/types';
 import BackButton from '@/app/components/BackBtn';
@@ -13,16 +14,17 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 
-export default function CoursePage() {
+export default function Page() {
   const params = useParams();
   const router = useRouter();
   const courseId = Array.isArray(params.id) ? params.id[0] : params.id;
 
   const {
-    data: courses,
+    data: coursesData,
     isLoading: coursesLoading,
     isError: coursesError,
   } = useCourses();
+
   const {
     data: assets = [],
     isLoading: assetsLoading,
@@ -34,70 +36,88 @@ export default function CoursePage() {
 
   if (coursesLoading || assetsLoading) return <LoadingComp />;
 
-  if (coursesError || assetsError)
+  if (coursesError || assetsError) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen gap-4">
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4">
         <p className="text-red-500">حدث خطأ أثناء تحميل البيانات</p>
         <button
           onClick={() => refetch()}
-          className="px-4 py-2 bg-blue-500 text-white rounded"
+          className="rounded bg-blue-500 px-4 py-2 text-white"
         >
           إعادة المحاولة
         </button>
       </div>
     );
+  }
 
-  const course = courses?.find((c: courses) => c.id === courseId);
-  if (!course) return null;
+  const course = coursesData?.find(
+    (c: courses) => Number(c.id) === Number(courseId),
+  );
+
+  if (!course) {
+    return (
+      <div className="flex min-h-screen items-center justify-center text-white">
+        Course not found
+      </div>
+    );
+  }
 
   return (
     <div className="relative min-h-screen overflow-hidden">
       <div
-        className="absolute inset-0 bg-cover bg-center opacity-25 shadow-inner shadow-[#0D0D0D]/90 "
+        className="absolute inset-0 bg-cover bg-center opacity-25 shadow-inner shadow-[#0D0D0D]/90"
         style={{
-          backgroundImage: `url(${course.image_url})`,
+          backgroundImage: `url(${course.imageUrl ? course.imageUrl : '/default-course-image.jpg'})`,
         }}
       />
 
       <div className="absolute inset-0 bg-linear-to-t from-[#0D0D0D] via-55% via-[#0D0D0D]/90 to-transparent" />
-      <div className="max-w-4xl mx-auto mt-20 z-100 relative">
+
+      <div className="relative z-10 mx-auto mt-20 max-w-4xl">
         <div className="mb-12">
           <BackButton route="/" />
-          <h1 className="text-4xl md:text-5xl font-bold text-[#e6d3a3] text-right leading-tight">
+          <h1 className="text-right text-4xl font-bold leading-tight text-[#e6d3a3] md:text-5xl">
             {course.title}
           </h1>
         </div>
+
         <div>
-          <h2 className="text-2xl md:text-3xl font-bold text-[#E5E5E5] text-right mb-8">
+          <h2 className="mb-8 text-right text-2xl font-bold text-[#E5E5E5] md:text-3xl">
             محتوى الكورس
           </h2>
-          <div>
-            {assets.length === 0 ? (
-              <p className="text-gray-400 text-center py-10">
-                لا توجد مواد متاحة
-              </p>
-            ) : (
-              assets.map((asset: lecture) => (
+
+          {assets.length === 0 ? (
+            <p className="py-10 text-center text-gray-400">
+              لا توجد مواد متاحة
+            </p>
+          ) : (
+            assets.map((asset: lecture) => {
+              const videos = asset.videos ?? [];
+              const exams = asset.exams ?? [];
+
+              return (
                 <div key={asset.id} className="flex flex-col gap-3">
                   <Accordion
                     type="single"
                     collapsible
-                    className="max-w-lg bg-[#38342B] rounded-md"
+                    className="max-w-lg rounded-md bg-[#38342B]"
                   >
                     <AccordionItem value={`item-${asset.id}`}>
-                      <AccordionTrigger className="text-right   gap-2 bg-[#141412] rounded-t rounded-b-none">
-                        <span className="text-xl font-semibold px-4 text-[#e6d3a3]">
+                      <AccordionTrigger className="gap-2 rounded-t rounded-b-none bg-[#141412] text-right">
+                        <span className="px-4 text-xl font-semibold text-[#e6d3a3]">
                           {asset.title}
                         </span>
                       </AccordionTrigger>
+
                       <AccordionContent>
-                        <div className="flex flex-col gap-3 p-3 my-2">
-                          {asset.videos.length + asset.exams.length === 0 && (
-                            <p className="text-gray-400 text-center py-10">
+                        <div className="my-2 flex flex-col gap-3 p-3">
+                          {videos.length + exams.length === 0 && (
+                            <p className="py-10 text-center text-gray-400">
                               لا توجد مواد متاحة
                             </p>
                           )}
-                          {asset.videos.map((video) => (
+
+                          {videos.map((video) => (
                             <button
                               key={video.video_id}
                               onClick={() =>
@@ -119,7 +139,7 @@ export default function CoursePage() {
                             </button>
                           ))}
 
-                          {asset.exams.map((exam) => (
+                          {exams.map((exam) => (
                             <button
                               key={exam.id}
                               onClick={() =>
@@ -145,9 +165,9 @@ export default function CoursePage() {
                     </AccordionItem>
                   </Accordion>
                 </div>
-              ))
-            )}
-          </div>
+              );
+            })
+          )}
         </div>
       </div>
     </div>

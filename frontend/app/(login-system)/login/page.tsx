@@ -10,12 +10,23 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 
+import { Suspense } from 'react';
+
 const cairo = Cairo({
   subsets: ['arabic'],
   weight: ['400', '700'],
 });
 
-function page() {
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginContent />
+    </Suspense>
+  );
+}
+
+function LoginContent() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const searchParams = useSearchParams();
@@ -123,4 +134,4 @@ function page() {
   );
 }
 
-export default page;
+

@@ -1,11 +1,10 @@
 'use client';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useAuth } from '@/app/hooks/useAuth';
-import { useRouter } from 'next/navigation';
 
 type Props = {
   id: string;
+  index: number;
   title: string;
   description: string | null;
   price: number;
@@ -13,6 +12,8 @@ type Props = {
   instructor?: string;
   progress?: number;
   discount?: number; // %
+  userData?: [];
+  isPriority?: boolean;
 };
 
 export default function CourseComp({
@@ -23,40 +24,29 @@ export default function CourseComp({
   imageUrl,
   instructor,
   progress = 50,
-  discount = 30,
+  userData,
+  isPriority = false,
 }: Props) {
-  const { loggedIn } = useAuth();
-
-  const router = useRouter();
-
-  const finalPrice =
-    discount > 0 ? Math.round(price - (price * discount) / 100) : price;
-
   return (
-    <Link
-<<<<<<< Updated upstream
-      href={loggedIn ? `/user/courses/${id}` : `/login?redirect=/user/courses/${id}`}
-=======
+      <div>
+        <Link
+
       href={
         userData ? `/home/courses/${id}` : `/login?redirect=/home/courses/${id}`
       }
->>>>>>> Stashed changes
     >
       <div className="group bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:bg-white/10 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl cursor-pointer h-full flex flex-col">
         {/* Image */}
-        <div className="relative w-full h-[240px] overflow-hidden">
+        <div className="relative w-full h-60 overflow-hidden">
           <Image
             src={imageUrl}
             alt={title}
             fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            priority={isPriority}
+            fetchPriority={isPriority ? 'high' : 'auto'}
             className="object-cover transition-transform duration-500 group-hover:scale-105"
           />
-
-          {discount > 0 && (
-            <span className="absolute top-3 left-3 bg-red-500 text-white text-xs px-2 py-1 rounded-md shadow">
-              خصم {discount}%
-            </span>
-          )}
         </div>
 
         {/* Content */}
@@ -64,7 +54,7 @@ export default function CourseComp({
           {/* Title */}
           <h3 className="text-xl font-bold text-white line-clamp-2">{title}</h3>
 
-          {!loggedIn ? (
+          {!userData ? (
             <>
               {/* MARKETING VERSION */}
               <p className="text-sm text-gray-400 line-clamp-2">
@@ -74,31 +64,17 @@ export default function CourseComp({
               <div className="flex flex-col gap-3 mt-auto">
                 {/* Price */}
                 <div className="flex gap-2 items-center">
-                  {discount > 0 && (
-                    <span className="text-gray-500 line-through text-sm">
-                      {price} جنيه
-                    </span>
-                  )}
                   <span className="text-[#e6d3a3] font-semibold text-lg">
-                    {finalPrice} جنيه
+                    {price} جنيه
                   </span>
                 </div>
-<<<<<<< Updated upstream
 
-                <button
-                  onClick={(e) => {
-                    e.preventDefault(); // prevent Link navigation
-                    router.push(`/login?redirect=/user/courses/${id}`);
-                  }}
-=======
-                <Link
-                  href={`/login?redirect=/home/courses/${id}`}
->>>>>>> Stashed changes
+                <div
                   className="w-full py-3 rounded-lg bg-[#e6d3a3] text-[#1C1C18] font-semibold 
-        hover:bg-[#d4c38c] transition-all duration-300 shadow-md hover:shadow-lg"
+        hover:bg-[#d4c38c] transition-all duration-300 shadow-md hover:shadow-lg text-center"
                 >
                   ابدأ الآن
-                </button>
+                </div>
               </div>
             </>
           ) : (
@@ -134,7 +110,7 @@ export default function CourseComp({
 
               <div className="flex items-center justify-between mt-auto pt-3">
                 <span className="text-[#e6d3a3] font-semibold text-lg">
-                  {finalPrice} جنيه
+                  {price} جنيه
                 </span>
 
                 <span className="text-sm text-[#e6d3a3] opacity-0 group-hover:opacity-100 transition">
@@ -146,5 +122,6 @@ export default function CourseComp({
         </div>
       </div>
     </Link>
+      </div>
   );
 }

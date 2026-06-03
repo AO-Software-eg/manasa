@@ -3,9 +3,11 @@ import CourseComp from '../../components/CourseComp';
 import { useCourses } from '../../hooks/queries/useCourses';
 import CoursesLoading from '@/app/components/CoursesLoading';
 import {courses} from '@/types' 
+import { useMe } from '@/app/hooks/queries/useMe';
 
 export default function Courses() {
   const {data: courses, isLoading, isError, error , refetch} = useCourses();
+  const { data: userData } = useMe();
 
   if (isLoading) {
     return <CoursesLoading />;
@@ -31,14 +33,17 @@ export default function Courses() {
         الكورسات
       </h1>
       <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-10">
-        {courses && courses.map((course: courses) => (
+        {courses && courses.map((course: courses , i: number) => (
           <CourseComp
             key={course.id}
+            index={i}
             id={course.id}
             title={course.title}
             description={course.description}
             price={course.price}
-            imageUrl={course.image_url}
+            imageUrl={course.imageUrl}
+            userData={userData}
+            isPriority={i < 3}
           />
         ))}
       </div>

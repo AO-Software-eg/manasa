@@ -5,7 +5,7 @@ import { Menu, Origami, UserPlus } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
-import { useAuth } from '../hooks/useAuth';
+import { useMe } from '../hooks/queries/useMe';
 import { api } from '../hooks/api';
 
 const dropdownVariants: Variants = {
@@ -54,14 +54,10 @@ function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const path = usePathname();
-<<<<<<< Updated upstream
-  const isUserPage = path.startsWith('/user');
-  const { loggedIn } = useAuth();
-=======
   const isUserPage = path.startsWith('/home');
   const { data: userData, isError } = useMe();
-  const isLoggedIn = !isError && !!userData;
->>>>>>> Stashed changes
+ 
+
 
 
 
@@ -145,7 +141,7 @@ function Header() {
                   ))}
                 </div>
                 <div className="flex gap-2">
-                  {loggedIn ? (
+                  {userData ? (
                     <><button
                       className="px-4 cursor-pointer py-2 bg-[#3b3b34] rounded-lg text-sm hover:bg-[#5a5a52] transition"
                       onClick={() => setIsMenuOpen(false)}

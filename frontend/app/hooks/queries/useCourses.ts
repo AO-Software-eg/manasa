@@ -9,6 +9,9 @@ export function useCourses() {
       if (!res.data.data) throw new Error('جدث خطأ اثناء تحميل الكورسات');
       return res.data.data;
     },
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    staleTime: 10 * 60 * 1000,
   });
 }
 
@@ -16,7 +19,7 @@ export function useCourseById(id: string) {
   return useQuery({
     queryKey: ['course', id],
     enabled: !!id,
-    staleTime: 0,
+    staleTime: 1000 * 60 * 5,
     queryFn: async () => {
       const res = await api.get(`/courses/${id}`);
       console.log('FETCHING COURSE', id);

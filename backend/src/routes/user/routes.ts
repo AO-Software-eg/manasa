@@ -28,8 +28,7 @@ router
       }
 
       const passwordHash = await hashPassword(data.password);
-      const user: db.User = {
-        id: '', // Doesn't matter, database creates the id
+      const user: db.InsertUser = {
         email: data.email,
         name: data.name,
         studentPhone: data.studentPhone,
@@ -37,7 +36,7 @@ router
         specialization: data.specialization,
         governorate: data.governorate,
         year: data.YearCombo,
-        passwordHash: passwordHash,
+        password: passwordHash,
       };
 
       await db.insertUser(user);
@@ -47,7 +46,7 @@ router
       if (err instanceof ZodError) {
         return res.status(400).send();
       } else {
-           return res.status(500).json({
+        return res.status(500).json({
           message: err instanceof Error ? err.message : 'حدث خطأ ما !',
         });
       }
@@ -65,14 +64,9 @@ router
       const data = req.body;
       validation.loginSchema.parse(data);
 
-      const user: db.User | null = await db.getUserByEmail(data.email);
-      if (!user) {
-        return res.status(404).json({
-          message: 'المستخدم غير موجود',
-        });
-      }
+      const user: db.SelectUser = await db.getUserByEmail(data.email);
 
-      if ((await verifyPassword(user.passwordHash, data.password)) == false) {
+      if ((await verifyPassword(user.password, data.password)) == false) {
         return res.status(400).json({
           message: 'كلمة سر غير صحيحه',
         });
@@ -94,6 +88,10 @@ router
       if (err instanceof ZodError) {
         return res.status(400).json({
           message: 'بيانات غير صحيحه',
+        });
+      } else if (err instanceof db.RowNotFoundError) {
+        return res.status(404).json({
+          message: 'المستخدم غير موجود',
         });
       } else {
         console.log(err);
@@ -130,9 +128,9 @@ router.route('/me').get(async (req: Request, res: Response) => {
       return res.status(500).json({ message: 'Email not found in token' });
     }
 
-    const user: db.User = await db.getUserByEmail(payload.email);
-    if (user?.passwordHash) {
-      user.passwordHash = '';
+    const user: db.SelectUser = await db.getUserByEmail(payload.email);
+    if (user.password) {
+      user.password = '';
     }
 
     return res.status(200).json(user);

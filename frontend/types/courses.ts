@@ -1,7 +1,7 @@
 export type courses = {
-    id: string;
+    id: number;
     title: string;
-    image_url: string;
+    imageUrl: string;
     price: number;
     year: string;
     specialization: string | null;

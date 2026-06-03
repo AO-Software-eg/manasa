@@ -9,7 +9,7 @@ export default function CourseImage({ title }: { title: string }) {
 
   return (
     <Image
-      src={course?.image_url ? course.image_url : '/default-course-image.jpg'}
+      src={course?.imageUrl ? course.imageUrl : '/default-course-image.jpg'}
       alt={title}
       width={600}
       height={400}

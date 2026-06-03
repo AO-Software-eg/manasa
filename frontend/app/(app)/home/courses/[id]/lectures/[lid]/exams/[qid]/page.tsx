@@ -10,9 +10,10 @@ import { useRouter } from 'next/navigation';
 import Timer from '@/app/components/Timer';
 import { ExamQuestion } from '@/types/exams';
 
+
 function Page() {
   const { qid } = useParams();
-  const examId = qid || '';
+  const examId = qid ? Number(qid) : NaN;
   const router = useRouter();
   const [currentQuestion, setCurrentQuestion] = useState(1);
   const [answers, setAnswers] = useState<Record<number, string>>({});
@@ -32,7 +33,10 @@ function Page() {
     );
   };
 
-  const { data, isLoading, error } = useExams(examId.toString());
+  const { data, isLoading, error } = useExams(examId);
+
+
+ 
 
   const questionCount = data?.questions.length || 0;
 
@@ -63,8 +67,11 @@ function Page() {
     return <div>Loading...</div>;
   }
 
+
   if (error) {
+    console.error('Error fetching exam data:', error);
     return <div>Something went wrong</div>;
+
   }
 
   // ----------------------------
@@ -169,9 +176,8 @@ function Page() {
             <div
               className="h-full bg-blue-600 transition-all duration-300"
               style={{
-                width: `${
-                  (Object.keys(answers).length / questionCount) * 100
-                }%`,
+                width: `${(Object.keys(answers).length / questionCount) * 100
+                  }%`,
               }}
             />
           </div>
@@ -200,15 +206,14 @@ function Page() {
                                             transition-all duration-200
                                             border
 
-                                            ${
-                                              isCurrent
-                                                ? 'bg-blue-600 border-blue-400 scale-110 shadow-lg shadow-blue-500/30'
-                                                : isAnswered
-                                                  ? 'bg-green-600 border-green-400 hover:scale-105'
-                                                  : isVisited
-                                                    ? 'bg-yellow-500 border-yellow-300 text-black hover:scale-105'
-                                                    : 'bg-gray-800 border-gray-700 hover:bg-gray-700 hover:scale-105'
-                                            }
+                                            ${isCurrent
+                        ? 'bg-blue-600 border-blue-400 scale-110 shadow-lg shadow-blue-500/30'
+                        : isAnswered
+                          ? 'bg-green-600 border-green-400 hover:scale-105'
+                          : isVisited
+                            ? 'bg-yellow-500 border-yellow-300 text-black hover:scale-105'
+                            : 'bg-gray-800 border-gray-700 hover:bg-gray-700 hover:scale-105'
+                      }
                                         `}
                   >
                     {questionNumber}
@@ -257,28 +262,27 @@ function Page() {
                   handleSelect(value);
                 }}
               >
-                {question.choices.map((option) => (
+                {question.questionChoices.map((option) => (
                   <div
                     key={option.id}
                     className={`
                                                 flex flex-row-reverse items-center gap-3 w-full rounded-2xl transition-all border
-                                                ${
-                                                  selectedOption === option.id
-                                                    ? 'bg-blue-600 border-blue-400 shadow-lg shadow-blue-500/20'
-                                                    : 'bg-[#111827] border-gray-700 hover:border-blue-500 hover:bg-[#172036]'
-                                                }
+                                                ${selectedOption === option.id.toString()
+                        ? 'bg-blue-600 border-blue-400 shadow-lg shadow-blue-500/20'
+                        : 'bg-[#111827] border-gray-700 hover:border-blue-500 hover:bg-[#172036]'
+                      }
                                             `}
                   >
                     <RadioGroupItem
-                      value={option.id}
-                      id={option.id}
+                      value={option.id.toString()}
+                      id={option.id.toString()}
                       className="mx-4"
                     />
                     <Label
-                      htmlFor={option.id}
+                      htmlFor={option.id.toString()}
                       className="w-full flex justify-end text-right py-5 px-2 cursor-pointer text-base"
                     >
-                      {option.choice_text}
+                      {option.choiceText}
                     </Label>
                   </div>
                 ))}
@@ -291,11 +295,10 @@ function Page() {
       <div className="flex justify-between items-center p-4">
         <button
           className={`
-                        ${
-                          currentQuestion === 1
-                            ? 'opacity-0 pointer-events-none'
-                            : 'hover:bg-gray-700'
-                        }
+                        ${currentQuestion === 1
+              ? 'opacity-0 pointer-events-none'
+              : 'hover:bg-gray-700'
+            }
 
                         border border-gray-700
                         bg-[#111827]
@@ -313,11 +316,10 @@ function Page() {
 
         <button
           className={`
-                        ${
-                          currentQuestion === questionCount
-                            ? 'opacity-50 cursor-not-allowed'
-                            : 'bg-blue-600 hover:bg-blue-700'
-                        }
+                        ${currentQuestion === questionCount
+              ? 'opacity-50 cursor-not-allowed'
+              : 'bg-blue-600 hover:bg-blue-700'
+            }
 
                         text-white
                         px-5 py-3
