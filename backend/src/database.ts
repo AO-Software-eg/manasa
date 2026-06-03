@@ -138,6 +138,12 @@ export async function getCourseLectures(courseId: number) {
     },
   });
 
+  if (res.length == 0) {
+    throw new RowNotFoundError(
+      `الدورة التدريبية ذات المعرف ${courseId} غير موجودة`,
+    );
+  }
+
   return res;
 }
 
