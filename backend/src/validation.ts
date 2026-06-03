@@ -4,56 +4,6 @@ export const MIN_PASSWORD_LENGTH = 6;
 export const MIN_NAME_LENGTH = 2;
 export const EGYPT_MOBILE_REGEX = /^\+201[0125]\d{8}$/;
 
-export const userSchema = z.object({
-  id: z.string(),
-  email: z.string(),
-  name: z.string(),
-  studentPhone: z.string(),
-  parentPhone: z.string(),
-  specialization: z.string().nullable(),
-  governorate: z.string(),
-  year: z.string(),
-  passwordHash: z.string(),
-});
-
-// Courses table in db
-export const courseSchema = z.object({
-  id: z.string(),
-  title: z.string(),
-  image_url: z.string(),
-  price: z.number(),
-  year: z.string(),
-  specialization: z.string().nullable(),
-  description: z.string().nullable(),
-  tags: z.string().nullable(),
-});
-
-// Lectures table in db
-export const lectureSchema = z.object({
-  id: z.string(),
-  course_id: z.string(),
-  title: z.string(),
-});
-
-// Lecture videos table in db
-export const lectureVideoSchema = z.object({
-  id: z.string(),
-  lecture_id: z.string(),
-  title: z.string(),
-  video_id: z.string(),
-});
-
-export const examQuestionChoiceSchema = z.object({
-  id: z.any(),
-  choice_text: z.string(),
-});
-
-export const examQuestionSchema = z.object({
-  id: z.string(),
-  question: z.string(),
-  choices: examQuestionChoiceSchema.array(),
-});
-
 export const loginSchema = z.object({
   email: z.email(),
   password: z.string().min(MIN_PASSWORD_LENGTH),
