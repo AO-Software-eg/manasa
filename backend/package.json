@@ -33,7 +33,7 @@
     "@types/node": "^25.5.2",
     "@types/pg": "^8.20.0",
     "dotenv": "^17.4.2",
-    "drizzle-kit": "^0.18.1",
+    "drizzle-kit": "^0.31.10",
     "express": "^5.2.1",
     "install": "^0.13.0",
     "nodemon": "^3.1.14",
