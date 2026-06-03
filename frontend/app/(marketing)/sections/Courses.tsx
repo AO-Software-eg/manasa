@@ -37,7 +37,7 @@ export default function Courses() {
           <CourseComp
             key={course.id}
             index={i}
-            id={course.id}
+            id={course.id.toString()}
             title={course.title}
             description={course.description}
             price={course.price}
