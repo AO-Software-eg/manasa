@@ -118,6 +118,17 @@ export async function getAllCourses(): Promise<SelectCourse[]> {
 }
 
 export async function getCourseLectures(courseId: number) {
+  const existsRes = await db
+    .select()
+    .from(schema.courses)
+    .where(eq(schema.courses.id, courseId));
+
+  if (existsRes.length == 0) {
+    throw new RowNotFoundError(
+      `الدورة التدريبية ذات المعرف ${courseId} غير موجودة`,
+    );
+  }
+
   const res = await db.query.lectures.findMany({
     where: (lectures, { eq }) => eq(lectures.courseId, courseId),
     with: {
@@ -136,12 +147,6 @@ export async function getCourseLectures(courseId: number) {
       },
     },
   });
-
-  if (res.length == 0) {
-    throw new RowNotFoundError(
-      `الدورة التدريبية ذات المعرف ${courseId} غير موجودة`,
-    );
-  }
 
   return res;
 }
