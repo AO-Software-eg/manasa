@@ -102,8 +102,7 @@ export async function getCourseById(id: number): Promise<SelectCourse> {
   const res = await db
     .select()
     .from(schema.courses)
-    .where(eq(schema.courses.id, id))
-    .limit(2);
+    .where(eq(schema.courses.id, id));
 
   if (res.length == 0) {
     throw new RowNotFoundError(`الدورة التدريبية ذات المعرف ${id} غير موجودة`);
@@ -153,8 +152,7 @@ export async function getLectureVideos(
   const existsRes = await db
     .select()
     .from(schema.lectures)
-    .where(eq(schema.lectures.id, lectureId))
-    .limit(2);
+    .where(eq(schema.lectures.id, lectureId));
 
   if (existsRes.length == 0) {
     throw new RowNotFoundError(`المحاضرة ذات المعرف ${lectureId} غير موجودة`);
@@ -172,8 +170,7 @@ export async function getExamQuestions(examId: number) {
   const existsRes = await db
     .select()
     .from(schema.exams)
-    .where(eq(schema.exams.id, examId))
-    .limit(2);
+    .where(eq(schema.exams.id, examId));
 
   if (existsRes.length == 0) {
     throw new RowNotFoundError(`الأمتحان ذو المعرف ${examId} غير موجود`);
