@@ -146,7 +146,11 @@ export async function getCourseLectures(courseId: number) {
 export async function getLectureVideos(
   lectureId: number,
 ): Promise<SelectLectureVideo[]> {
-  const existsRes = await db.select().from(schema.lectures).limit(2);
+  const existsRes = await db
+    .select()
+    .from(schema.lectures)
+    .where(eq(schema.lectures.id, lectureId))
+    .limit(2);
 
   if (existsRes.length == 0) {
     throw new RowNotFoundError(`المحاضرة ذات المعرف ${lectureId} غير موجودة`);
