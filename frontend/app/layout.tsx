@@ -37,7 +37,9 @@ export default function RootLayout({
         geist.variable,
       )}
     >
-      <body className="min-h-full flex bg-[#1C1C18]  flex-col">
+      <body className="min-h-full flex bg-[#1C1C18]  flex-col"
+      suppressHydrationWarning
+      >
         <Providers>
           <Toaster richColors position="top-right" />
           <Header />

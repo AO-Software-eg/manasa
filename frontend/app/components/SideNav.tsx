@@ -27,17 +27,25 @@ const navGroups = [
   {
     label: 'القائمة الرئيسية',
     items: [
+<<<<<<< Updated upstream
       { name: 'الرئيسية', href: '/user/dashboard', icon: Home },
       { name: 'الدروس', href: '/user/courses', icon: BookOpen , badge: true},
       { name: 'المحفظة', href: '/user/wallet', icon: Wallet },
       { name: 'التاريخ', href: '/user/history', icon: Clock },
+=======
+      { name: 'الرئيسية', href: '/home', icon: Home },
+      { name: 'الدروس', href: '/home/courses', icon: BookOpen, badge: true },
+      { name: 'اشتراكاتي', href: '/home/mycourses', icon: BookMarked, badge: true },
+      { name: 'المحفظة', href: '/home/wallet', icon: Wallet },
+      { name: 'التاريخ', href: '/home/history', icon: Clock },
+>>>>>>> Stashed changes
     ],
   },
   {
     label: 'الدعم',
     items: [
-      { name: 'الدعم الفني', href: '/user/tech-support', icon: Headset },
-      { name: 'الإعدادات', href: '/user/settings', icon: Settings },
+      { name: 'الدعم الفني', href: '/home/tech-support', icon: Headset },
+      { name: 'الإعدادات', href: '/home/settings', icon: Settings },
     ],
   },
 ];
@@ -80,7 +88,12 @@ function SideNav({
   const menuRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
 
-  const isActive = (href: string) => path.startsWith(href);
+  const isActive = (href: string) => {
+    if (href === "/home") {
+      return path === "/home";
+    }
+    return path === href || path.startsWith(`${href}/`);
+  };
   const userName = loggedIn && userData ? userData.name : '...';
   const [courses, setCourses] = useState<{ id: number; title: string }[] | null>(null);
   const coursesCount = courses?.length || 0;
@@ -152,7 +165,7 @@ function SideNav({
 
         {/* Profile */}
         <div className="p-3 border-b border-[#1f1f1c]">
-          <Link href="/user/profile">
+          <Link href="/home/profile">
             <div
               className={`flex items-center gap-2.5 p-2.5 rounded-xl cursor-pointer hover:bg-[#222219] transition-colors ${collapsed ? 'justify-center' : 'bg-[#1c1c18] border border-[#2a2a22] '
                 }`}
@@ -310,7 +323,7 @@ function SideNav({
           >
             <X size={18} />
           </button>
-          <Link href="/user/profile" onClick={() => setIsMenuOpen(false)}>
+          <Link href="/home/profile" onClick={() => setIsMenuOpen(false)}>
             <div className="flex items-center gap-2.5 bg-[#1c1c18] px-3 py-2 rounded-xl border border-[#2a2a22]">
               <UserAvatar name={userName} />
               <div>
@@ -339,9 +352,15 @@ function SideNav({
                       <Link
                         href={item.href}
                         onClick={() => setIsMenuOpen(false)}
+<<<<<<< Updated upstream
                         className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all ${active
                             ? 'bg-[#252520] text-[#e6d3a3]'
                             : 'text-[#7a7060] hover:bg-[#1c1c18] hover:text-[#c4b48a]'
+=======
+                        className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-colors ${active
+                          ? 'bg-[#252520] text-[#e6d3a3]'
+                          : 'text-[#7a7060] hover:bg-[#1c1c18] hover:text-[#c4b48a]'
+>>>>>>> Stashed changes
                           }`}
                       >
                         {active && (
@@ -349,7 +368,7 @@ function SideNav({
                         )}
                         <Icon size={18} strokeWidth={active ? 2.2 : 1.8} />
                         <span className="flex-1">{item.name}</span>
-                        { item.badge && coursesCount > 0 && (
+                        {item.badge && coursesCount > 0 && (
                           <span className="bg-[#2a2820] text-[#c4a95a] text-[10px] font-semibold px-1.5 py-0.5 rounded-full">
                             {coursesCount}
                           </span>

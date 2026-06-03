@@ -2,7 +2,15 @@ import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   images: {
-    domains: ['ytgu3s3xxa.ufs.sh'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'ytgu3s3xxa.ufs.sh',
+        port: '',
+        pathname: '/**'
+      }
+    ]
+    
   },
   /* config options here */
   reactCompiler: true,

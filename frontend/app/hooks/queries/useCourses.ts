@@ -19,6 +19,7 @@ export function useCourseById(id: string) {
     staleTime: 0,
     queryFn: async () => {
       const res = await api.get(`/courses/${id}`);
+      console.log('FETCHING COURSE', id);
       if (!id) throw new Error('لم يتم العثور على الكورس');
       return res.data.data;
     },

@@ -77,7 +77,6 @@ function Page() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const onsubmit = async (data: Infer) => {
-    console.log('valid data', data);
 
     try {
       const res = await api.post('/signup', data);

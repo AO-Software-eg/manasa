@@ -20,7 +20,7 @@ function AIInsights() {
   return (
     <div className="bg-[#222] rounded-2xl p-4 flex flex-col gap-3 border border-[#333]">
       <h3 className="text-sm font-semibold text-[#e6d3a3] flex items-center gap-2">
-         تحليل الأداء الذكي
+        تحليل الأداء الذكي
       </h3>
 
       <p className="text-sm text-gray-300">
@@ -30,13 +30,13 @@ function AIInsights() {
 
       <div className="text-sm flex flex-col gap-2">
         <p className='text-white'>
-           <span className="text-[#e6d3a3]">أضعف أسبوع:</span> {weakest.week}
+          <span className="text-[#e6d3a3]">أضعف أسبوع:</span> {weakest.week}
         </p>
         <p className='text-white'>
-           <span className="text-[#e6d3a3]">التقدير:</span> {weakest.grade}%
+          <span className="text-[#e6d3a3]">التقدير:</span> {weakest.grade}%
         </p>
         <p className='text-white'>
-           <span className="text-[#e6d3a3]">نصيحة:</span> راجع الدرس المرتبط
+          <span className="text-[#e6d3a3]">نصيحة:</span> راجع الدرس المرتبط
           بهذا الأسبوع + حل تمارين إضافية
         </p>
       </div>
@@ -61,9 +61,8 @@ function RecentActivityCard({ title }: Props) {
         <h2 className="text-lg font-semibold">{title}</h2>
         <TrendingUp className="text-[#e6d3a3]" size={20} />
       </div>
-
       {/* Chart */}
-      <div className="w-full h-48">
+      <div className="w-full h-48 shrink-0">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data}>
             <XAxis dataKey="week" stroke="#888" />
@@ -79,7 +78,6 @@ function RecentActivityCard({ title }: Props) {
           </LineChart>
         </ResponsiveContainer>
       </div>
-
       {/* Divider */}
       <div className="w-full h-px bg-[#2a2a2a]" />
 

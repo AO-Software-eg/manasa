@@ -54,8 +54,14 @@ function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const path = usePathname();
+<<<<<<< Updated upstream
   const isUserPage = path.startsWith('/user');
   const { loggedIn } = useAuth();
+=======
+  const isUserPage = path.startsWith('/home');
+  const { data: userData, isError } = useMe();
+  const isLoggedIn = !isError && !!userData;
+>>>>>>> Stashed changes
 
 
 

@@ -19,7 +19,7 @@ function page() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const searchParams = useSearchParams();
-  const redirect = searchParams.get('redirect') || '/user';
+  const redirect = searchParams.get('redirect') || '/home';
 
   const onsubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();

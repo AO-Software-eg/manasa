@@ -34,7 +34,13 @@ export default function CourseComp({
 
   return (
     <Link
+<<<<<<< Updated upstream
       href={loggedIn ? `/user/courses/${id}` : `/login?redirect=/user/courses/${id}`}
+=======
+      href={
+        userData ? `/home/courses/${id}` : `/login?redirect=/home/courses/${id}`
+      }
+>>>>>>> Stashed changes
     >
       <div className="group bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:bg-white/10 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl cursor-pointer h-full flex flex-col">
         {/* Image */}
@@ -77,12 +83,17 @@ export default function CourseComp({
                     {finalPrice} جنيه
                   </span>
                 </div>
+<<<<<<< Updated upstream
 
                 <button
                   onClick={(e) => {
                     e.preventDefault(); // prevent Link navigation
                     router.push(`/login?redirect=/user/courses/${id}`);
                   }}
+=======
+                <Link
+                  href={`/login?redirect=/home/courses/${id}`}
+>>>>>>> Stashed changes
                   className="w-full py-3 rounded-lg bg-[#e6d3a3] text-[#1C1C18] font-semibold 
         hover:bg-[#d4c38c] transition-all duration-300 shadow-md hover:shadow-lg"
                 >
