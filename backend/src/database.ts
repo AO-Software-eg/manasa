@@ -154,8 +154,6 @@ export async function getLectureVideos(
 
   if (existsRes.length == 0) {
     throw new RowNotFoundError(`المحاضرة ذات المعرف ${lectureId} غير موجودة`);
-  } else if (existsRes.length > 1) {
-    throw new NonUniqueDataError(existsRes.length);
   }
 
   const res = await db
@@ -175,8 +173,6 @@ export async function getExamQuestions(examId: number) {
 
   if (existsRes.length == 0) {
     throw new RowNotFoundError(`الأمتحان ذو المعرف ${examId} غير موجود`);
-  } else if (existsRes.length > 1) {
-    throw new NonUniqueDataError(existsRes.length);
   }
 
   const res = await db.query.questions.findMany({
