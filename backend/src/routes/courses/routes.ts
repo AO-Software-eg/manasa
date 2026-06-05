@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.route('/').get(async (req: Request, res: Response) => {
   try {
-    const courses: db.Course[] = await db.getAllCourses();
+    const courses: db.SelectCourse[] = await db.getAllCourses();
     return res
       .status(200)
       .json({ message: 'Courses retrieval successful', data: courses });
@@ -25,7 +25,7 @@ router.route('/:courseId').get(async (req: Request, res: Response) => {
     if (/^\d+$/.test(courseId) === false) {
       return res.status(401).json({ message: 'Invalid course ID paramater' });
     }
-    const course: db.Course = await db.getCourseById(Number(courseId));
+    const course: db.SelectCourse = await db.getCourseById(Number(courseId));
 
     return res.status(200).json({ message: 'Found course', data: course });
   } catch (err: any) {
@@ -49,7 +49,9 @@ router.route('/:courseId/lectures').get(async (req: Request, res: Response) => {
       return res.status(401).json({ message: 'Invalid course ID paramater' });
     }
 
-    const lectures: db.Lecture[] = await db.getCourseLectures(Number(courseId));
+    const lectures: db.SelectLecture[] = await db.getCourseLectures(
+      Number(courseId),
+    );
 
     return res
       .status(200)
