@@ -10,6 +10,50 @@ import { hashPassword, verifyPassword } from '../../hash.ts';
 const router = express.Router();
 
 router
+  .route('/users/enroll')
+  .post(bodyParser.json(), async (req: Request, res: Response) => {
+    if (!req.is('application/json')) {
+      return res.status(415).send();
+    }
+
+    try {
+      const data = req.body;
+      validation.enrollSchema.parse(data);
+
+      await db.addCourseEnrollment(data);
+    } catch (err: any) {
+      if (err instanceof ZodError) {
+        return res.status(400).send();
+      } else {
+        return res.status(500).json({
+          message: err instanceof Error ? err.message : 'حدث خطأ ما !',
+        });
+      }
+    }
+  });
+
+router
+  .route('/users/:userId/enrollments')
+  .get(async (req: Request, res: Response) => {
+    try {
+      const userId = req.params.userId;
+
+      if (typeof userId !== 'string') {
+        return res.status(401).json({ message: 'Invalid user ID paramater' });
+      }
+      if (/^\d+$/.test(userId) === false) {
+        return res.status(401).json({ message: 'Invalid user ID paramater' });
+      }
+
+      const enrollments = await db.getCourseEnrollments(Number(userId));
+
+      return res.status(200).json(enrollments);
+    } catch (err: any) {
+      res.status(500).send();
+    }
+  });
+
+router
   .route('/signup')
   .post(bodyParser.json(), async (req: Request, res: Response) => {
     if (!req.is('application/json')) {

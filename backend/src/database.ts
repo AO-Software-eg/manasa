@@ -56,6 +56,11 @@ export type InsertQuestion = typeof schema.questions.$inferInsert;
 export type SelectQuestionChoice = typeof schema.questionChoices.$inferSelect;
 export type InsertQuestionChoice = typeof schema.questionChoices.$inferInsert;
 
+export type SelectCourseEnrollment =
+  typeof schema.courseEnrollments.$inferSelect;
+export type InsertCourseEnrollment =
+  typeof schema.courseEnrollments.$inferInsert;
+
 export type RelationLecture = Awaited<
   ReturnType<typeof getCourseLectures>
 >[number];
@@ -191,6 +196,21 @@ export async function getExamQuestions(examId: number) {
   });
 
   return res;
+}
+
+export async function getCourseEnrollments(
+  userId: number,
+): Promise<SelectCourseEnrollment[]> {
+  const res = await db
+    .select()
+    .from(schema.courseEnrollments)
+    .where(eq(schema.courseEnrollments.studentId, userId));
+
+  return res;
+}
+
+export async function addCourseEnrollment(enrollment: InsertCourseEnrollment) {
+  await db.insert(schema.courseEnrollments).values(enrollment);
 }
 
 export default db;
