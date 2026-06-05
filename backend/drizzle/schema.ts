@@ -1,4 +1,4 @@
-import { pgTable, foreignKey, unique, bigint, timestamp, text, boolean, integer } from "drizzle-orm/pg-core"
+import { pgTable, foreignKey, unique, bigint, timestamp, text, boolean, integer, primaryKey } from "drizzle-orm/pg-core"
 import { sql } from "drizzle-orm"
 
 
@@ -108,4 +108,24 @@ export const lectures = pgTable("lectures", {
 			foreignColumns: [courses.id],
 			name: "lectures_course_id_fkey"
 		}).onUpdate("cascade").onDelete("cascade"),
+]);
+
+export const courseEnrollments = pgTable("course_enrollments", {
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
+	studentId: bigint("student_id", { mode: "number" }).notNull(),
+	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
+	courseId: bigint("course_id", { mode: "number" }).notNull(),
+}, (table) => [
+	foreignKey({
+			columns: [table.courseId],
+			foreignColumns: [courses.id],
+			name: "course_enrollments_course_id_fkey"
+		}).onUpdate("cascade").onDelete("cascade"),
+	foreignKey({
+			columns: [table.studentId],
+			foreignColumns: [users.id],
+			name: "course_enrollments_student_id_fkey"
+		}).onUpdate("cascade").onDelete("cascade"),
+	primaryKey({ columns: [table.studentId, table.courseId], name: "course_enrollments_pkey"}),
 ]);

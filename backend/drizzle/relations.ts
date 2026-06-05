@@ -6,6 +6,8 @@ import {
   questions,
   questionChoices,
   courses,
+  courseEnrollments,
+  users,
 } from './schema.ts';
 
 export const lectureVideosRelations = relations(lectureVideos, ({ one }) => ({
@@ -52,4 +54,23 @@ export const questionsRelations = relations(questions, ({ one, many }) => ({
 
 export const coursesRelations = relations(courses, ({ many }) => ({
   lectures: many(lectures),
+  courseEnrollments: many(courseEnrollments),
+}));
+
+export const courseEnrollmentsRelations = relations(
+  courseEnrollments,
+  ({ one }) => ({
+    course: one(courses, {
+      fields: [courseEnrollments.courseId],
+      references: [courses.id],
+    }),
+    user: one(users, {
+      fields: [courseEnrollments.studentId],
+      references: [users.id],
+    }),
+  }),
+);
+
+export const usersRelations = relations(users, ({ many }) => ({
+  courseEnrollments: many(courseEnrollments),
 }));
