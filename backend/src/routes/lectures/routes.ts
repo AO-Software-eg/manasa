@@ -15,7 +15,7 @@ router.route('/:lectureId/videos').get(async (req: Request, res: Response) => {
       return res.status(401).json({ message: 'Invalid lecture ID paramater' });
     }
 
-    const data: db.LectureVideo[] = await db.getLectureVideos(
+    const data: db.SelectLectureVideo[] = await db.getLectureVideos(
       Number(lectureId),
     );
 
