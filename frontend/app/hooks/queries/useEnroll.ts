@@ -1,7 +1,9 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/app/hooks/api';
 
 export const useEnroll = () => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async ({
       studentId,
@@ -14,9 +16,14 @@ export const useEnroll = () => {
         studentId,
         courseId,
       });
-      console.log('Enrollment response:', response.data);
 
       return response.data;
+    },
+
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ['enrollments', variables.studentId.toString()],
+      });
     },
   });
 };
