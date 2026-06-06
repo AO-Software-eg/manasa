@@ -1,4 +1,4 @@
-'use client'; 
+'use client';
 
 import CourseImage from '@/app/components/CourseImg';
 import BackButton from '@/app/components/BackBtn';
@@ -6,13 +6,20 @@ import ExpandableText from '@/app/components/EcalpsedTxt';
 import Link from 'next/link';
 import LoadingComp from '@/app/components/LoadingComp';
 import { useCourseById } from '@/app/hooks/queries/useCourses';
-import { useParams } from 'next/navigation'; 
+import { useParams } from 'next/navigation';
+import { useEnroll } from '@/app/hooks/queries/useEnroll';
+import { useMe } from '@/app/hooks/queries/useMe';
+import { useGetEnrollments } from '@/app/hooks/queries/useEnroll';
 
-export default function CoursePage() { 
+
+export default function CoursePage() {
   const params = useParams();
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
 
+
   const { data: course, isLoading, isError, refetch } = useCourseById(id ?? '');
+
+
 
   if (isLoading) return <LoadingComp />;
 
@@ -48,9 +55,40 @@ interface CourseDataProps {
 }
 
 function CourseData({ course }: CourseDataProps) {
+  const { data: userData } = useMe();
+
+  const enrollMutation = useEnroll();
+
+  const handleEnroll = () => {
+    if (!userData?.id) return;
+
+    console.log('Enrolling user:', userData.id, 'in course:', course.id);
+
+    enrollMutation.mutate({
+      studentId: Number(userData.id),
+      courseId: Number(course.id),
+    });
+  };
+
+  const { data: enrollments, isLoading: enrollLoading, isError: enrollError } = useGetEnrollments(userData?.id?.toString() ?? '');
+
+  const enrolledCourseIds = new Set(
+    enrollments?.map((e: any) => e.courseId) ?? []
+  )
+
+  const isPurchased = enrolledCourseIds.has(Number(course.id))
+
+
+
   return (
     <div className="space-y-8 mt-12">
-      <div className="bg-[#1C1C18] border-2 border-[#e6d3a3]/50 p-8 rounded-2xl flex flex-col items-center justify-center">
+      {
+        isPurchased ? (
+         <div>
+           تم شراء هذا الكورس 
+         </div>
+        ) : (
+               <div className="bg-[#1C1C18] border-2 border-[#e6d3a3]/50 p-8 rounded-2xl flex flex-col items-center justify-center">
         <div className="relative  pt-4 text-center">
           <h2 className="text-3xl font-bold mb-6 text-[#e6d3a3]">
             المحتوى مقفل
@@ -59,14 +97,16 @@ function CourseData({ course }: CourseDataProps) {
             قم بشراء الكورس للوصول إلى جميع الدروس والمواد
           </p>
           <div className="flex justify-center items-center w-full">
-            <Link href={`/home/courses/${course.id}/lectures`}>
-              <button className="px-12 py-4 mx-auto bg-[#e6d3a3]/20 hover:bg-[#e6d3a3]/30 border-2 border-[#e6d3a3] text-[#e6d3a3] font-bold text-lg rounded-full shadow-lg hover:shadow-[#e6d3a3]/25 transform hover:scale-105 transition-all">
-                شراء الكورس
-              </button>
-            </Link>
+
+            <button onClick={handleEnroll} disabled={enrollMutation.isPending} className="px-12 py-4 mx-auto bg-[#e6d3a3]/20 hover:bg-[#e6d3a3]/30 border-2 border-[#e6d3a3] text-[#e6d3a3] font-bold text-lg rounded-full shadow-lg hover:shadow-[#e6d3a3]/25 transform hover:scale-105 transition-all">
+              شراء الكورس
+            </button>
+
           </div>
-        </div>
-      </div>
-    </div>
+        </div >
+      </div >
+        )
+}
+    </div >
   );
 }

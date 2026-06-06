@@ -21,8 +21,13 @@ router
       validation.enrollSchema.parse(data);
 
       await db.addCourseEnrollment(data);
+      return res.status(201).json({
+        message: 'Enrollment created',
+      });
     } catch (err: any) {
+      console.log(err);
       if (err instanceof ZodError) {
+        console.log(err);
         return res.status(400).send();
       } else {
         return res.status(500).json({
