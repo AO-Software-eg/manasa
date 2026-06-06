@@ -198,13 +198,26 @@ export async function getExamQuestions(examId: number) {
   return res;
 }
 
-export async function getCourseEnrollments(
-  userId: number,
-): Promise<SelectCourseEnrollment[]> {
-  const res = await db
-    .select()
-    .from(schema.courseEnrollments)
-    .where(eq(schema.courseEnrollments.studentId, userId));
+export async function getCourseEnrollments(userId: number) {
+  const res = await db.query.courseEnrollments.findMany({
+    where: (courseEnrollments, { eq }) =>
+      eq(courseEnrollments.studentId, userId),
+    columns: {
+      courseId: false,
+    },
+    with: {
+      course: {
+        columns: {
+          id: true,
+          title: true,
+          imageUrl: true,
+          createdAt: true,
+          price: true,
+          description: true,
+        },
+      },
+    },
+  });
 
   return res;
 }
