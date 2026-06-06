@@ -6,10 +6,11 @@ import ExpandableText from '@/app/components/EcalpsedTxt';
 import Link from 'next/link';
 import LoadingComp from '@/app/components/LoadingComp';
 import { useCourseById } from '@/app/hooks/queries/useCourses';
-import { useParams } from 'next/navigation';
+import { useParams , useRouter } from 'next/navigation';
 import { useEnroll } from '@/app/hooks/queries/useEnroll';
 import { useMe } from '@/app/hooks/queries/useMe';
 import { useGetEnrollments } from '@/app/hooks/queries/useEnroll';
+import { toast } from 'sonner';
 
 
 export default function CoursePage() {
@@ -58,11 +59,15 @@ function CourseData({ course }: CourseDataProps) {
   const { data: userData } = useMe();
 
   const enrollMutation = useEnroll();
+  const router = useRouter();
 
   const handleEnroll = () => {
     if (!userData?.id) return;
 
     console.log('Enrolling user:', userData.id, 'in course:', course.id);
+    router.push(`/home/courses/${course.id}/lectures`);
+    toast.success('تم الانضمام الي الكورس بنجاح')
+
 
     enrollMutation.mutate({
       studentId: Number(userData.id),
@@ -73,7 +78,7 @@ function CourseData({ course }: CourseDataProps) {
   const { data: enrollments, isLoading: enrollLoading, isError: enrollError } = useGetEnrollments(userData?.id?.toString() ?? '');
 
   const enrolledCourseIds = new Set(
-    enrollments?.map((e: any) => e.courseId) ?? []
+    enrollments?.map((e: any) => Number(e.course.id)) ?? []
   )
 
   const isPurchased = enrolledCourseIds.has(Number(course.id))
@@ -85,8 +90,15 @@ function CourseData({ course }: CourseDataProps) {
       {
         isPurchased ? (
          <div>
-           تم شراء هذا الكورس 
+          <h1>
+             تم شراء هذا الكورس 
+          </h1>
+             <Link href={`/home/courses/${course.id}/lectures`}  className="px-12 py-4 mx-auto bg-[#e6d3a3]/20 hover:bg-[#e6d3a3]/30 border-2 border-[#e6d3a3] text-[#e6d3a3] font-bold text-lg rounded-full shadow-lg hover:shadow-[#e6d3a3]/25 transform hover:scale-105 transition-all">
+             الدخول اللى المحاضرات
+            </Link>
+
          </div>
+
         ) : (
                <div className="bg-[#1C1C18] border-2 border-[#e6d3a3]/50 p-8 rounded-2xl flex flex-col items-center justify-center">
         <div className="relative  pt-4 text-center">

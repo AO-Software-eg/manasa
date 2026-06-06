@@ -10,14 +10,15 @@ export function useLectures(courseID: string) {
     queryFn: async () => {
       const res = await api.get(`/courses/${courseID}/lectures`);
       if (!res.data.data) throw new Error('لم يتم الحصول على محتوى الكورس');
+      console.log(res.data.data)
       return res.data.data;
     },
   });
 }
 
 export function useVideo(
-  lectureId: string,
-  videoRecordId: string
+  lectureId: number,
+  videoRecordId: number
 ) {
   return useQuery({
     queryKey: ['video', lectureId, videoRecordId],
@@ -29,14 +30,19 @@ export function useVideo(
       );
 
       const video = res.data.data.find(
-        (v: lectureVideoSchema) => v.id === videoRecordId
+        (v: lectureVideoSchema) => Number(v.id) === Number(videoRecordId)
       );
+      console.log({
+        lectureId,
+        videoRecordId,
+        videos: res.data.data,
+      });
 
       if (!video) {
         throw new Error('لم يتم العثور على الفيديو');
       }
 
-      const vidRes = await api.get(`/videos/${video.video_id}`);
+      const vidRes = await api.get(`/videos/${video.videoId}`);
 
       return {
         otp: vidRes.data.otp,

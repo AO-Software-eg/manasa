@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 
 function Footer() {
   const path = usePathname();
-  const isUserPage = path.startsWith('/user');
+  const isUserPage = path.startsWith('/home');
   return (
     <>
       {!isUserPage && (

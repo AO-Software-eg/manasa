@@ -13,8 +13,8 @@ export default function Courses() {
   
   const { data: enrollments, isLoading: enrollLoading, isError: enrollError } = useGetEnrollments(userData?.id?.toString() ?? '');
 
-  const enrolledCourseIds  = new Set(
-    enrollments?.map((e:any) => e.courseId) ?? []
+  const enrolledCourseIds  = new Set<number>(
+    enrollments?.map((e:any) => Number(e.course.id)) ?? []
   )
 
 
@@ -54,6 +54,7 @@ export default function Courses() {
             imageUrl={course.imageUrl}
             userData={userData}
             isPriority={i < 3}
+            progress={100}
           />
         ))}
       </div>

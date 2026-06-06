@@ -4,7 +4,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { courses } from '@/types';
 import BackButton from '@/app/components/BackBtn';
 import { lecture } from '@/types';
-import { useCourses } from '@/app/hooks/queries/useCourses';
+import { useCourseById } from '@/app/hooks/queries/useCourses';
 import { useLectures } from '@/app/hooks/queries/useLectures';
 import LoadingComp from '@/app/components/LoadingComp';
 import {
@@ -18,12 +18,13 @@ export default function Page() {
   const params = useParams();
   const router = useRouter();
   const courseId = Array.isArray(params.id) ? params.id[0] : params.id;
-
   const {
-    data: coursesData,
+    data: course,
     isLoading: coursesLoading,
-    isError: coursesError,
-  } = useCourses();
+    isError: coursesError
+  } = useCourseById(courseId ?? '')
+
+
 
   const {
     data: assets = [],
@@ -36,7 +37,7 @@ export default function Page() {
 
   if (coursesLoading || assetsLoading) return <LoadingComp />;
 
-  if (coursesError || assetsError) {
+  if (coursesError || assetsError) { 
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4">
         <p className="text-red-500">حدث خطأ أثناء تحميل البيانات</p>
@@ -50,9 +51,7 @@ export default function Page() {
     );
   }
 
-  const course = coursesData?.find(
-    (c: courses) => Number(c.id) === Number(courseId),
-  );
+
 
   if (!course) {
     return (
@@ -92,79 +91,80 @@ export default function Page() {
             </p>
           ) : (
             assets.map((asset: lecture) => {
-              const videos = asset.videos ?? [];
+              const videos = asset.lectureVideos ?? [];
               const exams = asset.exams ?? [];
 
               return (
-                <div key={asset.id} className="flex flex-col gap-3">
-                  <Accordion
-                    type="single"
-                    collapsible
-                    className="max-w-lg rounded-md bg-[#38342B]"
-                  >
-                    <AccordionItem value={`item-${asset.id}`}>
-                      <AccordionTrigger className="gap-2 rounded-t rounded-b-none bg-[#141412] text-right">
-                        <span className="px-4 text-xl font-semibold text-[#e6d3a3]">
-                          {asset.title}
-                        </span>
-                      </AccordionTrigger>
 
-                      <AccordionContent>
-                        <div className="my-2 flex flex-col gap-3 p-3">
-                          {videos.length + exams.length === 0 && (
-                            <p className="py-10 text-center text-gray-400">
-                              لا توجد مواد متاحة
-                            </p>
-                          )}
+                <Accordion
+                  key={asset.id}
+                  type="single"
+                  collapsible
+                  className="max-w-lg rounded-md bg-[#38342B]"
+                >
+                  <AccordionItem value={`item-${asset.id}`}>
+                    <AccordionTrigger className="gap-2 rounded-t rounded-b-none bg-[#141412] text-right">
+                      <span className="px-4 text-xl font-semibold text-[#e6d3a3]">
+                        {asset.title}
+                      </span>
+                    </AccordionTrigger>
 
-                          {videos.map((video) => (
-                            <button
-                              key={video.video_id}
-                              onClick={() =>
-                                router.push(
-                                  `/home/courses/${courseId}/lectures/${asset.id}/videos/${video.id}`,
-                                )
-                              }
-                              className="flex items-center justify-between rounded-xl border border-zinc-700 bg-zinc-900/60 p-4 transition-all hover:border-blue-500 hover:bg-zinc-800"
-                            >
-                              <div className="flex items-center gap-3">
-                                <span className="font-medium text-zinc-100">
-                                  {video.title}
-                                </span>
-                              </div>
+                    <AccordionContent>
+                      <div className="my-2 flex flex-col gap-3 p-3">
+                        {videos.length + exams.length === 0 && (
+                          <p className="py-10 text-center text-gray-400">
+                            لا توجد مواد متاحة
+                          </p>
+                        )}
 
-                              <span className="text-sm text-zinc-400">
-                                مشاهدة
+                        {videos.map((video) => (
+                          <button
+                            key={video.id}
+                            onClick={() =>
+                              router.push(
+                                `/home/courses/${courseId}/lectures/${asset.id}/videos/${video.id}`,
+                              )
+                            }
+                            className="flex items-center justify-between rounded-xl border border-zinc-700 bg-zinc-900/60 p-4 transition-all hover:border-blue-500 hover:bg-zinc-800"
+                          >
+                            <div className="flex items-center gap-3">
+                              <span className="font-medium text-zinc-100">
+                                {video.title}
                               </span>
-                            </button>
-                          ))}
+                            </div>
 
-                          {exams.map((exam) => (
-                            <button
-                              key={exam.id}
-                              onClick={() =>
-                                router.push(
-                                  `/home/courses/${courseId}/lectures/${asset.id}/exams/${exam.id}`,
-                                )
-                              }
-                              className="flex items-center justify-between rounded-xl border border-zinc-700 bg-zinc-900/60 p-4 transition-all hover:border-emerald-500 hover:bg-zinc-800"
-                            >
-                              <div className="flex items-center gap-3">
-                                <span className="font-medium text-zinc-100">
-                                  {exam.title}
-                                </span>
-                              </div>
+                            <span className="text-sm text-zinc-400">
+                              مشاهدة
+                            </span>
+                          </button>
+                        ))}
 
-                              <span className="text-sm text-zinc-400">
-                                اختبار
+                        {exams.map((exam) => (
+                          <button
+                            key={exam.id}
+                            onClick={() =>
+                              router.push(
+                                `/home/courses/${courseId}/lectures/${asset.id}/exams/${exam.id}`,
+                              )
+                            }
+                            className="flex items-center justify-between rounded-xl border border-zinc-700 bg-zinc-900/60 p-4 transition-all hover:border-emerald-500 hover:bg-zinc-800"
+                          >
+                            <div className="flex items-center gap-3">
+                              <span className="font-medium text-zinc-100">
+                                {exam.title}
                               </span>
-                            </button>
-                          ))}
-                        </div>
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
-                </div>
+                            </div>
+
+                            <span className="text-sm text-zinc-400">
+                              اختبار
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+
               );
             })
           )}

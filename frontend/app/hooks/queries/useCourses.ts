@@ -20,6 +20,8 @@ export function useCourseById(id: string) {
     queryKey: ['course', id],
     enabled: !!id,
     staleTime: 1000 * 60 * 5,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
     queryFn: async () => {
       const res = await api.get(`/courses/${id}`);
       console.log('FETCHING COURSE', id);

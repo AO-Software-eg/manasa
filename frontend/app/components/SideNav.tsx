@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useMe } from '../hooks/queries/useMe';
 import { useCourses } from '../hooks/queries/useCourses';
+import { useGetEnrollments } from '../hooks/queries/useEnroll';
 import {
   Menu,
   BellRing,
@@ -29,8 +30,8 @@ const navGroups = [
     label: 'القائمة الرئيسية',
     items: [
       { name: 'الرئيسية', href: '/home', icon: Home },
-      { name: 'الدروس', href: '/home/courses', icon: BookOpen , badge: true},
-      { name: 'اشتراكاتي', href: '/home/mycourses', icon: BookMarked , badge: true},
+      { name: 'الدروس', href: '/home/courses', icon: BookOpen, badge: true },
+      { name: 'اشتراكاتي', href: '/home/mycourses', icon: BookMarked, badge: true },
       { name: 'المحفظة', href: '/home/wallet', icon: Wallet },
       { name: 'التاريخ', href: '/home/history', icon: Clock },
     ],
@@ -92,6 +93,8 @@ function SideNav({
   const userName = loggedIn && userData ? userData.name : '...';
   const { data: coursesData } = useCourses();
   const coursesCount = coursesData?.length || 0;
+  const { data: enrollments, isLoading } = useGetEnrollments(userData?.id ?? '');
+  const enrollmentCount = enrollments?.length || 0;
 
 
 
@@ -203,6 +206,11 @@ function SideNav({
                         {!collapsed && item.badge && item.name === "الدروس" && (
                           <span className="bg-[#2a2820] text-[#c4a95a] text-[10px] font-semibold px-1.5 py-0.5 rounded-full">
                             {coursesCount}
+                          </span>
+                        )}
+                        {!collapsed && item.badge && item.name === "اشتراكاتي" && (
+                          <span className="bg-[#2a2820] text-[#c4a95a] text-[10px] font-semibold px-1.5 py-0.5 rounded-full">
+                            {enrollmentCount}
                           </span>
                         )}
                       </Link>
@@ -346,9 +354,14 @@ function SideNav({
                         )}
                         <Icon size={18} strokeWidth={active ? 2.2 : 1.8} />
                         <span className="flex-1">{item.name}</span>
-                         {!collapsed && item.badge && item.name === "الدروس" && coursesCount > 0 && (
+                        {!collapsed && item.badge && item.name === "الدروس" && coursesCount > 0 && (
                           <span className="bg-[#2a2820] text-[#c4a95a] text-[10px] font-semibold px-1.5 py-0.5 rounded-full">
                             {coursesCount}
+                          </span>
+                        )}
+                             {!collapsed && item.badge && item.name === "اشتراكاتي" && (
+                          <span className="bg-[#2a2820] text-[#c4a95a] text-[10px] font-semibold px-1.5 py-0.5 rounded-full">
+                            {enrollmentCount}
                           </span>
                         )}
                       </Link>

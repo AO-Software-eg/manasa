@@ -2,7 +2,7 @@ export type lecture = {
     id: string;
     course_id: string;
     title: string;
-    videos: [
+    lectureVideos: [
         {
             id: number;
             title: string;
