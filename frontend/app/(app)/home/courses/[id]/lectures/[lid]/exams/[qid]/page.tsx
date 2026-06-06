@@ -9,6 +9,7 @@ import { useParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import Timer from '@/app/components/Timer';
 import { ExamQuestion } from '@/types/exams';
+import PopUp from '@/app/components/PopUp';
 
 
 function Page() {
@@ -36,7 +37,7 @@ function Page() {
   const { data, isLoading, error } = useExams(examId);
 
 
- 
+
 
   const questionCount = data?.questions.length || 0;
 
@@ -335,135 +336,28 @@ function Page() {
         </button>
       </div>
 
-      {/* Exit Popup */}
-      <ExitPopUp
-        onExit={onExit}
-        setOnExit={setOnExit}
-        onOpenExit={onOpenExit}
-        setOpenOnExit={setOpenOnExit}
+      <PopUp
+        open={onOpenExit}
+        title="هل أنت متأكد أنك تريد الخروج؟"
+        description="سيتم فقدان جميع الإجابات غير المحفوظة."
+        confirmText="خروج"
+        confirmClassName="bg-red-500 hover:bg-red-600"
+        onClose={() => setOpenOnExit(false)}
+        onConfirm={() => setOnExit(true)}
       />
 
-      {/* Submit Popup */}
-      <SubmitPopUp
-        onSubmit={onSubmit}
-        setOnSubmit={setOnSubmit}
-        answers={answers}
+      <PopUp
+        open={onSubmit}
+        title="هل أنت متأكد أنك تريد تقديم الامتحان؟"
+        description="تأكد من مراجعة إجاباتك قبل تقديم الامتحان."
+        confirmText="تقديم الامتحان"
+        confirmClassName="bg-green-600 hover:bg-green-700"
+        onClose={() => setOnSubmit(false)}
+        onConfirm={() => console.log(answers)}
       />
     </div>
   );
 }
 
-// --------------------------------------
-// Exit Popup
-// --------------------------------------
-
-function ExitPopUp({
-  onExit,
-  setOnExit,
-  onOpenExit,
-  setOpenOnExit,
-}: {
-  onExit: boolean;
-  setOnExit: React.Dispatch<React.SetStateAction<boolean>>;
-  onOpenExit: boolean;
-  setOpenOnExit: React.Dispatch<React.SetStateAction<boolean>>;
-}) {
-  return (
-    <div
-      className={`
-                ${onOpenExit ? 'flex' : 'hidden'}
-
-                fixed inset-0
-                bg-black/60
-                backdrop-blur-sm
-                items-center justify-center
-                z-50
-            `}
-    >
-      <div className="bg-[#111827] border border-gray-700 p-6 rounded-3xl shadow-xl w-[90%] max-w-md">
-        <h2 className="text-2xl font-bold mb-4 text-right">
-          هل أنت متأكد أنك تريد الخروج؟
-        </h2>
-
-        <p className="mb-6 text-gray-300 text-right">
-          سيتم فقدان جميع الإجابات غير المحفوظة.
-        </p>
-
-        <div className="flex justify-end gap-4">
-          <button
-            onClick={() => setOpenOnExit(false)}
-            className="bg-gray-700 hover:bg-gray-600 px-5 py-2 rounded-xl transition"
-          >
-            إلغاء
-          </button>
-
-          <button
-            className="bg-red-500 hover:bg-red-600 px-5 py-2 rounded-xl transition"
-            onClick={() => {
-              setOnExit(true);
-              console.log(onExit);
-            }}
-          >
-            خروج
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// --------------------------------------
-// Submit Popup
-// --------------------------------------
-
-function SubmitPopUp({
-  onSubmit,
-  setOnSubmit,
-  answers,
-}: {
-  onSubmit: boolean;
-  setOnSubmit: React.Dispatch<React.SetStateAction<boolean>>;
-  answers: Record<number, string>;
-}) {
-  return (
-    <div
-      className={`
-                ${onSubmit ? 'flex' : 'hidden'}
-
-                fixed inset-0
-                bg-black/60
-                backdrop-blur-sm
-                items-center justify-center
-                z-50
-            `}
-    >
-      <div className="bg-[#111827] border border-gray-700 p-6 rounded-3xl shadow-xl w-[90%] max-w-md">
-        <h2 className="text-2xl font-bold mb-4 text-right">
-          هل أنت متأكد أنك تريد تقديم الامتحان؟
-        </h2>
-
-        <p className="mb-6 text-gray-300 text-right">
-          تأكد من مراجعة إجاباتك قبل تقديم الامتحان.
-        </p>
-
-        <div className="flex justify-end gap-4">
-          <button
-            onClick={() => setOnSubmit(false)}
-            className="bg-gray-700 hover:bg-gray-600 px-5 py-2 rounded-xl transition"
-          >
-            إلغاء
-          </button>
-
-          <button
-            className="bg-green-600 hover:bg-green-700 px-5 py-2 rounded-xl transition"
-            onClick={() => console.log(answers)}
-          >
-            تقديم الامتحان
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 export default Page;

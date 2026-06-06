@@ -8,7 +8,7 @@ function Timer({
   timeDone: boolean;
   setTimeDone: (value: boolean) => void;
 }) {
-  const [time, setTime] = useState((1) * 60); // 30 minutes in seconds
+  const [time, setTime] = useState((45) * 60); 
   useEffect(() => {
     const timer = setInterval(() => {
       setTime((prev) => Math.max(prev - 1, 0));

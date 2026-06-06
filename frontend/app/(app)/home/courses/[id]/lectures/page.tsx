@@ -7,16 +7,19 @@ import { lecture } from '@/types';
 import { useCourseById } from '@/app/hooks/queries/useCourses';
 import { useLectures } from '@/app/hooks/queries/useLectures';
 import LoadingComp from '@/app/components/LoadingComp';
+import PopUp from '@/app/components/PopUp';
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import { useState } from 'react';
 
 export default function Page() {
   const params = useParams();
   const router = useRouter();
+  const [open, setOpen] = useState(false);
   const courseId = Array.isArray(params.id) ? params.id[0] : params.id;
   const {
     data: course,
@@ -37,7 +40,7 @@ export default function Page() {
 
   if (coursesLoading || assetsLoading) return <LoadingComp />;
 
-  if (coursesError || assetsError) { 
+  if (coursesError || assetsError) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4">
         <p className="text-red-500">حدث خطأ أثناء تحميل البيانات</p>
@@ -139,27 +142,45 @@ export default function Page() {
                           </button>
                         ))}
 
-                        {exams.map((exam) => (
-                          <button
-                            key={exam.id}
-                            onClick={() =>
-                              router.push(
-                                `/home/courses/${courseId}/lectures/${asset.id}/exams/${exam.id}`,
-                              )
-                            }
-                            className="flex items-center justify-between rounded-xl border border-zinc-700 bg-zinc-900/60 p-4 transition-all hover:border-emerald-500 hover:bg-zinc-800"
+                        {exams.map((exam, i: number) => (
+                          <div
+                            key={i}
+                            className='w-full flex items-center justify-between'
                           >
-                            <div className="flex items-center gap-3">
-                              <span className="font-medium text-zinc-100">
-                                {exam.title}
-                              </span>
-                            </div>
+                            <button
+                              key={exam.id}
+                              onClick={() => setOpen(true)}
+                              className="flex items-center justify-between w-full rounded-xl border border-zinc-700 bg-zinc-900/60 p-4 transition-all hover:border-emerald-500 hover:bg-zinc-800"
+                            >
+                              <div className="flex items-center gap-3">
+                                <span className="font-medium text-zinc-100">
+                                  {exam.title}
+                                </span>
+                              </div>
 
-                            <span className="text-sm text-zinc-400">
-                              اختبار
-                            </span>
-                          </button>
+                              <span className="text-sm text-zinc-400">
+                                اختبار
+                              </span>
+                            </button>
+                            <PopUp
+                              key={i}
+                              open={open}
+                              title="هل انت متأكد من بدأ الأمتحان ؟"
+                              description="تنبيه هام جدا جدا جدا
+
+خلي بالك الامتحان مدته : 45 دقيقة
+مينفعش تخرج من الاختبار قبل ما تكون خلصت الاختبار ..."
+                              confirmText="بدء الأمتحان"
+                              confirmClassName="bg-green-500 hover:bg-green-600"
+                              onClose={() => setOpen(false)}
+                              onConfirm={() => router.push(
+                                `/home/courses/${courseId}/lectures/${asset.id}/exams/${exam.id}`
+                              )} /></div>
                         ))}
+
+
+
+
                       </div>
                     </AccordionContent>
                   </AccordionItem>
