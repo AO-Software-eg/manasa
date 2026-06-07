@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import { drizzle } from 'drizzle-orm/node-postgres';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 
 import * as schema from '../drizzle/schema.ts';
 import * as schemaRelations from '../drizzle/relations.ts';
@@ -222,8 +222,50 @@ export async function getCourseEnrollments(userId: number) {
   return res;
 }
 
+export async function isUserEnrolled(userId: number, courseId: number) {
+  const res = await db
+    .select()
+    .from(schema.courseEnrollments)
+    .where(
+      and(
+        eq(schema.courseEnrollments.studentId, userId),
+        eq(schema.courseEnrollments.courseId, courseId),
+      ),
+    );
+
+  console.log(res.length != 0);
+
+  return res.length != 0;
+}
+
 export async function addCourseEnrollment(enrollment: InsertCourseEnrollment) {
   await db.insert(schema.courseEnrollments).values(enrollment);
+}
+
+export async function getExam(examId: number): Promise<SelectExam> {
+  const res = await db
+    .select()
+    .from(schema.exams)
+    .where(eq(schema.exams.id, examId));
+
+  if (res.length === 0) {
+    throw new RowNotFoundError(`Exam with id ${examId} not found`);
+  }
+
+  return res[0];
+}
+
+export async function getLecture(lectureId: number): Promise<SelectLecture> {
+  const res = await db
+    .select()
+    .from(schema.lectures)
+    .where(eq(schema.lectures.id, lectureId));
+
+  if (res.length === 0) {
+    throw new RowNotFoundError(`Lecture with id ${lectureId} not found`);
+  }
+
+  return res[0];
 }
 
 export default db;
