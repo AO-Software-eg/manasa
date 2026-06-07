@@ -1,7 +1,6 @@
 import express, { type Request, type Response } from 'express';
 import * as db from '../../database.ts';
 import * as auth from '../../auth.ts';
-import * as jwt from 'jsonwebtoken';
 
 const router = express.Router();
 
