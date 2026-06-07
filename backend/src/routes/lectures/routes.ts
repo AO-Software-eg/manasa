@@ -1,6 +1,6 @@
 import express, { type Request, type Response } from 'express';
 import * as db from '../../database.ts';
-import { ZodAny } from 'zod';
+import * as auth from '../../auth.ts';
 
 const router = express.Router();
 
@@ -15,6 +15,17 @@ router.route('/:lectureId/videos').get(async (req: Request, res: Response) => {
       return res.status(401).json({ message: 'Invalid lecture ID paramater' });
     }
 
+    const payload = auth.verifyToken(req.cookies.user_token);
+    const userId = payload.id;
+
+    const lecture = await db.getLecture(Number(lectureId));
+
+    if (!(await db.isUserEnrolled(userId, lecture.courseId))) {
+      return res.status(401).json({
+        message: 'Unauthorized, user does not have access to this course',
+      });
+    }
+
     const data: db.SelectLectureVideo[] = await db.getLectureVideos(
       Number(lectureId),
     );
@@ -23,6 +34,11 @@ router.route('/:lectureId/videos').get(async (req: Request, res: Response) => {
       .status(200)
       .json({ message: 'Found lecture videos', data: data });
   } catch (err: any) {
+    console.log(err);
+
+    if (err instanceof db.RowNotFoundError) {
+      return res.status(404).json({ message: 'Lecture not found' });
+    }
     return res.status(500).send();
   }
 });

@@ -1,5 +1,6 @@
 import express, { type Request, type Response } from 'express';
 import * as db from '../../database.ts';
+import * as auth from '../../auth.ts';
 
 const router = express.Router();
 
@@ -47,6 +48,17 @@ router.route('/:courseId/lectures').get(async (req: Request, res: Response) => {
     }
     if (/^\d+$/.test(courseId) === false) {
       return res.status(401).json({ message: 'Invalid course ID paramater' });
+    }
+
+    const payload = auth.verifyToken(req.cookies.user_token);
+    const userId = payload.id;
+
+    if (!(await db.isUserEnrolled(userId, Number(courseId)))) {
+      return res
+        .status(401)
+        .json({
+          message: 'Unauthorized, user does not have access to this course',
+        });
     }
 
     const lectures: db.SelectLecture[] = await db.getCourseLectures(
