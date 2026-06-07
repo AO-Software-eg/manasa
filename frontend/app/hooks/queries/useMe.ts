@@ -9,9 +9,8 @@ export function useMe() {
     queryFn: async () => {
       try {
         const res = await api.get('/me');
-        console.log('status:', res.status);
-        console.log('full response:', res.data);
         // Guard against undefined — return null if no user data
+        console.log(res.data)
         return res.data ?? null;
 
       } catch (err: unknown) {

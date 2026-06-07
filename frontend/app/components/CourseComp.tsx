@@ -40,11 +40,6 @@ export default function CourseComp({
   const isOwned = isPurchased || isMyCoursesPage;
 
 
-  console.log({
-    title,
-    isOwned,
-    progress,
-  });
   return (
     <Link
       href={

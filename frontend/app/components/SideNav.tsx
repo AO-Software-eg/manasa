@@ -40,7 +40,6 @@ const navGroups = [
     label: 'الدعم',
     items: [
       { name: 'الدعم الفني', href: '/home/tech-support', icon: Headset },
-      { name: 'الإعدادات', href: '/home/settings', icon: Settings },
     ],
   },
 ];

@@ -11,6 +11,8 @@ import { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 
 import { Suspense } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+
 
 const cairo = Cairo({
   subsets: ['arabic'],
@@ -31,6 +33,7 @@ function LoginContent() {
   const [showPassword, setShowPassword] = useState(false);
   const searchParams = useSearchParams();
   const redirect = searchParams.get('redirect') || '/home';
+  const queryClient = useQueryClient();
 
   const onsubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -44,10 +47,13 @@ function LoginContent() {
       const res = await api.post('/login', payload, { withCredentials: true });
 
       toast.success('تم الدخول بنجاح!');
+      await queryClient.refetchQueries({
+        queryKey: ['me'],
+      });
 
       router.push(redirect);
     } catch (err: any) {
-      console.log(err.response?.data?.message );
+      console.log(err.response?.data?.message);
 
       const message = err.response?.data?.message || 'حدث خطأ أثناء الدخول';
 

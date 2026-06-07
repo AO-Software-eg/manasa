@@ -12,6 +12,7 @@ import { useMe } from '@/app/hooks/queries/useMe';
 import { useGetEnrollments } from '@/app/hooks/queries/useEnroll';
 import { toast } from 'sonner';
 
+
 export default function CoursePage() {
   const params = useParams();
   const id = Array.isArray(params.id) ? params.id[0] : params.id;

@@ -32,11 +32,6 @@ export function useVideo(
       const video = res.data.data.find(
         (v: lectureVideoSchema) => Number(v.id) === Number(videoRecordId)
       );
-      console.log({
-        lectureId,
-        videoRecordId,
-        videos: res.data.data,
-      });
 
       if (!video) {
         throw new Error('لم يتم العثور على الفيديو');

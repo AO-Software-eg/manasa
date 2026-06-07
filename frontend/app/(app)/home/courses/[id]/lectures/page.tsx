@@ -14,20 +14,20 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import { Lock } from 'lucide-react';
 import { useState } from 'react';
 
 export default function Page() {
   const params = useParams();
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [isLocked, setIsLocked] = useState(true);
   const courseId = Array.isArray(params.id) ? params.id[0] : params.id;
   const {
     data: course,
     isLoading: coursesLoading,
-    isError: coursesError
-  } = useCourseById(courseId ?? '')
-
-
+    isError: coursesError,
+  } = useCourseById(courseId ?? '');
 
   const {
     data: assets = [],
@@ -53,8 +53,6 @@ export default function Page() {
       </div>
     );
   }
-
-
 
   if (!course) {
     return (
@@ -98,7 +96,6 @@ export default function Page() {
               const exams = asset.exams ?? [];
 
               return (
-
                 <Accordion
                   key={asset.id}
                   type="single"
@@ -120,72 +117,112 @@ export default function Page() {
                           </p>
                         )}
 
-                        {videos.map((video) => (
-                          <button
-                            key={video.id}
-                            onClick={() =>
-                              router.push(
-                                `/home/courses/${courseId}/lectures/${asset.id}/videos/${video.id}`,
-                              )
-                            }
-                            className="flex items-center justify-between rounded-xl border border-zinc-700 bg-zinc-900/60 p-4 transition-all hover:border-blue-500 hover:bg-zinc-800"
-                          >
-                            <div className="flex items-center gap-3">
-                              <span className="font-medium text-zinc-100">
-                                {video.title}
-                              </span>
-                            </div>
-
-                            <span className="text-sm text-zinc-400">
-                              مشاهدة
-                            </span>
-                          </button>
-                        ))}
-
-                        {exams.map((exam, i: number) => (
-                          <div
-                            key={i}
-                            className='w-full flex items-center justify-between'
-                          >
+                        {videos.map((video) =>
+                          !isLocked ? (
                             <button
-                              key={exam.id}
-                              onClick={() => setOpen(true)}
-                              className="flex items-center justify-between w-full rounded-xl border border-zinc-700 bg-zinc-900/60 p-4 transition-all hover:border-emerald-500 hover:bg-zinc-800"
+                              key={video.id}
+                              disabled={true}
+                              className="flex items-center justify-between rounded-xl border border-zinc-700 bg-zinc-900/60 p-4 transition-all hover:border-zinc-800 hover:opacity-75"
                             >
                               <div className="flex items-center gap-3">
                                 <span className="font-medium text-zinc-100">
-                                  {exam.title}
+                                  {video.title}
                                 </span>
                               </div>
 
                               <span className="text-sm text-zinc-400">
-                                اختبار
+                                <Lock />
                               </span>
                             </button>
-                            <PopUp
-                              key={i}
-                              open={open}
-                              title="هل انت متأكد من بدأ الأمتحان ؟"
-                              description="تنبيه هام جدا جدا جدا
+                          ) : (
+                            <button
+                              key={video.id}
+                              onClick={() =>
+                                router.push(
+                                  `/home/courses/${courseId}/lectures/${asset.id}/videos/${video.id}`,
+                                )
+                              }
+                              className="flex items-center justify-between rounded-xl border border-zinc-700 bg-zinc-900/60 p-4 transition-all hover:border-blue-500 hover:bg-zinc-800"
+                            >
+                              <div className="flex items-center gap-3">
+                                <span className="font-medium text-zinc-100">
+                                  {video.title}
+                                </span>
+                              </div>
 
+                              <span className="text-sm text-zinc-400">
+                                مشاهدة
+                              </span>
+                            </button>
+                          ),
+                        )}
+
+                        {exams.map((exam, i: number) =>
+                          isLocked ? (
+                            <div
+                              key={i}
+                              className="w-full flex items-center justify-between"
+                            >
+                              <button
+                                key={exam.id}
+                                disabled={true}
+                                className="flex opacity-90 items-center justify-between w-full rounded-xl border border-zinc-700 bg-zinc-900/60 p-4 transition-all  hover:opacity-80"
+                              >
+                                <div className="flex items-center gap-3">
+                                  <span className="font-medium text-zinc-100">
+                                    {exam.title}
+                                  </span>
+                                </div>
+
+                                <span className="text-sm text-zinc-400">
+                                  <Lock />
+                                </span>
+                              </button>
+                
+                            </div>
+                          ) : (
+                            <div
+                              key={i}
+                              className="w-full flex items-center justify-between"
+                            >
+                              <button
+                                key={exam.id}
+                                onClick={() => setOpen(true)}
+                                className="flex items-center justify-between w-full rounded-xl border border-zinc-700 bg-zinc-900/60 p-4 transition-all hover:border-emerald-500 hover:bg-zinc-800"
+                              >
+                                <div className="flex items-center gap-3">
+                                  <span className="font-medium text-zinc-100">
+                                    {exam.title}
+                                  </span>
+                                </div>
+
+                                <span className="text-sm text-zinc-400">
+                                  اختبار
+                                </span>
+                              </button>
+                              <PopUp
+                                key={i}
+                                open={open}
+                                title="هل انت متأكد من بدأ الأمتحان ؟"
+                                description="تنبيه هام جدا جدا جدا
 خلي بالك الامتحان مدته : 45 دقيقة
 مينفعش تخرج من الاختبار قبل ما تكون خلصت الاختبار ..."
-                              confirmText="بدء الأمتحان"
-                              confirmClassName="bg-green-500 hover:bg-green-600"
-                              onClose={() => setOpen(false)}
-                              onConfirm={() => router.push(
-                                `/home/courses/${courseId}/lectures/${asset.id}/exams/${exam.id}`
-                              )} /></div>
-                        ))}
-
-
-
-
+                                confirmText="بدء الأمتحان"
+                                confirmClassName="bg-green-500 hover:bg-green-600"
+                                onClose={() => setOpen(false)}
+                                onConfirm={() =>
+                                  router.push(
+                                    `/home/courses/${courseId}/lectures/${asset.id}/exams/${exam.id}`,
+                                  )
+                                }
+                              />
+                            </div>
+                          ),
+                        )}
                       </div>
                     </AccordionContent>
                   </AccordionItem>
                 </Accordion>
-
               );
             })
           )}
