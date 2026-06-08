@@ -233,8 +233,6 @@ export async function isUserEnrolled(userId: number, courseId: number) {
       ),
     );
 
-  console.log(res.length != 0);
-
   return res.length != 0;
 }
 
@@ -263,6 +261,21 @@ export async function getLecture(lectureId: number): Promise<SelectLecture> {
 
   if (res.length === 0) {
     throw new RowNotFoundError(`Lecture with id ${lectureId} not found`);
+  }
+
+  return res[0];
+}
+
+export async function getQuestionChoice(
+  choiceId: number,
+): Promise<SelectQuestionChoice> {
+  const res = await db
+    .select()
+    .from(schema.questionChoices)
+    .where(eq(schema.questionChoices.id, choiceId));
+
+  if (res.length === 0) {
+    throw new RowNotFoundError(`Choice with id ${choiceId} not found`);
   }
 
   return res[0];

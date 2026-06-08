@@ -1,0 +1,10 @@
+{
+  "examId": 1,
+  "studentId": 1,
+  "answers": [
+    {
+      "questionId": 1,
+      "choiceId": 1
+    }
+  ]
+}
