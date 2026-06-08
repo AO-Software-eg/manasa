@@ -55,7 +55,7 @@ router.route('/:courseId/lectures').get(async (req: Request, res: Response) => {
 
     if (!(await db.isUserEnrolled(userId, Number(courseId)))) {
       return res
-        .status(401)
+        .status(403)
         .json({
           message: 'Unauthorized, user does not have access to this course',
         });

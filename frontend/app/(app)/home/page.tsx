@@ -86,7 +86,9 @@ function page() {
 
           {/* Cards */}
           <div className="flex flex-col gap-4 max-h-80 overflow-y-scroll ">
-            {subscribedCourses?.map((enrollment: Enrollment, i: number) => (
+            {
+              subscribedCourses?.length > 0 ? (
+                subscribedCourses?.map((enrollment: Enrollment, i: number) => (
               <Link key={enrollment.course.id} href={`/home/courses/${enrollment.course.id}`}>
                 <CardLayout
                   
@@ -115,7 +117,16 @@ function page() {
                   </div>
                 </CardLayout>
               </Link>
-            ))}
+            ))
+              ) : (
+                <div className='w-full text-center flex items-center justify-center flex-col gap-10 bg-[#31312a] px-2 py-4'>
+               <h1 className="text-2xl font-semibold">  لم يتم الاشتراك في أي كورس</h1>
+                <Link  href={`/home/courses`}  className="px-4 py-2 bg-amber-200 text-white rounded">
+                  الذهاب لشراء الكورسات
+                </Link>
+                </div>
+              )
+            }
           </div>
         </div>
 

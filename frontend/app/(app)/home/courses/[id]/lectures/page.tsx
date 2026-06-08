@@ -1,7 +1,7 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import { courses } from '@/types';
+import Link from 'next/link';
 import BackButton from '@/app/components/BackBtn';
 import { lecture } from '@/types';
 import { useCourseById } from '@/app/hooks/queries/useCourses';
@@ -33,14 +33,22 @@ export default function Page() {
     data: assets = [],
     isLoading: assetsLoading,
     isError: assetsError,
+    error,
     refetch,
   } = useLectures(courseId ?? '');
+  console.log(assets)
 
   if (!courseId) return null;
 
   if (coursesLoading || assetsLoading) return <LoadingComp />;
+  const status = (error as any)?.response?.status;
+
+  if (status === 401 || status === 403) {
+    return <NotAuthorized />;
+  }
 
   if (coursesError || assetsError) {
+
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4">
         <p className="text-red-500">حدث خطأ أثناء تحميل البيانات</p>
@@ -53,6 +61,11 @@ export default function Page() {
       </div>
     );
   }
+
+
+
+
+
 
   if (!course) {
     return (
@@ -158,7 +171,7 @@ export default function Page() {
                         )}
 
                         {exams.map((exam, i: number) =>
-                          isLocked ? (
+                          !isLocked ? (
                             <div
                               key={i}
                               className="w-full flex items-center justify-between"
@@ -178,7 +191,7 @@ export default function Page() {
                                   <Lock />
                                 </span>
                               </button>
-                
+
                             </div>
                           ) : (
                             <div
@@ -229,5 +242,31 @@ export default function Page() {
         </div>
       </div>
     </div>
+  );
+}
+
+
+function NotAuthorized() {
+  return (
+    <section className="min-h-screen flex items-center justify-center">
+      <div className="max-w-md text-center">
+        <h1 className="text-9xl  mb-4 flex justify-center items-center "><Lock className='' /></h1>
+
+        <h2 className="text-3xl font-bold text-[#e6d3a3]">
+          هذا المحتوى غير متاح
+        </h2>
+
+        <p className="mt-4 text-zinc-400">
+          يجب الاشتراك في الكورس أولاً للوصول إلى المحاضرات والاختبارات.
+        </p>
+
+        <Link
+          href="/home"
+          className="inline-block mt-6 rounded-lg bg-[#e6d3a3] px-5 py-2 text-black font-semibold"
+        >
+          تصفح الكورسات
+        </Link>
+      </div>
+    </section>
   );
 }

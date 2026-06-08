@@ -21,7 +21,7 @@ router.route('/:lectureId/videos').get(async (req: Request, res: Response) => {
     const lecture = await db.getLecture(Number(lectureId));
 
     if (!(await db.isUserEnrolled(userId, lecture.courseId))) {
-      return res.status(401).json({
+      return res.status(403).json({
         message: 'Unauthorized, user does not have access to this course',
       });
     }
