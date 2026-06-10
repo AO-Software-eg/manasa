@@ -288,7 +288,8 @@ export async function addExamSubmission(submission: InsertExamSubmission) {
   await db.insert(schema.examSubmissions).values(submission);
 }
 
-export async function getExamSubmissions(
+// returns all the exam submissions a student has made
+export async function getStudentExamSubmissions(
   studentId: number,
 ): Promise<SelectExamSubmission[]> {
   const res = await db
@@ -298,7 +299,28 @@ export async function getExamSubmissions(
 
   if (res.length === 0) {
     throw new RowNotFoundError(
-      'No exam submission for user with id ${studentId} found',
+      `No exam submission for user with id ${studentId} found`,
+    );
+  }
+
+  return res;
+}
+
+// returns all the exam submissions a student has made for a specific exam
+export async function getExamSubmissions(studentId: number, examId: number) {
+  const res = await db
+    .select()
+    .from(schema.examSubmissions)
+    .where(
+      and(
+        eq(schema.examSubmissions.studentId, studentId),
+        eq(schema.examSubmissions.examId, examId),
+      ),
+    );
+
+  if (res.length === 0) {
+    throw new RowNotFoundError(
+      `No exam submission for user with id ${studentId} and exam with id ${examId} found`,
     );
   }
 
@@ -310,6 +332,15 @@ export async function isUserFoundById(userId: number): Promise<boolean> {
     .select()
     .from(schema.users)
     .where(eq(schema.users.id, userId));
+
+  return res.length !== 0;
+}
+
+export async function isExamFound(examId: number): Promise<boolean> {
+  const res = await db
+    .select()
+    .from(schema.exams)
+    .where(eq(schema.exams.id, examId));
 
   return res.length !== 0;
 }
