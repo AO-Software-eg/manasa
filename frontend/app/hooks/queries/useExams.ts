@@ -76,3 +76,18 @@ export const useSubmitExam = () => {
     },
   });
 };
+
+export const useGetExamSubmissions = (userId: number) => {
+  return useQuery({
+    queryKey: ["userId", userId],
+    enabled: !isNaN(userId),
+    queryFn: async () => {
+      const res = await api.get(`/users/${userId}/grades`);
+      if (!res.data) throw new Error('جدث خطأ اثناء تحميل الامتحانات');
+      return res.data
+    },
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    staleTime: 10 * 60 * 1000,
+  })
+}
