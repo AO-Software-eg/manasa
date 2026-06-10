@@ -34,7 +34,16 @@ router
         });
       }
 
-      const grade = await gr.gradeExam(req.body);
+      const grade: gr.Grade = await gr.gradeExam(req.body);
+
+      const submission: db.InsertExamSubmission = {
+        studentId: req.body.studentId,
+        examId: exam.id,
+        grade: grade.grade,
+      };
+
+      db.addExamSubmission(submission);
+
       return res.status(200).json(grade);
     } catch (err: any) {
       if (err instanceof ZodError) {

@@ -61,6 +61,9 @@ export type SelectCourseEnrollment =
 export type InsertCourseEnrollment =
   typeof schema.courseEnrollments.$inferInsert;
 
+export type SelectExamSubmission = typeof schema.examSubmissions.$inferSelect;
+export type InsertExamSubmission = typeof schema.examSubmissions.$inferInsert;
+
 export type RelationLecture = Awaited<
   ReturnType<typeof getCourseLectures>
 >[number];
@@ -279,6 +282,36 @@ export async function getQuestionChoice(
   }
 
   return res[0];
+}
+
+export async function addExamSubmission(submission: InsertExamSubmission) {
+  await db.insert(schema.examSubmissions).values(submission);
+}
+
+export async function getExamSubmissions(
+  studentId: number,
+): Promise<SelectExamSubmission[]> {
+  const res = await db
+    .select()
+    .from(schema.examSubmissions)
+    .where(eq(schema.examSubmissions.studentId, studentId));
+
+  if (res.length === 0) {
+    throw new RowNotFoundError(
+      'No exam submission for user with id ${studentId} found',
+    );
+  }
+
+  return res;
+}
+
+export async function isUserFoundById(userId: number): Promise<boolean> {
+  const res = await db
+    .select()
+    .from(schema.users)
+    .where(eq(schema.users.id, userId));
+
+  return res.length !== 0;
 }
 
 export default db;

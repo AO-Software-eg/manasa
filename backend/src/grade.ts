@@ -1,7 +1,14 @@
 import * as db from './database.ts';
 import * as schema from './validation.ts';
 
-export async function gradeExam(data: any): Promise<Object> {
+export type Grade = {
+  grade: number;
+  gradePercent: number;
+  gradeDivideString: string;
+  questionCount: number;
+};
+
+export async function gradeExam(data: any): Promise<Grade> {
   schema.examSubmissionSchema.parse(data);
 
   const questions = await db.getExamQuestions(data.examId);
@@ -39,7 +46,7 @@ export async function gradeExam(data: any): Promise<Object> {
     }
   }
 
-  const result = {
+  const result: Grade = {
     grade: grade,
     gradePercent: (grade / questions.length) * 100,
     gradeDivideString: grade + '/' + questions.length,
