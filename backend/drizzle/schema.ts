@@ -95,6 +95,28 @@ export const courses = pgTable("courses", {
 	tags: text(),
 });
 
+export const examSubmissions = pgTable("exam_submissions", {
+	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
+	id: bigint({ mode: "number" }).primaryKey().generatedByDefaultAsIdentity({ name: "exam_submissions_id_seq", startWith: 1, increment: 1, minValue: 1, maxValue: 9223372036854775807, cache: 1 }),
+	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
+	examId: bigint("exam_id", { mode: "number" }).notNull(),
+	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
+	studentId: bigint("student_id", { mode: "number" }).notNull(),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+	grade: integer().notNull(),
+}, (table) => [
+	foreignKey({
+			columns: [table.examId],
+			foreignColumns: [exams.id],
+			name: "exam_submissions_exam_id_fkey"
+		}).onUpdate("cascade").onDelete("cascade"),
+	foreignKey({
+			columns: [table.studentId],
+			foreignColumns: [users.id],
+			name: "exam_submissions_student_id_fkey"
+		}).onUpdate("cascade").onDelete("cascade"),
+]);
+
 export const lectures = pgTable("lectures", {
 	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
 	id: bigint({ mode: "number" }).primaryKey().generatedByDefaultAsIdentity({ name: "lectures_id_seq", startWith: 1, increment: 1, minValue: 1, maxValue: 9223372036854775807, cache: 1 }),
@@ -128,4 +150,31 @@ export const courseEnrollments = pgTable("course_enrollments", {
 			name: "course_enrollments_student_id_fkey"
 		}).onUpdate("cascade").onDelete("cascade"),
 	primaryKey({ columns: [table.studentId, table.courseId], name: "course_enrollments_pkey"}),
+]);
+
+export const studentAnswers = pgTable("student_answers", {
+	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
+	questionId: bigint("question_id", { mode: "number" }).notNull(),
+	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
+	studentId: bigint("student_id", { mode: "number" }).notNull(),
+	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
+	choiceId: bigint("choice_id", { mode: "number" }).notNull(),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+}, (table) => [
+	foreignKey({
+			columns: [table.questionId, table.choiceId],
+			foreignColumns: [questionChoices.id, questionChoices.questionId],
+			name: "fk_student_answers_valid_context"
+		}),
+	foreignKey({
+			columns: [table.questionId],
+			foreignColumns: [questions.id],
+			name: "student_answers_question_id_fkey"
+		}).onUpdate("cascade").onDelete("cascade"),
+	foreignKey({
+			columns: [table.studentId],
+			foreignColumns: [users.id],
+			name: "student_answers_student_id_fkey"
+		}).onUpdate("cascade").onDelete("cascade"),
+	primaryKey({ columns: [table.questionId, table.studentId], name: "student_answers_pkey"}),
 ]);
