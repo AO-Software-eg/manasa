@@ -1,7 +1,7 @@
 'use client';
 
 import { ChevronLeft, Send } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useExams } from '@/app/hooks/queries/useExams';
@@ -10,19 +10,25 @@ import { useRouter } from 'next/navigation';
 import Timer from '@/app/components/Timer';
 import { ExamQuestion } from '@/types/exams';
 import PopUp from '@/app/components/PopUp';
-
+import { useMe } from '@/app/hooks/queries/useMe';
+import { useSubmitExam } from '@/app/hooks/queries/useExams';
+import { toast } from 'sonner';
 
 function Page() {
   const { qid } = useParams();
+  const { id } = useParams();
+  const { lid } = useParams();
   const examId = qid ? Number(qid) : NaN;
   const router = useRouter();
   const [currentQuestion, setCurrentQuestion] = useState(1);
-  const [answers, setAnswers] = useState<Record<number, string>>({});
+  const [answers, setAnswers] = useState<Record<number, number>>({});
   const [isQuestionVisited, setIsQuestionVisited] = useState<number[]>([1]);
   const [onExit, setOnExit] = useState(false);
   const [onOpenExit, setOpenOnExit] = useState(false);
   const [onSubmit, setOnSubmit] = useState(false);
   const [timeDone, setTimeDone] = useState(false);
+  const { data: userData } = useMe();
+  const SubmitExam = useSubmitExam();
 
   // ----------------------------
   // Helpers
@@ -36,43 +42,58 @@ function Page() {
 
   const { data, isLoading, error } = useExams(examId);
 
-
-
-
   const questionCount = data?.questions.length || 0;
 
+const handleSubmitData = useCallback(() => {
+  if (!userData) return;
+
+  const formattedAnswers = Object.entries(answers).map(
+    ([questionId, choiceId]) => ({
+      questionId: Number(questionId),
+      choiceId,
+    }),
+  );
+
+  SubmitExam.mutate(
+    {
+      studentId: userData.id,
+      examId,
+      answers: formattedAnswers,
+    },
+    {
+      onSuccess: (data) => {
+        console.log('Exam submitted successfully:', data);
+        router.push(`/home/courses/${id}/lectures/${lid}/exams/${examId}/submitted`);
+      },
+      onError: (error) => {
+        console.error(error);
+      },
+    }
+  );
+}, [answers, userData, examId, id, router, SubmitExam]);
+
   useEffect(() => {
-    const handleExit = () => {
-      if (onExit) {
-        setAnswers({});
-        setCurrentQuestion(1);
-        setIsQuestionVisited([1]);
-        console.log(answers);
-        return router.push(`/home/courses/`);
-      }
-      setOnExit(false);
-    };
+    if (onExit) {
+      setAnswers({});
+      setCurrentQuestion(1);
+      setIsQuestionVisited([1]);
+      router.push('/home/courses/');
+    }
+  }, [onExit, router]);
 
-    handleExit();
-  }, [onExit]);
-
-  // handle time done
   useEffect(() => {
     if (timeDone) {
-      setOnExit(true);
-      alert('انتهى الوقت المحدد للامتحان. سيتم تقديم إجاباتك الآن.');
+      toast('انتهى الوقت المحدد للامتحان. سيتم تقديم إجاباتك الآن.');
+      handleSubmitData();
     }
   }, [timeDone]);
-
   if (isLoading) {
     return <div>Loading...</div>;
   }
 
-
   if (error) {
     console.error('Error fetching exam data:', error);
     return <div>Something went wrong</div>;
-
   }
 
   // ----------------------------
@@ -82,9 +103,7 @@ function Page() {
   const nextQuestion = () => {
     setCurrentQuestion((prev) => {
       const next = Math.min(prev + 1, questionCount);
-
       markQuestionAsVisited(next);
-
       return next;
     });
   };
@@ -92,16 +111,13 @@ function Page() {
   const prevQuestion = () => {
     setCurrentQuestion((prev) => {
       const previous = Math.max(prev - 1, 1);
-
       markQuestionAsVisited(previous);
-
       return previous;
     });
   };
 
   const gotoQuestion = (questionNumber: number) => {
     setCurrentQuestion(questionNumber);
-
     markQuestionAsVisited(questionNumber);
   };
 
@@ -109,10 +125,13 @@ function Page() {
   // Answers
   // ----------------------------
 
-  const handleSelect = (optionId: string) => {
+  const handleSelect = (optionId: number) => {
+    const currentQuestionData = data?.questions[currentQuestion - 1];
+    if (!currentQuestionData) return;
+
     setAnswers((prev) => ({
       ...prev,
-      [currentQuestion]: optionId,
+      [currentQuestionData.id]: optionId,
     }));
   };
 
@@ -120,7 +139,12 @@ function Page() {
   // Current selected answer
   // ----------------------------
 
-  const selectedOption = answers[currentQuestion] || '';
+  const currentQuestionData = data?.questions[currentQuestion - 1];
+
+
+  const selectedOption: number | undefined = currentQuestionData
+    ? answers[currentQuestionData.id]
+    : undefined;
 
   return (
     <div className="max-w-full flex flex-col p-4 gap-4 min-h-screen bg-[#0d0d0d] text-white">
@@ -146,27 +170,15 @@ function Page() {
       {/* Main Content */}
       <div className="flex-1 p-4 lg:h-[calc(102dvh-5rem)] lg:overflow-y-auto overflow-x-hidden">
         {/* Question Navigation */}
-        <div
-          className="
-                        mb-10
-                        w-full
-                        max-w-4xl
-                        mx-auto
-                        bg-[#111827]
-                        border border-gray-800
-                        rounded-3xl
-                        p-6
-                        shadow-lg
-                    "
-        >
-          {/* timer */}
+        <div className="mb-10 w-full max-w-4xl mx-auto bg-[#111827] border border-gray-800 rounded-3xl p-6 shadow-lg">
+          {/* Timer */}
           <Timer timeDone={timeDone} setTimeDone={setTimeDone} />
+
           {/* Header */}
           <div className="flex items-center justify-between mb-4">
             <p className="text-sm text-gray-400">
               السؤال {currentQuestion} من {questionCount}
             </p>
-
             <p className="text-sm text-blue-400">
               {Object.keys(answers).length} / {questionCount} مجاب
             </p>
@@ -177,8 +189,7 @@ function Page() {
             <div
               className="h-full bg-blue-600 transition-all duration-300"
               style={{
-                width: `${(Object.keys(answers).length / questionCount) * 100
-                  }%`,
+                width: `${(Object.keys(answers).length / questionCount) * 100}%`,
               }}
             />
           </div>
@@ -189,11 +200,11 @@ function Page() {
               .fill(0)
               .map((_, index) => {
                 const questionNumber = index + 1;
-
                 const isCurrent = questionNumber === currentQuestion;
-
-                const isAnswered = !!answers[questionNumber];
-
+                const questionId = data?.questions[questionNumber - 1]?.id;
+                const isAnswered = questionId !== undefined
+                  ? answers[questionId] !== undefined
+                  : false;
                 const isVisited = isQuestionVisited.includes(questionNumber);
 
                 return (
@@ -201,21 +212,18 @@ function Page() {
                     key={index}
                     onClick={() => gotoQuestion(questionNumber)}
                     className={`
-                                            w-12 h-12 rounded-2xl
-                                            flex items-center justify-center
-                                            text-sm font-semibold
-                                            transition-all duration-200
-                                            border
-
-                                            ${isCurrent
-                        ? 'bg-blue-600 border-blue-400 scale-110 shadow-lg shadow-blue-500/30'
-                        : isAnswered
+                      w-12 h-12 rounded-2xl flex items-center justify-center
+                      text-sm font-semibold transition-all duration-200 border
+                      ${
+                        isCurrent
+                          ? 'bg-blue-600 border-blue-400 scale-110 shadow-lg shadow-blue-500/30'
+                          : isAnswered
                           ? 'bg-green-600 border-green-400 hover:scale-105'
                           : isVisited
-                            ? 'bg-yellow-500 border-yellow-300 text-black hover:scale-105'
-                            : 'bg-gray-800 border-gray-700 hover:bg-gray-700 hover:scale-105'
+                          ? 'bg-yellow-500 border-yellow-300 text-black hover:scale-105'
+                          : 'bg-gray-800 border-gray-700 hover:bg-gray-700 hover:scale-105'
                       }
-                                        `}
+                    `}
                   >
                     {questionNumber}
                   </button>
@@ -229,17 +237,14 @@ function Page() {
               <div className="w-4 h-4 rounded bg-blue-600" />
               الحالي
             </div>
-
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 rounded bg-green-600" />
               مجاب
             </div>
-
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 rounded bg-yellow-500" />
               تمت زيارته
             </div>
-
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 rounded bg-gray-800 border border-gray-700" />
               غير مفتوح
@@ -248,31 +253,31 @@ function Page() {
         </div>
 
         {data?.questions.map((question: ExamQuestion, index: number) => {
-          if (index + 1 !== currentQuestion) {
-            return null;
-          }
+          if (index + 1 !== currentQuestion) return null;
           return (
             <div key={question.id} className="max-w-4xl mx-auto">
               <h1 className="text-3xl font-bold mb-4 text-right">
                 {question.question}
               </h1>
               <RadioGroup
-                value={selectedOption}
+                value={selectedOption !== undefined ? selectedOption.toString() : ''}
                 className="w-full flex flex-col items-end gap-4"
                 onValueChange={(value) => {
-                  handleSelect(value);
+                  handleSelect(Number(value));
                 }}
               >
                 {question.questionChoices.map((option) => (
                   <div
                     key={option.id}
                     className={`
-                                                flex flex-row-reverse items-center gap-3 w-full rounded-2xl transition-all border
-                                                ${selectedOption === option.id.toString()
-                        ? 'bg-blue-600 border-blue-400 shadow-lg shadow-blue-500/20'
-                        : 'bg-[#111827] border-gray-700 hover:border-blue-500 hover:bg-[#172036]'
+                      flex flex-row-reverse items-center gap-3 w-full rounded-2xl transition-all border
+                      ${
+                        // BUG FIX: Compare number to number, not number to string.
+                        selectedOption === option.id
+                          ? 'bg-blue-600 border-blue-400 shadow-lg shadow-blue-500/20'
+                          : 'bg-[#111827] border-gray-700 hover:border-blue-500 hover:bg-[#172036]'
                       }
-                                            `}
+                    `}
                   >
                     <RadioGroupItem
                       value={option.id.toString()}
@@ -292,22 +297,15 @@ function Page() {
           );
         })}
       </div>
+
       {/* Footer */}
       <div className="flex justify-between items-center p-4">
         <button
           className={`
-                        ${currentQuestion === 1
-              ? 'opacity-0 pointer-events-none'
-              : 'hover:bg-gray-700'
-            }
-
-                        border border-gray-700
-                        bg-[#111827]
-                        rounded-2xl
-                        px-5 py-3
-                        flex items-center gap-2 flex-row-reverse
-                        transition
-                    `}
+            ${currentQuestion === 1 ? 'opacity-0 pointer-events-none' : 'hover:bg-gray-700'}
+            border border-gray-700 bg-[#111827] rounded-2xl px-5 py-3
+            flex items-center gap-2 flex-row-reverse transition
+          `}
           onClick={() => prevQuestion()}
           disabled={currentQuestion === 1}
         >
@@ -317,17 +315,9 @@ function Page() {
 
         <button
           className={`
-                        ${currentQuestion === questionCount
-              ? 'opacity-50 cursor-not-allowed'
-              : 'bg-blue-600 hover:bg-blue-700'
-            }
-
-                        text-white
-                        px-5 py-3
-                        rounded-2xl
-                        flex items-center gap-2 flex-row-reverse
-                        transition
-                    `}
+            ${currentQuestion === questionCount ? 'opacity-50 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}
+            text-white px-5 py-3 rounded-2xl flex items-center gap-2 flex-row-reverse transition
+          `}
           onClick={() => nextQuestion()}
           disabled={currentQuestion === questionCount}
         >
@@ -353,11 +343,10 @@ function Page() {
         confirmText="تقديم الامتحان"
         confirmClassName="bg-green-600 hover:bg-green-700"
         onClose={() => setOnSubmit(false)}
-        onConfirm={() => console.log(answers)}
+        onConfirm={handleSubmitData}
       />
     </div>
   );
 }
-
 
 export default Page;

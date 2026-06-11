@@ -5,9 +5,11 @@ import {
   exams,
   questions,
   questionChoices,
+  examSubmissions,
+  users,
   courses,
   courseEnrollments,
-  users,
+  studentAnswers,
 } from './schema.ts';
 
 export const lectureVideosRelations = relations(lectureVideos, ({ one }) => ({
@@ -32,15 +34,17 @@ export const examsRelations = relations(exams, ({ one, many }) => ({
     references: [lectures.id],
   }),
   questions: many(questions),
+  examSubmissions: many(examSubmissions),
 }));
 
 export const questionChoicesRelations = relations(
   questionChoices,
-  ({ one }) => ({
+  ({ one, many }) => ({
     question: one(questions, {
       fields: [questionChoices.questionId],
       references: [questions.id],
     }),
+    studentAnswers: many(studentAnswers),
   }),
 );
 
@@ -50,6 +54,27 @@ export const questionsRelations = relations(questions, ({ one, many }) => ({
     fields: [questions.examId],
     references: [exams.id],
   }),
+  studentAnswers: many(studentAnswers),
+}));
+
+export const examSubmissionsRelations = relations(
+  examSubmissions,
+  ({ one }) => ({
+    exam: one(exams, {
+      fields: [examSubmissions.examId],
+      references: [exams.id],
+    }),
+    user: one(users, {
+      fields: [examSubmissions.studentId],
+      references: [users.id],
+    }),
+  }),
+);
+
+export const usersRelations = relations(users, ({ many }) => ({
+  examSubmissions: many(examSubmissions),
+  courseEnrollments: many(courseEnrollments),
+  studentAnswers: many(studentAnswers),
 }));
 
 export const coursesRelations = relations(courses, ({ many }) => ({
@@ -71,6 +96,17 @@ export const courseEnrollmentsRelations = relations(
   }),
 );
 
-export const usersRelations = relations(users, ({ many }) => ({
-  courseEnrollments: many(courseEnrollments),
+export const studentAnswersRelations = relations(studentAnswers, ({ one }) => ({
+  questionChoice: one(questionChoices, {
+    fields: [studentAnswers.questionId],
+    references: [questionChoices.id],
+  }),
+  question: one(questions, {
+    fields: [studentAnswers.questionId],
+    references: [questions.id],
+  }),
+  user: one(users, {
+    fields: [studentAnswers.studentId],
+    references: [users.id],
+  }),
 }));

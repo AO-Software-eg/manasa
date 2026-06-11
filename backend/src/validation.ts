@@ -4,6 +4,17 @@ export const MIN_PASSWORD_LENGTH = 6;
 export const MIN_NAME_LENGTH = 2;
 export const EGYPT_MOBILE_REGEX = /^\+201[0125]\d{8}$/;
 
+export const examSubmissionSchema = z.object({
+  studentId: z.number(),
+  examId: z.number(),
+  answers: z.array(
+    z.object({
+      questionId: z.number(),
+      choiceId: z.number(),
+    }),
+  ),
+});
+
 export const enrollSchema = z.object({
   courseId: z.number(),
   studentId: z.number(),

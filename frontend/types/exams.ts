@@ -15,3 +15,18 @@ const examQuestionSchema = z.object({
   questionChoices: examQuestionChoiceSchema.array(),
 });
 export type ExamQuestion = z.infer<typeof examQuestionSchema>;
+
+
+
+ const examSubmissionSchema = z.object({
+  studentId: z.number(),
+  examId: z.number(),
+  answers: z.array(
+    z.object({
+      questionId: z.number(),
+      choiceId: z.number(),
+    }),
+  ),
+});
+
+export type examSubmissionSchema = z.infer<typeof examQuestionSchema>;
