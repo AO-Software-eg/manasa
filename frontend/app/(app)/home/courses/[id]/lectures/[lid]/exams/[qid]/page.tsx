@@ -16,6 +16,8 @@ import { toast } from 'sonner';
 
 function Page() {
   const { qid } = useParams();
+  const { id } = useParams();
+  const { lid } = useParams();
   const examId = qid ? Number(qid) : NaN;
   const router = useRouter();
   const [currentQuestion, setCurrentQuestion] = useState(1);
@@ -42,20 +44,33 @@ function Page() {
 
   const questionCount = data?.questions.length || 0;
 
-  const handleSubmitData = useCallback(() => {
-    if (!userData) return;
-    const formattedAnswers = Object.entries(answers).map(
-      ([questionId, choiceId]) => ({
-        questionId: Number(questionId),
-        choiceId,
-      }),
-    );
-    SubmitExam.mutate({
+const handleSubmitData = useCallback(() => {
+  if (!userData) return;
+
+  const formattedAnswers = Object.entries(answers).map(
+    ([questionId, choiceId]) => ({
+      questionId: Number(questionId),
+      choiceId,
+    }),
+  );
+
+  SubmitExam.mutate(
+    {
       studentId: userData.id,
       examId,
       answers: formattedAnswers,
-    });
-  }, [userData, answers, examId, SubmitExam]);
+    },
+    {
+      onSuccess: (data) => {
+        console.log('Exam submitted successfully:', data);
+        router.push(`/home/courses/${id}/lectures/${lid}/exams/${examId}/submitted`);
+      },
+      onError: (error) => {
+        console.error(error);
+      },
+    }
+  );
+}, [answers, userData, examId, id, router, SubmitExam]);
 
   useEffect(() => {
     if (onExit) {

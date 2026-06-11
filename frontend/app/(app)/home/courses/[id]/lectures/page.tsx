@@ -15,19 +15,56 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { Lock } from 'lucide-react';
+import { useGetExamSubmissions } from '@/app/hooks/queries/useExams';
+import { useMe } from '@/app/hooks/queries/useMe';
 import { useState } from 'react';
+
+function NotAuthorized() {
+  return (
+    <section className="min-h-screen flex items-center justify-center">
+      <div className="max-w-md text-center">
+        <h1 className="text-9xl mb-4 flex justify-center items-center">
+          <Lock />
+        </h1>
+        <h2 className="text-3xl font-bold text-[#e6d3a3]">
+          هذا المحتوى غير متاح
+        </h2>
+        <p className="mt-4 text-zinc-400">
+          يجب الاشتراك في الكورس أولاً للوصول إلى المحاضرات والاختبارات.
+        </p>
+        <Link
+          href="/home"
+          className="inline-block mt-6 rounded-lg bg-[#e6d3a3] px-5 py-2 text-black font-semibold"
+        >
+          تصفح الكورسات
+        </Link>
+      </div>
+    </section>
+  );
+}
 
 export default function Page() {
   const params = useParams();
   const router = useRouter();
-  const [open, setOpen] = useState(false);
-  const [isLocked, setIsLocked] = useState(true);
+  const [openExamId, setOpenExamId] = useState<number | null>(null);
+
   const courseId = Array.isArray(params.id) ? params.id[0] : params.id;
+
+  
   const {
     data: course,
     isLoading: coursesLoading,
     isError: coursesError,
   } = useCourseById(courseId ?? '');
+
+  const { data: userData } = useMe();
+  const userId = userData?.id ?? 0;
+
+  const { data: submittedExams } = useGetExamSubmissions(userId);
+
+  const solvedExamIds = new Set(
+    submittedExams?.map((exam: any) => exam.examId)
+  );
 
   const {
     data: assets = [],
@@ -36,19 +73,17 @@ export default function Page() {
     error,
     refetch,
   } = useLectures(courseId ?? '');
-  console.log(assets)
 
   if (!courseId) return null;
 
   if (coursesLoading || assetsLoading) return <LoadingComp />;
-  const status = (error as any)?.response?.status;
 
+  const status = (error as any)?.response?.status;
   if (status === 401 || status === 403) {
     return <NotAuthorized />;
   }
 
   if (coursesError || assetsError) {
-
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4">
         <p className="text-red-500">حدث خطأ أثناء تحميل البيانات</p>
@@ -61,11 +96,6 @@ export default function Page() {
       </div>
     );
   }
-
-
-
-
-
 
   if (!course) {
     return (
@@ -113,7 +143,7 @@ export default function Page() {
                   key={asset.id}
                   type="single"
                   collapsible
-                  className="max-w-lg rounded-md bg-[#38342B]"
+                  className="max-w-lg rounded-md bg-[#38342B] mb-4"
                 >
                   <AccordionItem value={`item-${asset.id}`}>
                     <AccordionTrigger className="gap-2 rounded-t rounded-b-none bg-[#141412] text-right">
@@ -130,108 +160,70 @@ export default function Page() {
                           </p>
                         )}
 
-                        {videos.map((video) =>
-                          !isLocked ? (
-                            <button
-                              key={video.id}
-                              disabled={true}
-                              className="flex items-center justify-between rounded-xl border border-zinc-700 bg-zinc-900/60 p-4 transition-all hover:border-zinc-800 hover:opacity-75"
-                            >
-                              <div className="flex items-center gap-3">
-                                <span className="font-medium text-zinc-100">
-                                  {video.title}
-                                </span>
-                              </div>
-
-                              <span className="text-sm text-zinc-400">
-                                <Lock />
+                        {videos.map((video) => (
+                          <button
+                            key={video.id}
+                            onClick={() =>
+                              router.push(
+                                `/home/courses/${courseId}/lectures/${asset.id}/videos/${video.id}`,
+                              )
+                            }
+                            className="flex items-center justify-between rounded-xl border border-zinc-700 bg-zinc-900/60 p-4 transition-all hover:border-blue-500 hover:bg-zinc-800"
+                          >
+                            <div className="flex items-center gap-3">
+                              <span className="font-medium text-zinc-100">
+                                {video.title}
                               </span>
-                            </button>
-                          ) : (
-                            <button
-                              key={video.id}
-                              onClick={() =>
-                                router.push(
-                                  `/home/courses/${courseId}/lectures/${asset.id}/videos/${video.id}`,
-                                )
-                              }
-                              className="flex items-center justify-between rounded-xl border border-zinc-700 bg-zinc-900/60 p-4 transition-all hover:border-blue-500 hover:bg-zinc-800"
-                            >
-                              <div className="flex items-center gap-3">
-                                <span className="font-medium text-zinc-100">
-                                  {video.title}
-                                </span>
-                              </div>
+                            </div>
+                            <span className="text-sm text-zinc-400">
+                              مشاهدة
+                            </span>
+                          </button>
+                        ))}
 
-                              <span className="text-sm text-zinc-400">
-                                مشاهدة
-                              </span>
-                            </button>
-                          ),
-                        )}
+                        {exams.map((exam) => {
+                          const isSolved = solvedExamIds.has(exam.id);
 
-                        {exams.map((exam, i: number) =>
-                          !isLocked ? (
+                          return (
                             <div
-                              key={i}
+                              key={exam.id}
                               className="w-full flex items-center justify-between"
                             >
                               <button
-                                key={exam.id}
-                                disabled={true}
-                                className="flex opacity-90 items-center justify-between w-full rounded-xl border border-zinc-700 bg-zinc-900/60 p-4 transition-all  hover:opacity-80"
+                                disabled={isSolved}
+                                onClick={() => {
+                                  if (!isSolved) setOpenExamId(exam.id);
+                                }}
+                                className="flex items-center justify-between w-full rounded-xl border border-zinc-700 bg-zinc-900/60 p-4 transition-all hover:border-emerald-500 hover:bg-zinc-800 disabled:opacity-50"
                               >
                                 <div className="flex items-center gap-3">
                                   <span className="font-medium text-zinc-100">
                                     {exam.title}
                                   </span>
                                 </div>
-
                                 <span className="text-sm text-zinc-400">
-                                  <Lock />
+                                  {isSolved ? 'تم الحل' : 'اختبار'}
                                 </span>
                               </button>
 
+                              {!isSolved && (
+                                <PopUp
+                                  open={openExamId === exam.id}
+                                  title="هل انت متأكد من بدأ الأمتحان ؟"
+                                  description="تنبيه هام جدا جدا جدا&#10;خلي بالك الامتحان مدته : 45 دقيقة&#10;مينفعش تخرج من الاختبار قبل ما تكون خلصت الاختبار ..."
+                                  confirmText="بدء الأمتحان"
+                                  confirmClassName="bg-green-500 hover:bg-green-600"
+                                  onClose={() => setOpenExamId(null)}
+                                  onConfirm={() =>
+                                    router.push(
+                                      `/home/courses/${courseId}/lectures/${asset.id}/exams/${exam.id}`,
+                                    )
+                                  }
+                                />
+                              )}
                             </div>
-                          ) : (
-                            <div
-                              key={i}
-                              className="w-full flex items-center justify-between"
-                            >
-                              <button
-                                key={exam.id}
-                                onClick={() => setOpen(true)}
-                                className="flex items-center justify-between w-full rounded-xl border border-zinc-700 bg-zinc-900/60 p-4 transition-all hover:border-emerald-500 hover:bg-zinc-800"
-                              >
-                                <div className="flex items-center gap-3">
-                                  <span className="font-medium text-zinc-100">
-                                    {exam.title}
-                                  </span>
-                                </div>
-
-                                <span className="text-sm text-zinc-400">
-                                  اختبار
-                                </span>
-                              </button>
-                              <PopUp
-                                key={i}
-                                open={open}
-                                title="هل انت متأكد من بدأ الأمتحان ؟"
-                                description="تنبيه هام جدا جدا جدا
-خلي بالك الامتحان مدته : 45 دقيقة
-مينفعش تخرج من الاختبار قبل ما تكون خلصت الاختبار ..."
-                                confirmText="بدء الأمتحان"
-                                confirmClassName="bg-green-500 hover:bg-green-600"
-                                onClose={() => setOpen(false)}
-                                onConfirm={() =>
-                                  router.push(
-                                    `/home/courses/${courseId}/lectures/${asset.id}/exams/${exam.id}`,
-                                  )
-                                }
-                              />
-                            </div>
-                          ),
-                        )}
+                          );
+                        })}
                       </div>
                     </AccordionContent>
                   </AccordionItem>
@@ -242,31 +234,5 @@ export default function Page() {
         </div>
       </div>
     </div>
-  );
-}
-
-
-function NotAuthorized() {
-  return (
-    <section className="min-h-screen flex items-center justify-center">
-      <div className="max-w-md text-center">
-        <h1 className="text-9xl  mb-4 flex justify-center items-center "><Lock className='' /></h1>
-
-        <h2 className="text-3xl font-bold text-[#e6d3a3]">
-          هذا المحتوى غير متاح
-        </h2>
-
-        <p className="mt-4 text-zinc-400">
-          يجب الاشتراك في الكورس أولاً للوصول إلى المحاضرات والاختبارات.
-        </p>
-
-        <Link
-          href="/home"
-          className="inline-block mt-6 rounded-lg bg-[#e6d3a3] px-5 py-2 text-black font-semibold"
-        >
-          تصفح الكورسات
-        </Link>
-      </div>
-    </section>
   );
 }

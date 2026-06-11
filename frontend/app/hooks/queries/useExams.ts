@@ -5,6 +5,7 @@ import { api } from '@/app/hooks/api';
 import axios from 'axios';
 import { ExamQuestion, ExamQuestionChoice } from '@/types/exams';
 import { useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 
 export const useExams = (examId: number) => {
   return useQuery({
@@ -61,10 +62,7 @@ export const useSubmitExam = () => {
       }
     },
 
-    onSuccess: (data) => {
-      console.log('Exam submitted successfully:', data);
-      router.push('/home/courses');
-    },
+
 
     onError: (error: unknown) => {
       if (axios.isAxiosError(error)) {
@@ -90,4 +88,19 @@ export const useGetExamSubmissions = (userId: number) => {
     refetchOnWindowFocus: false,
     staleTime: 10 * 60 * 1000,
   })
+}
+export const useGetOnSubmit = (examId: number, userId: number) => {
+  return useQuery({
+    queryKey: ["examId", examId],
+    enabled: !isNaN(examId),
+    queryFn: async () => {
+      const res = await api.get(`/users/${userId}/grades/${examId}`);
+      if (!res.data) throw new Error('جدث خطأ اثناء تحميل التصحيح');
+      return res.data
+    },
+    refetchOnMount: true,
+    refetchOnWindowFocus: false,
+    
+  })
+
 }

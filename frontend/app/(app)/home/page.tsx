@@ -5,6 +5,7 @@ import { useMe } from '@/app/hooks/queries/useMe';
 import { useGetEnrollments } from '@/app/hooks/queries/useEnroll';
 import RecentActivityCard from '@/app/components/RecentActivityCard';
 import { courses } from '@/types';
+import { useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
 
 
@@ -18,6 +19,12 @@ type Enrollment = {
 function page() {
   const { data: userData } = useMe();
   const { data: subscribedCourses } = useGetEnrollments(userData?.id ?? '');
+  const queryClient = useQueryClient();
+
+  queryClient.invalidateQueries({
+    queryKey: ['enrollments', userData?.id],
+  });
+
 
 
   const dashboardData = {
@@ -89,41 +96,41 @@ function page() {
             {
               subscribedCourses?.length > 0 ? (
                 subscribedCourses?.map((enrollment: Enrollment, i: number) => (
-              <Link key={enrollment.course.id} href={`/home/courses/${enrollment.course.id}`}>
-                <CardLayout
-                  
-                  classname="flex items-center  justify-between p-4 rounded-2xl bg-[#1a1a1a] hover:bg-[#222] transition"
-                >
-                  {/* Right side (image) */}
-                  <div className="w-14 h-14 rounded-xl overflow-hidden bg-black/30 flex items-center justify-center">
-                    <img
-                      src={enrollment.course.imageUrl}
-                      alt={enrollment.course.title}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
+                  <Link key={enrollment.course.id} href={`/home/courses/${enrollment.course.id}`}>
+                    <CardLayout
 
-                  {/* Middle content */}
-                  <div className="flex-1 px-4 text-right">
-                    <h2 className="text-sm font-semibold leading-snug">
-                      {enrollment.course.title}
-                    </h2>
+                      classname="flex items-center  justify-between p-4 rounded-2xl bg-[#1a1a1a] hover:bg-[#222] transition"
+                    >
+                      {/* Right side (image) */}
+                      <div className="w-14 h-14 rounded-xl overflow-hidden bg-black/30 flex items-center justify-center">
+                        <img
+                          src={enrollment.course.imageUrl}
+                          alt={enrollment.course.title}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
 
-                  </div>
+                      {/* Middle content */}
+                      <div className="flex-1 px-4 text-right">
+                        <h2 className="text-sm font-semibold leading-snug">
+                          {enrollment.course.title}
+                        </h2>
 
-                  {/* Left arrow */}
-                  <div className="text-gray-400">
-                    <ChevronLeft />
-                  </div>
-                </CardLayout>
-              </Link>
-            ))
+                      </div>
+
+                      {/* Left arrow */}
+                      <div className="text-gray-400">
+                        <ChevronLeft />
+                      </div>
+                    </CardLayout>
+                  </Link>
+                ))
               ) : (
                 <div className='w-full text-center flex items-center justify-center flex-col gap-10 bg-[#31312a] px-2 py-4'>
-               <h1 className="text-2xl font-semibold">  لم يتم الاشتراك في أي كورس</h1>
-                <Link  href={`/home/courses`}  className="px-4 py-2 bg-amber-200 text-white rounded">
-                  الذهاب لشراء الكورسات
-                </Link>
+                  <h1 className="text-2xl font-semibold">  لم يتم الاشتراك في أي كورس</h1>
+                  <Link href={`/home/courses`} className="px-4 py-2 bg-amber-200 text-white rounded">
+                    الذهاب لشراء الكورسات
+                  </Link>
                 </div>
               )
             }
