@@ -10,7 +10,7 @@ import { hashPassword, verifyPassword } from '../../hash.ts';
 const router = express.Router();
 
 router
-  .route('/users/:userId/grades/examId')
+  .route('/users/:userId/grades/:examId')
   .get(async (req: Request, res: Response) => {
     try {
       const userId = req.params.userId;
