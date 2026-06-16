@@ -1,164 +1,163 @@
-"use client";
-import { useMe } from "@/app/hooks/queries/useMe"
-import { useGetOnSubmit } from "@/app/hooks/queries/useExams"
-import { useParams } from "next/navigation";
-import Link from "next/link";
-import { useQueryClient } from "@tanstack/react-query";
+'use client';
 
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
+import { useEffect } from 'react';
+
+import { useMe } from '@/app/hooks/queries/useMe';
+import { useGetOnSubmit } from '@/app/hooks/queries/useExams';
+
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from '@/components/ui/table';
-import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card";
+import { useQueryClient } from '@tanstack/react-query';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-
-
-type Grade = {
-    id: number;
-    createdAt: string;
-    grade: number;
+type Submission = {
+  id: number;
+  studentId: number;
+  createdAt: string;
+  grade: number;
+  questionCount: number;
 };
 
+type ExamData = {
+  exam: {
+    id: number;
+    createdAt: string;
+    lectureId: number;
+    title: string;
+  };
+  submissions: Submission[];
+};
 
-function page() {
-    const { data: useData } = useMe();
-    const { qid, id } = useParams();
-    const examId = qid ? Number(qid) : NaN;
-    const { data: grades, isLoading } = useGetOnSubmit(examId, useData?.id ?? '');
+function Page() {
+  const { data: user } = useMe();
+  const { qid, id } = useParams();
+  const examId = Number(qid);
 
+  const { data, isLoading, isError } = useGetOnSubmit(examId, user?.id ?? '');
 
-    const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
 
-    queryClient.invalidateQueries({
-        queryKey: ['examId', examId],
-    });
+  useEffect(() => {
+    queryClient.invalidateQueries({ queryKey: ['examId', examId] });
+  }, [examId, queryClient]);
 
-    const formatDate = (dateString: string) => {
-        return new Intl.DateTimeFormat('ar-EG', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-        }).format(new Date(dateString));
-    };
+  const formatDate = (date: string) => {
+    return new Intl.DateTimeFormat('ar-EG', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(new Date(date));
+  };
 
-    if (isLoading) {
-        <div className="container mx-auto py-6 w-full min-h-screen flex items-center justify-center" dir="rtl">
-            <h1 className="text-2xl font-bold mb-6">
-                درجات الامتحان
-            </h1>
-
-            <div className="rounded-md border" dir="rtl">
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead className="text-right text-white">
-                                رقم المحاولة
-                            </TableHead>
-                            <TableHead className="text-right text-white">
-                                الدرجة
-                            </TableHead>
-                            <TableHead className="text-right text-white">
-                                تاريخ التقديم
-                            </TableHead>
-                        </TableRow>
-                    </TableHeader>
-
-                    <TableBody>
-
-                    </TableBody>
-                </Table>
-            </div>
-            <div>
-                <Link href={`http://localhost:3000/home/courses/${id}/lectures`}>
-                    <button >
-                        العودة للكورس
-                    </button>
-                </Link>
-            </div>
-        </div>
-    }
-
+  if (isLoading) {
     return (
-        <Card className="bg-[#13131] text-white  w-full min-h-screen " >
-            <CardHeader>
-                <CardTitle className="text-2xl text-right">
-                    درجات الامتحان
-                </CardTitle>
-            </CardHeader>
+      <div className="w-full min-h-screen flex items-center justify-center text-white">
+        جاري التحميل...
+      </div>
+    );
+  }
 
-            <CardContent>
-                <div className="overflow-hidden rounded-lg border border-slate-700">
-                    <Table>
-                        <TableHeader>
-                            <TableRow className="border-slate-700">
-                                <TableHead className="text-right text-slate-300">
-                                    رقم المحاولة
-                                </TableHead>
+  if (isError) {
+    return (
+      <div className="w-full min-h-screen flex items-center justify-center text-red-500">
+        حدث خطأ أثناء تحميل البيانات
+      </div>
+    );
+  }
 
-                                <TableHead className="text-right text-slate-300">
-                                    الدرجة
-                                </TableHead>
+  if (!data) {
+    return (
+      <div className="w-full min-h-screen flex items-center justify-center text-white">
+        لا توجد بيانات
+      </div>
+    );
+  }
 
-                                <TableHead className="text-right text-slate-300">
-                                    تاريخ التقديم
-                                </TableHead>
-                            </TableRow>
-                        </TableHeader>
+  return (
+    <div className="w-full min-h-screen bg-[#131313] p-6 space-y-6">
+      <Card className="bg-[#1a1a1a] border-slate-700 text-white">
+        <CardHeader>
+          <CardTitle className="flex flex-col gap-3">
+            <div className="flex justify-between items-center">
+              <div className="text-2xl">{data.exam.title}</div>
+              <Badge variant="outline" className='text-white'>امتحان #{data.exam.id}</Badge>
+            </div>
+            <div className="text-sm text-slate-400">
+              <div>تاريخ إنشاء الامتحان: {formatDate(data.exam.createdAt)}</div>
+              <div>Lecture ID: {data.exam.lectureId}</div>
+            </div>
+          </CardTitle>
+        </CardHeader>
 
-                        <TableBody>
-                            {grades?.map((grade: Grade) => (
-                                <TableRow
-                                    key={grade.id}
-                                    className="border-slate-700 hover:bg-slate-800"
-                                >
-                                    <TableCell className="text-right">
-                                        #{grade.id}
-                                    </TableCell>
+        <CardContent>
+          <div className="overflow-hidden rounded-lg border border-slate-700">
+            <Table>
+              <TableHeader>
+                <TableRow className="border-slate-700">
+                  <TableHead className="text-right text-slate-300">رقم المحاولة</TableHead>
+                  <TableHead className="text-right text-slate-300">الدرجة</TableHead>
+                  <TableHead className="text-right text-slate-300">عدد الأسئلة</TableHead>
+                  <TableHead className="text-right text-slate-300">تاريخ التقديم</TableHead>
+                </TableRow>
+              </TableHeader>
 
-                                    <TableCell className="text-right">
-                                        <Badge
-                                            variant={
-                                                grade.grade >= 4
-                                                    ? "default"
-                                                    : "destructive"
-                                            }
-                                        >
-                                            {grade.grade}
-                                        </Badge>
-                                    </TableCell>
+              <TableBody>
+                {data.submissions.length ? (
+                  data.submissions.map((submission: Submission) => (
+                    <TableRow
+                      key={submission.id}
+                      className="border-slate-700 hover:bg-slate-800"
+                    >
+                      <TableCell className="text-right">#{submission.id}</TableCell>
+                      <TableCell className="text-right">
+                        <Badge
+                          variant={
+                            submission.grade >= submission.questionCount / 2
+                              ? 'default'
+                              : 'destructive'
+                          }
+                        >
+                          {submission.grade} / {submission.questionCount}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">{submission.questionCount}</TableCell>
+                      <TableCell className="text-right text-slate-300">
+                        {formatDate(submission.createdAt)}
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={4} className="text-center text-slate-400">
+                      لا توجد محاولات لهذا الامتحان
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
 
-                                    <TableCell className="text-right text-slate-300">
-                                        {formatDate(grade.createdAt)}
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </div>
-
-                <div className="mt-6 flex justify-start">
-                    <Button asChild>
-                        <Link href={`/home/courses/${id}/lectures`}>
-                            العودة للكورس
-                        </Link>
-                    </Button>
-                </div>
-            </CardContent>
-        </Card >
-    )
+      <div className="flex justify-start">
+        <Button asChild>
+          <Link href={`/home/courses/${id}/lectures`}>العودة للكورس</Link>
+        </Button>
+      </div>
+    </div>
+  );
 }
 
-export default page
+export default Page;

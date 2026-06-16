@@ -13,6 +13,8 @@ import PopUp from '@/app/components/PopUp';
 import { useMe } from '@/app/hooks/queries/useMe';
 import { useSubmitExam } from '@/app/hooks/queries/useExams';
 import { toast } from 'sonner';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 
 function Page() {
   const { qid } = useParams();
@@ -44,33 +46,33 @@ function Page() {
 
   const questionCount = data?.questions.length || 0;
 
-const handleSubmitData = useCallback(() => {
-  if (!userData) return;
+  const handleSubmitData = useCallback(() => {
+    if (!userData) return;
 
-  const formattedAnswers = Object.entries(answers).map(
-    ([questionId, choiceId]) => ({
-      questionId: Number(questionId),
-      choiceId,
-    }),
-  );
+    const formattedAnswers = Object.entries(answers).map(
+      ([questionId, choiceId]) => ({
+        questionId: Number(questionId),
+        choiceId,
+      }),
+    );
 
-  SubmitExam.mutate(
-    {
-      studentId: userData.id,
-      examId,
-      answers: formattedAnswers,
-    },
-    {
-      onSuccess: (data) => {
-        console.log('Exam submitted successfully:', data);
-        router.push(`/home/courses/${id}/lectures/${lid}/exams/${examId}/submitted`);
+    SubmitExam.mutate(
+      {
+        studentId: userData.id,
+        examId,
+        answers: formattedAnswers,
       },
-      onError: (error) => {
-        console.error(error);
-      },
-    }
-  );
-}, [answers, userData, examId, id, router, SubmitExam]);
+      {
+        onSuccess: (data) => {
+          console.log('Exam submitted successfully:', data);
+          router.push(`/home/courses/${id}/lectures/${lid}/exams/${examId}/submitted`);
+        },
+        onError: (error) => {
+          console.error(error);
+        },
+      }
+    );
+  }, [answers, userData, examId, id, router, SubmitExam]);
 
   useEffect(() => {
     if (onExit) {
@@ -88,13 +90,50 @@ const handleSubmitData = useCallback(() => {
     }
   }, [timeDone]);
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="w-full min-h-screen bg-[#131313] flex items-center justify-center p-6">
+        <Card className="w-full max-w-md bg-[#1a1a1a] border-slate-700 text-white">
+          <CardContent className="flex flex-col items-center gap-4 py-10">
+            <div className="h-10 w-10 rounded-full border-4 border-slate-700 border-t-white animate-spin" />
+
+            <h2 className="text-xl font-semibold">
+              جاري تحميل بيانات الامتحان
+            </h2>
+
+            <p className="text-slate-400 text-center">
+              برجاء الانتظار قليلاً...
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
   if (error) {
-    console.error('Error fetching exam data:', error);
-    return <div>Something went wrong</div>;
+    return (
+      <div className="w-full min-h-screen bg-[#131313] flex items-center justify-center p-6">
+        <Card className="w-full max-w-md bg-[#1a1a1a] border-red-800 text-white">
+          <CardContent className="flex flex-col items-center gap-4 py-10">
+
+            <h2 className="text-2xl font-semibold">
+              حدث خطأ
+            </h2>
+
+            <p className="text-slate-400 text-center">
+              تعذر تحميل بيانات الامتحان
+            </p>
+
+            <Button onClick={() => window.location.reload()}>
+              إعادة المحاولة
+            </Button>
+
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
+
+
 
   // ----------------------------
   // Navigation
@@ -214,14 +253,13 @@ const handleSubmitData = useCallback(() => {
                     className={`
                       w-12 h-12 rounded-2xl flex items-center justify-center
                       text-sm font-semibold transition-all duration-200 border
-                      ${
-                        isCurrent
-                          ? 'bg-blue-600 border-blue-400 scale-110 shadow-lg shadow-blue-500/30'
-                          : isAnswered
+                      ${isCurrent
+                        ? 'bg-blue-600 border-blue-400 scale-110 shadow-lg shadow-blue-500/30'
+                        : isAnswered
                           ? 'bg-green-600 border-green-400 hover:scale-105'
                           : isVisited
-                          ? 'bg-yellow-500 border-yellow-300 text-black hover:scale-105'
-                          : 'bg-gray-800 border-gray-700 hover:bg-gray-700 hover:scale-105'
+                            ? 'bg-yellow-500 border-yellow-300 text-black hover:scale-105'
+                            : 'bg-gray-800 border-gray-700 hover:bg-gray-700 hover:scale-105'
                       }
                     `}
                   >
@@ -272,10 +310,10 @@ const handleSubmitData = useCallback(() => {
                     className={`
                       flex flex-row-reverse items-center gap-3 w-full rounded-2xl transition-all border
                       ${
-                        // BUG FIX: Compare number to number, not number to string.
-                        selectedOption === option.id
-                          ? 'bg-blue-600 border-blue-400 shadow-lg shadow-blue-500/20'
-                          : 'bg-[#111827] border-gray-700 hover:border-blue-500 hover:bg-[#172036]'
+                      // BUG FIX: Compare number to number, not number to string.
+                      selectedOption === option.id
+                        ? 'bg-blue-600 border-blue-400 shadow-lg shadow-blue-500/20'
+                        : 'bg-[#111827] border-gray-700 hover:border-blue-500 hover:bg-[#172036]'
                       }
                     `}
                   >

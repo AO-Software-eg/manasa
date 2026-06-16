@@ -2,7 +2,7 @@
 
 import { useMe } from '@/app/hooks/queries/useMe';
 import { useGetExamSubmissions } from '@/app/hooks/queries/useExams';
-
+import { Badge } from '@/components/ui/badge';
 import {
     Table,
     TableBody,
@@ -12,15 +12,21 @@ import {
     TableRow,
 } from '@/components/ui/table';
 
-type Grade = {
+type Submission = {
     id: number;
+    studentId: number;
     createdAt: string;
     grade: number;
+    questionCount: number;
+    exam: {
+        id: number;
+        title: string;
+    };
 };
 
 export default function Page() {
     const { data: userData } = useMe();
-    const { data: grades } = useGetExamSubmissions(userData?.id ?? NaN);
+    const { data: submissions } = useGetExamSubmissions(userData?.id ?? NaN);
 
     const formatDate = (dateString: string) => {
         return new Intl.DateTimeFormat('ar-EG', {
@@ -34,39 +40,54 @@ export default function Page() {
 
     return (
         <div className="container mx-auto py-6" dir="rtl">
-            <h1 className="text-2xl font-bold mb-6">
-                درجات الامتحانات
-            </h1>
+            <h1 className="text-2xl font-bold mb-6">درجات الامتحانات</h1>
 
             <div className="rounded-md border" dir="rtl">
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead className="text-right text-white">
-                                رقم المحاولة
-                            </TableHead>
-                            <TableHead className="text-right text-white">
-                                الدرجة
-                            </TableHead>
-                            <TableHead className="text-right text-white">
-                                تاريخ التقديم
-                            </TableHead>
+                            <TableHead className="text-right text-white">رقم المحاولة</TableHead>
+                            <TableHead className="text-right text-white">الامتحان</TableHead>
+                            <TableHead className="text-right text-white">الدرجة</TableHead>
+                            <TableHead className="text-right text-white">عدد الأسئلة</TableHead>
+                            <TableHead className="text-right text-white">تاريخ التقديم</TableHead>
                         </TableRow>
                     </TableHeader>
 
                     <TableBody>
-                        {grades?.map((grade: Grade) => (
-                            <TableRow key={grade.id}>
+                        {submissions?.map((submission: Submission) => (
+                            <TableRow key={submission.id}>
                                 <TableCell className="text-right text-white">
-                                    {grade.id}
+                                    #{submission.id}
                                 </TableCell>
 
                                 <TableCell className="text-right text-white">
-                                    {grade.grade}
+                                    <div className="flex flex-col gap-1">
+                                        <span>{submission.exam.title.trim()}</span>
+                                        <Badge variant="outline" className="w-fit text-xs text-white">
+                                            #{submission.exam.id}
+                                        </Badge>
+                                    </div>
+                                </TableCell>
+
+                                <TableCell className="text-right">
+                                    <Badge
+                                        variant={
+                                            submission.grade >= submission.questionCount / 2
+                                                ? 'default'
+                                                : 'destructive'
+                                        }
+                                    >
+                                        {submission.grade} / {submission.questionCount}
+                                    </Badge>
                                 </TableCell>
 
                                 <TableCell className="text-right text-white">
-                                    {formatDate(grade.createdAt)}
+                                    {submission.questionCount}
+                                </TableCell>
+
+                                <TableCell className="text-right text-white">
+                                    {formatDate(submission.createdAt)}
                                 </TableCell>
                             </TableRow>
                         ))}

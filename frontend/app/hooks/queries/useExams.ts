@@ -5,7 +5,6 @@ import { api } from '@/app/hooks/api';
 import axios from 'axios';
 import { ExamQuestion, ExamQuestionChoice } from '@/types/exams';
 import { useRouter } from 'next/navigation';
-import { useQueryClient } from '@tanstack/react-query';
 
 export const useExams = (examId: number) => {
   return useQuery({
