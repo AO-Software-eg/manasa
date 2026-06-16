@@ -37,10 +37,6 @@ const dropdownVariants: Variants = {
 
 const listItems = [
   {
-    label: 'المنتدى',
-    href: '/archive',
-  },
-  {
     label: 'الرئيسية',
     href: '/',
   },
@@ -57,9 +53,6 @@ function Header() {
   const isUserPage = path.startsWith('/home');
   const { data: userData, isError } = useMe();
  
-
-
-
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -86,35 +79,67 @@ function Header() {
   return (
     <>
       {!isUserPage && (
-        <header className="fixed translate-x-1/2 right-1/2  fi z-100 w-[70%] mx-auto p-3 mt-8  shadow-2xl shadow-black border-2 border-[#3b3b34] text-[#e6d3a3] bg-[#1C1C18] rounded-3xl">
+        <header className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[90%] md:w-[70%] lg:w-[60%] mx-auto p-4 shadow-2xl border border-[#3b3b34] text-[#e6d3a3] bg-[#1C1C18]/90 backdrop-blur-xl rounded-2xl">
           <nav className="flex justify-between items-center">
-            <div className="absolute left-5 -top-10 pointer-events-none">
-              <Image
-                src="https://ytgu3s3xxa.ufs.sh/f/GNGTKtuqz7dpVGUxsIyjrdms09WbDu2AhOYkEV4yUBfq3vpg"
-                alt="Logo"
-                width={50}
-                height={50}
-              />
-            </div>
-
-            <Link href={'/'} className="flex items-center gap-2">
-              <Origami />
+            <Link href={'/'} className="flex items-center justify-center gap-2">
+              <Origami className="text-[#e6d3a3]" />
+              <span className="text-xl font-bold">منصة سلسلة</span>
             </Link>
 
-            <ul className="md:flex gap-5 hidden ">
+            <ul className="md:flex gap-8 hidden items-center">
               {listItems.map((item, i) => (
                 <li
-                  className="cursor-pointer hover:opacity-70 transition list-none"
+                  className={`cursor-pointer transition list-none ${path !== item.href ? 'text-[#e6d3a3] font-bold' : 'text-[#e6d3a3]/70 hover:text-[#e6d3a3]'}`}
                   key={item.href}
                 >
                   <Link href={item.href}>{item.label}</Link>
                 </li>
               ))}
+              <div className="flex gap-3 items-center">
+                {userData ? (
+                  <>
+                    <Link href={'/home'} onClick={() => setIsMenuOpen(false)}>
+                      <button className="px-5 py-2 bg-[#e6d3a3] text-[#1C1C18] rounded-xl font-semibold hover:bg-[#d4c38c] transition-all duration-300">
+                       اذهب إلى التطبيق
+                      </button>
+                    </Link>
+                    <button 
+                      className="px-4 py-2 bg-transparent border border-[#e6d3a3] text-[#e6d3a3] rounded-xl hover:bg-[#e6d3a3]/10 transition-all duration-300"
+                      onClick={() => {
+                        api.post('/logout', {}).then(() => {
+                          window.location.href = '/';
+                        });
+                        setIsMenuOpen(false);
+                      }}
+                    >
+                      تسجيل الخروج
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      href={'/login'}
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <button className="px-4 py-2 text-sm hover:opacity-80 transition">
+                        تسجيل الدخول
+                      </button>
+                    </Link>
+                    <Link
+                      href={'/signup'}
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <button className="px-5 py-2 bg-[#e6d3a3] text-[#1C1C18] rounded-xl font-semibold hover:bg-[#d4c38c] transition-all duration-300">
+                        إنشاء حساب
+                      </button>
+                    </Link>
+                  </>
+                )}
+              </div>
             </ul>
 
-            <button onClick={toggleMenu}>
-              <UserPlus className="hidden lg:block" />
-              <Menu className="block lg:hidden" />
+            <button onClick={toggleMenu} className="md:hidden">
+              <Menu className="text-[#e6d3a3]" />
             </button>
           </nav>
 
@@ -127,50 +152,47 @@ function Header() {
                 initial="hidden"
                 animate="visible"
                 exit="exit"
-                className="flex flex-col text-center gap-3 absolute -left-2 top-20 bg-[#1C1C18] p-3 rounded-lg shadow-lg border-2 border-[#3b3b34] before:absolute before:-top-2 before:left-5 before:w-4 before:h-4 before:bg-[#1C1C18] before:rotate-45 before:border-t-2 before:border-l-2 before:border-[#3b3b34]"
+                className="flex flex-col gap-4 mt-4 p-4 rounded-xl bg-[#1C1C18] border border-[#3b3b34]"
               >
-                <div className="md:hidden flex flex-col gap-2">
-                  {listItems.map((item, i) => (
-                    <li
-                      className="cursor-pointer hover:opacity-70 transition list-none "
-                      key={item.href}
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      <Link href={item.href}>{item.label}</Link>
-                    </li>
-                  ))}
-                </div>
-                <div className="flex gap-2">
+                {listItems.map((item, i) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setIsMenuOpen(false)}
+                    className={`text-right py-2 ${path === item.href ? 'text-[#e6d3a3] font-bold' : 'text-[#e6d3a3]/70'}`}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+                <div className="flex flex-col gap-3 pt-3 border-t border-[#3b3b34]">
                   {userData ? (
-                    <><button
-                      className="px-4 cursor-pointer py-2 bg-[#3b3b34] rounded-lg text-sm hover:bg-[#5a5a52] transition"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      <Link href={'/user'}>اذهب الى التطبيق</Link>
-                    </button>
-                    <button className="px-4 cursor-pointer py-2 bg-none border-2 border-[#e6d3a3] box-border rounded-lg text-sm hover:bg-[#5a5a52] transition" onClick={() => {
-                      api.post('/logout', {}).then(() => {
-                        window.location.href = '/';
-                      });
-                      setIsMenuOpen(false);
-                    }}>
-                      تسجيل الخروج
-                      </button></>
+                    <>
+                      <Link href={'/home'} onClick={() => setIsMenuOpen(false)}>
+                        <button className="w-full px-5 py-3 bg-[#e6d3a3] text-[#1C1C18] rounded-xl font-semibold">
+                          اذهب إلى التطبيق
+                        </button>
+                      </Link>
+                      <button 
+                        className="w-full px-4 py-3 border border-[#e6d3a3] text-[#e6d3a3] rounded-xl"
+                        onClick={() => {
+                          api.post('/logout', {}).then(() => {
+                            window.location.href = '/';
+                          });
+                          setIsMenuOpen(false);
+                        }}
+                      >
+                        تسجيل الخروج
+                      </button>
+                    </>
                   ) : (
                     <>
-                      <Link
-                        href={'/login'}
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        <button className="px-4 cursor-pointer py-2 bg-[#3b3b34] rounded-lg text-sm hover:bg-[#5a5a52] transition">
+                      <Link href={'/login'} onClick={() => setIsMenuOpen(false)}>
+                        <button className="w-full px-4 py-3 text-right text-[#e6d3a3]">
                           تسجيل الدخول
                         </button>
                       </Link>
-                      <Link
-                        href={'/signup'}
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        <button className="px-4 cursor-pointer py-2 bg-none border-2 border-[#e6d3a3] box-border rounded-lg text-sm hover:bg-[#5a5a52] transition">
+                      <Link href={'/signup'} onClick={() => setIsMenuOpen(false)}>
+                        <button className="w-full px-5 py-3 bg-[#e6d3a3] text-[#1C1C18] rounded-xl font-semibold">
                           إنشاء حساب
                         </button>
                       </Link>
