@@ -75,8 +75,7 @@ router
           .json({ message: `User with id ${userId} does not exist` });
       }
 
-      const submissions: db.SelectExamSubmission[] =
-        await db.getStudentExamSubmissions(Number(userId));
+      const submissions = await db.getStudentExamSubmissions(Number(userId));
 
       return res.status(200).json(submissions);
     } catch (err: any) {

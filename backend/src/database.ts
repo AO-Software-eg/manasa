@@ -289,13 +289,22 @@ export async function addExamSubmission(submission: InsertExamSubmission) {
 }
 
 // returns all the exam submissions a student has made
-export async function getStudentExamSubmissions(
-  studentId: number,
-): Promise<SelectExamSubmission[]> {
-  const res = await db
-    .select()
-    .from(schema.examSubmissions)
-    .where(eq(schema.examSubmissions.studentId, studentId));
+export async function getStudentExamSubmissions(studentId: number) {
+  const res = await db.query.examSubmissions.findMany({
+    where: (examSubmissions, { and }) =>
+      and(eq(examSubmissions.studentId, studentId)),
+    columns: {
+      examId: false,
+    },
+    with: {
+      exam: {
+        columns: {
+          id: true,
+          title: true,
+        },
+      },
+    },
+  });
 
   if (res.length === 0) {
     throw new RowNotFoundError(
@@ -308,21 +317,45 @@ export async function getStudentExamSubmissions(
 
 // returns all the exam submissions a student has made for a specific exam
 export async function getExamSubmissions(studentId: number, examId: number) {
-  const res = await db
+  const exam = await db
     .select()
-    .from(schema.examSubmissions)
-    .where(
-      and(
-        eq(schema.examSubmissions.studentId, studentId),
-        eq(schema.examSubmissions.examId, examId),
-      ),
-    );
+    .from(schema.exams)
+    .where(eq(schema.exams.id, examId));
+  if (exam.length === 0) {
+    throw new RowNotFoundError(`No exam with id ${examId} found`);
+  }
 
-  if (res.length === 0) {
+  // const subs = await db
+  //   .select()
+  //   .from(schema.examSubmissions)
+  //   .where(
+  //     and(
+  //       eq(schema.examSubmissions.studentId, studentId),
+  //       eq(schema.examSubmissions.examId, examId),
+  //     ),
+  //   );
+
+  const subs = await db.query.examSubmissions.findMany({
+    where: (examSubmissions, { and }) =>
+      and(
+        eq(examSubmissions.studentId, studentId),
+        eq(examSubmissions.examId, examId),
+      ),
+    columns: {
+      examId: false,
+    },
+  });
+
+  if (subs.length === 0) {
     throw new RowNotFoundError(
       `No exam submission for user with id ${studentId} and exam with id ${examId} found`,
     );
   }
+
+  const res = {
+    exam: exam[0],
+    submissions: subs,
+  };
 
   return res;
 }
