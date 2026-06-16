@@ -117,6 +117,7 @@ router
     }
   });
 
+// TODO(omar): check if the user exists
 router
   .route('/users/:userId/enrollments')
   .get(async (req: Request, res: Response) => {

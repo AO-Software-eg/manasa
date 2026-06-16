@@ -3,8 +3,6 @@ import * as schema from './validation.ts';
 
 export type Grade = {
   grade: number;
-  gradePercent: number;
-  gradeDivideString: string;
   questionCount: number;
 };
 
@@ -48,8 +46,6 @@ export async function gradeExam(data: any): Promise<Grade> {
 
   const result: Grade = {
     grade: grade,
-    gradePercent: (grade / questions.length) * 100,
-    gradeDivideString: grade + '/' + questions.length,
     questionCount: questions.length,
   };
 

@@ -104,6 +104,7 @@ export const examSubmissions = pgTable("exam_submissions", {
 	studentId: bigint("student_id", { mode: "number" }).notNull(),
 	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 	grade: integer().notNull(),
+	questionCount: integer("question_count").notNull(),
 }, (table) => [
 	foreignKey({
 			columns: [table.examId],

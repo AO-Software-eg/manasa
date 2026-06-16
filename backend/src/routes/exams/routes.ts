@@ -40,6 +40,7 @@ router
         studentId: req.body.studentId,
         examId: exam.id,
         grade: grade.grade,
+        questionCount: grade.questionCount
       };
 
       db.addExamSubmission(submission);
