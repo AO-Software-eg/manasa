@@ -10,6 +10,85 @@ import { hashPassword, verifyPassword } from '../../hash.ts';
 const router = express.Router();
 
 router
+  .route('/users/:userId/grades/:examId')
+  .get(async (req: Request, res: Response) => {
+    try {
+      const userId = req.params.userId;
+      const examId = req.params.examId;
+
+      if (typeof userId !== 'string') {
+        return res.status(401).json({ message: 'Invalid user ID paramater' });
+      }
+      if (/^\d+$/.test(userId) === false) {
+        return res.status(401).json({ message: 'Invalid user ID paramater' });
+      }
+
+      if (typeof examId !== 'string') {
+        return res.status(401).json({ message: 'Invalid exam ID paramater' });
+      }
+      if (/^\d+$/.test(examId) === false) {
+        return res.status(401).json({ message: 'Invalid exam ID paramater' });
+      }
+
+      if (!(await db.isUserFoundById(Number(userId)))) {
+        return res
+          .status(404)
+          .json({ message: `User with id ${userId} does not exist` });
+      }
+      if (!(await db.isExamFound(Number(examId)))) {
+        return res
+          .status(404)
+          .json({ message: `Exam with id ${examId} does not exist` });
+      }
+
+      const submission = await db.getExamSubmissions(
+        Number(userId),
+        Number(examId),
+      );
+      return res.status(200).json(submission);
+    } catch (err: any) {
+      console.log(err);
+      if (err instanceof db.RowNotFoundError) {
+        return res.status(404).send();
+      }
+
+      return res.status(500).send();
+    }
+  });
+
+router
+  .route('/users/:userId/grades')
+  .get(async (req: Request, res: Response) => {
+    try {
+      const userId = req.params.userId;
+
+      if (typeof userId !== 'string') {
+        return res.status(401).json({ message: 'Invalid user ID paramater' });
+      }
+      if (/^\d+$/.test(userId) === false) {
+        return res.status(401).json({ message: 'Invalid user ID paramater' });
+      }
+
+      if (!(await db.isUserFoundById(Number(userId)))) {
+        return res
+          .status(404)
+          .json({ message: `User with id ${userId} does not exist` });
+      }
+
+      const submissions = await db.getStudentExamSubmissions(Number(userId));
+
+      return res.status(200).json(submissions);
+    } catch (err: any) {
+      console.log(err);
+      if (err instanceof db.RowNotFoundError) {
+        return res.status(404).send();
+      }
+
+      return res.status(500).send();
+    }
+  });
+
+router
   .route('/users/enroll')
   .post(bodyParser.json(), async (req: Request, res: Response) => {
     if (!req.is('application/json')) {
@@ -37,6 +116,7 @@ router
     }
   });
 
+// TODO(omar): check if the user exists
 router
   .route('/users/:userId/enrollments')
   .get(async (req: Request, res: Response) => {
