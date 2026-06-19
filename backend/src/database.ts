@@ -321,6 +321,27 @@ export async function getStudentExamSubmissions(studentId: number) {
           title: true,
         },
       },
+      answerSubmissions: {
+        columns: {
+          questionId: false,
+          choiceId: false,
+          createdAt: false,
+        },
+        with: {
+          question: {
+            columns: {
+              examId: false,
+              createdAt: false,
+            },
+          },
+          questionChoice: {
+            columns: {
+              questionId: false,
+              createdAt: false,
+            },
+          },
+        },
+      },
     },
   });
 
@@ -351,6 +372,30 @@ export async function getExamSubmissions(studentId: number, examId: number) {
       ),
     columns: {
       examId: false,
+    },
+    with: {
+      answerSubmissions: {
+        columns: {
+          questionId: false,
+          choiceId: false,
+          createdAt: false,
+          studentId: false,
+        },
+        with: {
+          question: {
+            columns: {
+              examId: false,
+              createdAt: false,
+            },
+          },
+          questionChoice: {
+            columns: {
+              questionId: false,
+              createdAt: false,
+            },
+          },
+        },
+      },
     },
   });
 
