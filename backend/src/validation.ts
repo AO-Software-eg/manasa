@@ -15,6 +15,8 @@ export const examSubmissionSchema = z.object({
   ),
 });
 
+export type examSubmissionData = z.infer<typeof examSubmissionSchema>;
+
 export const enrollSchema = z.object({
   courseId: z.number(),
   studentId: z.number(),
