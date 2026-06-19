@@ -325,16 +325,6 @@ export async function getExamSubmissions(studentId: number, examId: number) {
     throw new RowNotFoundError(`No exam with id ${examId} found`);
   }
 
-  // const subs = await db
-  //   .select()
-  //   .from(schema.examSubmissions)
-  //   .where(
-  //     and(
-  //       eq(schema.examSubmissions.studentId, studentId),
-  //       eq(schema.examSubmissions.examId, examId),
-  //     ),
-  //   );
-
   const subs = await db.query.examSubmissions.findMany({
     where: (examSubmissions, { and }) =>
       and(
