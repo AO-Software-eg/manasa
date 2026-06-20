@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect } from 'react';
-
 import { useMe } from '@/app/hooks/queries/useMe';
 import { useGetOnSubmit } from '@/app/hooks/queries/useExams';
 
@@ -19,24 +18,7 @@ import {
 import { useQueryClient } from '@tanstack/react-query';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-
-type Submission = {
-  id: number;
-  studentId: number;
-  createdAt: string;
-  grade: number;
-  questionCount: number;
-};
-
-type ExamData = {
-  exam: {
-    id: number;
-    createdAt: string;
-    lectureId: number;
-    title: string;
-  };
-  submissions: Submission[];
-};
+import { ExamGrade } from '@/types';
 
 function Page() {
   const { data: user } = useMe();
@@ -92,7 +74,9 @@ function Page() {
           <CardTitle className="flex flex-col gap-3">
             <div className="flex justify-between items-center">
               <div className="text-2xl">{data.exam.title}</div>
-              <Badge variant="outline" className='text-white'>امتحان #{data.exam.id}</Badge>
+              <Badge variant="outline" className="text-white">
+                امتحان #{data.exam.id}
+              </Badge>
             </div>
             <div className="text-sm text-slate-400">
               <div>تاريخ إنشاء الامتحان: {formatDate(data.exam.createdAt)}</div>
@@ -106,21 +90,34 @@ function Page() {
             <Table>
               <TableHeader>
                 <TableRow className="border-slate-700">
-                  <TableHead className="text-right text-slate-300">رقم المحاولة</TableHead>
-                  <TableHead className="text-right text-slate-300">الدرجة</TableHead>
-                  <TableHead className="text-right text-slate-300">عدد الأسئلة</TableHead>
-                  <TableHead className="text-right text-slate-300">تاريخ التقديم</TableHead>
+                  <TableHead className="text-right text-slate-300">
+                    رقم المحاولة
+                  </TableHead>
+                  <TableHead className="text-right text-slate-300">
+                    الدرجة
+                  </TableHead>
+                  <TableHead className="text-right text-slate-300">
+                    عدد الأسئلة
+                  </TableHead>
+                  <TableHead className="text-right text-slate-300">
+                    تاريخ التقديم
+                  </TableHead>
+                  <TableHead className="text-right text-slate-300">
+                    النتايج
+                  </TableHead>
                 </TableRow>
               </TableHeader>
 
               <TableBody>
                 {data.submissions.length ? (
-                  data.submissions.map((submission: Submission) => (
+                  data.submissions.map((submission: ExamGrade) => (
                     <TableRow
                       key={submission.id}
                       className="border-slate-700 hover:bg-slate-800"
                     >
-                      <TableCell className="text-right">#{submission.id}</TableCell>
+                      <TableCell className="text-right">
+                        #{submission.id}
+                      </TableCell>
                       <TableCell className="text-right">
                         <Badge
                           variant={
@@ -132,15 +129,27 @@ function Page() {
                           {submission.grade} / {submission.questionCount}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-right">{submission.questionCount}</TableCell>
+                      <TableCell className="text-right">
+                        {submission.questionCount}
+                      </TableCell>
                       <TableCell className="text-right text-slate-300">
                         {formatDate(submission.createdAt)}
+                      </TableCell>
+                      <TableCell className="text-right text-slate-300">
+                        <Link href={`/home/history/exams_results/${submission.id}?examId=${examId}`}>
+                          <button className="bg-slate-800 p-2 rounded-2xl transition-opacity hover:opacity-65">
+                            تصحيح الاجابات
+                          </button>
+                        </Link>
                       </TableCell>
                     </TableRow>
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={4} className="text-center text-slate-400">
+                    <TableCell
+                      colSpan={4}
+                      className="text-center text-slate-400"
+                    >
                       لا توجد محاولات لهذا الامتحان
                     </TableCell>
                   </TableRow>

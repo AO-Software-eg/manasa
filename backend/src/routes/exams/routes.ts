@@ -23,27 +23,40 @@ router
           .json({ message: 'Unauthorized, user is not logged in' });
       }
 
+      // Validate exam submission
       schema.examSubmissionSchema.parse(req.body);
+      const data: schema.examSubmissionData = req.body;
 
-      const exam = await db.getExam(req.body.examId);
+      const exam = await db.getExam(data.examId);
       const lecture = await db.getLecture(exam.lectureId);
 
-      if (!(await db.isUserEnrolled(req.body.studentId, lecture.courseId))) {
+      if (!(await db.isUserEnrolled(data.studentId, lecture.courseId))) {
         return res.status(401).json({
           message: 'Unathorized, user does not have access to this course',
         });
       }
 
-      const grade: gr.Grade = await gr.gradeExam(req.body);
+      const grade: gr.Grade = await gr.gradeExam(data);
 
+      // Add exam submission
       const submission: db.InsertExamSubmission = {
-        studentId: req.body.studentId,
+        studentId: data.studentId,
         examId: exam.id,
         grade: grade.grade,
-        questionCount: grade.questionCount
+        questionCount: grade.questionCount,
       };
+      const submissionId: number = await db.addExamSubmission(submission);
 
-      db.addExamSubmission(submission);
+      // Add submitted answers
+      const answerSubmissions: db.InsertAnswerSubmission[] = data.answers.map(
+        (answer) => ({
+          studentId: data.studentId,
+          examSubmissionId: submissionId,
+          questionId: answer.questionId,
+          choiceId: answer.choiceId,
+        }),
+      );
+      await db.addAnswerSubmissions(answerSubmissions);
 
       return res.status(200).json(grade);
     } catch (err: any) {
