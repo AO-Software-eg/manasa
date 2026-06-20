@@ -35,11 +35,10 @@ export default function Page() {
         <div className="bg-black rounded-lg p-4">
           <p className="text-xs text-muted-foreground mb-1">الدرجة</p>
           <p
-            className={`text-2xl font-medium ${
-              submission.grade >= submission.questionCount / 2
+            className={`text-2xl font-medium ${submission.grade >= submission.questionCount / 2
                 ? 'text-green-700 dark:text-green-200'
                 : 'text-red-600 dark:text-red-200'
-            }`}
+              }`}
           >
             {submission.grade} / {submission.questionCount}
           </p>
@@ -47,9 +46,8 @@ export default function Page() {
         <div className="bg-black rounded-lg p-4">
           <p className="text-xs text-muted-foreground mb-1">النتيجة</p>
           <p
-            className={`text-2xl font-medium ${
-              pct >= 50 ? 'text-green-700 dark:text-green-200' : 'text-red-600 dark:text-red-200'
-            }`}
+            className={`text-2xl font-medium ${pct >= 50 ? 'text-green-700 dark:text-green-200' : 'text-red-600 dark:text-red-200'
+              }`}
           >
             {pct}%
           </p>
@@ -70,27 +68,25 @@ export default function Page() {
           return (
             <div
               key={answer.question.id}
-              className={`rounded-xl border p-4 ${
-                isCorrect
+              className={`rounded-xl border p-4 ${isCorrect
                   ? 'bg-green-500/10 border-green-500/30 text-green-700 dark:bg-green-950/30 dark:border-green-800 dark:text-green-200'
                   : 'bg-destructive/10 border-destructive/30 text-destructive dark:bg-destructive/20 dark:border-destructive/40'
-              }`} >
+                }`} >
               {/* Question number + status */}
               <div
-                className={`flex items-center gap-2 text-xs font-medium uppercase tracking-wide mb-2 ${
-                  isCorrect
+                className={`flex items-center gap-2 text-xs font-medium uppercase tracking-wide mb-2 ${isCorrect
                     ? 'text-green-700 dark:text-green-200'
                     : 'text-destructive dark:text-destructive'
-                }`}
+                  }`}
               >
 
                 {isCorrect ? (
                   <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>
+                    <circle cx="12" cy="12" r="10" /><path d="m9 12 2 2 4-4" />
                   </svg>
                 ) : (
                   <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="12" r="10"/><path d="m15 9-6 6m0-6 6 6"/>
+                    <circle cx="12" cy="12" r="10" /><path d="m15 9-6 6m0-6 6 6" />
                   </svg>
                 )}
                 السؤال {index + 1}
@@ -104,26 +100,37 @@ export default function Page() {
               {/* Selected answer pill */}
               <p className="text-xs text-muted-foreground mb-1">الأجابة المختارة</p>
               <span
-                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium ${
-                  isCorrect
-                  ? 'bg-green-500/15 text-green-700 dark:bg-green-800/40 dark:text-green-200'
-                  : 'bg-destructive/15 text-destructive dark:bg-destructive/20 dark:text-destructive'
+                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium ${isCorrect
+                    ? 'bg-green-500/15 text-green-700 dark:bg-green-800/40 dark:text-green-200'
+                    : 'bg-destructive/15 text-destructive dark:bg-destructive/20 dark:text-destructive'
 
-                }`}
+                  }`}
               >
                 {isCorrect ? (
                   <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M20 6 9 17l-5-5"/>
+                    <path d="M20 6 9 17l-5-5" />
                   </svg>
                 ) : (
                   <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M18 6 6 18M6 6l12 12"/>
+                    <path d="M18 6 6 18M6 6l12 12" />
                   </svg>
                 )}
                 {answer.questionChoice.choiceText}
               </span>
+              {
+                !isCorrect && (
+                  <div>
+                    <h1>
+                 الأجابة الصحيحه :<span> اسم فاعل</span>
+                    </h1>
+                  </div>
+                )
+              }
             </div>
+
+
           );
+
         })}
       </div>
     </div>
