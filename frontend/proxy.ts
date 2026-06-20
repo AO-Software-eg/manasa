@@ -35,11 +35,11 @@ export default async function proxy(request: NextRequest) {
   } else if (url.pathname.startsWith('/home')) {
     if (!loggedIn) {
       url.pathname = '/login';
-      return NextResponse.redirect(url);
+      return NextResponse.redirect(url); // instead of .rewrite(url) because it was making bugs while routing .
     }
   }
 
-  return NextResponse.rewrite(url);
+  return NextResponse.next();
 }
 
 export const config = {
