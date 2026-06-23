@@ -7,7 +7,47 @@ import z, { date, ZodError } from 'zod';
 import bodyParser from 'body-parser';
 import { hashPassword, verifyPassword } from '../../hash.ts';
 
+import * as progress from '../../progress.ts';
+
 const router = express.Router();
+
+router
+  .route('/users/:userId/progress/:courseId')
+  .get(async (req: Request, res: Response) => {
+    const {userId, courseId} = req.params;
+    if (typeof userId !== 'string') {
+      return res.status(401).json({ message: 'Invalid user ID paramater' });
+    }
+    if (/^\d+$/.test(userId) === false) {
+      return res.status(401).json({ message: 'Invalid user ID paramater' });
+    }
+
+    if (typeof courseId !== 'string') {
+      return res.status(401).json({ message: 'Invalid course ID paramater' });
+    }
+    if (/^\d+$/.test(courseId) === false) {
+      return res.status(401).json({ message: 'Invalid course ID paramater' });
+    }
+
+    try {
+      const lectures: db.RelationUserLectures = await db.getUserLectures(
+        Number(userId),
+        Number(courseId),
+      );
+
+      const data = progress.getUserProgress(lectures);
+
+      return res.status(200).json(data);
+    } catch (err: any) {
+      if (err instanceof db.RowNotFoundError) {
+        return res
+          .status(404)
+          .json({ message: `${err.message}` });
+      }
+
+      return res.status(500).send();
+    }
+  });
 
 router
   .route('/users/:userId/grades/:examId')
