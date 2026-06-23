@@ -77,6 +77,8 @@ export type RelationExamQuestions = Awaited<
   ReturnType<typeof getExamQuestions>
 >[number];
 
+export type RelationUserLectures = Awaited<ReturnType<typeof getUserLectures>>;
+
 export async function isUserFound(email: string): Promise<boolean> {
   const res = await db
     .select()
@@ -114,7 +116,7 @@ export async function getCourseById(id: number): Promise<SelectCourse> {
     .from(schema.courses)
     .where(eq(schema.courses.id, id));
 
-  if (res.length == 0) {
+  if (res.length === 0) {
     throw new RowNotFoundError(`الدورة التدريبية ذات المعرف ${id} غير موجودة`);
   }
 
@@ -429,6 +431,44 @@ export async function isExamFound(examId: number): Promise<boolean> {
     .where(eq(schema.exams.id, examId));
 
   return res.length !== 0;
+}
+
+export async function getUserLectures(studentId: number, courseId: number) {
+  const course = await db
+    .select()
+    .from(schema.courses)
+    .where(eq(schema.courses.id, courseId));
+
+  if (course.length === 0) {
+    throw new RowNotFoundError(
+      `الدورة التدريبية ذات المعرف ${courseId} غير موجودة`,
+    );
+  }
+
+  const lectures = await db.query.lectures.findMany({
+    where: (lectures, { eq }) => eq(lectures.courseId, courseId),
+    columns: {
+      courseId: false,
+    },
+    with: {
+      exams: {
+        columns: {
+          lectureId: false,
+        },
+        with: {
+          examSubmissions: {
+            where: eq(schema.examSubmissions.studentId, 42),
+            columns: {
+              examId: false,
+              studentId: false,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  return lectures;
 }
 
 export default db;
