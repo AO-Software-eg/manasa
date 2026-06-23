@@ -50,6 +50,7 @@ export const questionChoicesRelations = relations(
 
 export const questionsRelations = relations(questions, ({ one, many }) => ({
   questionChoices: many(questionChoices),
+  correctChoices: many(questionChoices),  // Secondary mapping, just makes more sense in certain cases
   exam: one(exams, {
     fields: [questions.examId],
     references: [exams.id],

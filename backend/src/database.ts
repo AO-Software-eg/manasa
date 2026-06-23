@@ -333,6 +333,16 @@ export async function getStudentExamSubmissions(studentId: number) {
               examId: false,
               createdAt: false,
             },
+            with: {
+              correctChoices: {
+                where: eq(schema.questionChoices.isCorrect, true),
+                columns: {
+                  isCorrect: false,
+                  questionId: false,
+                  createdAt: false,
+                }
+              }
+            }
           },
           questionChoice: {
             columns: {
@@ -364,7 +374,7 @@ export async function getExamSubmissions(studentId: number, examId: number) {
     throw new RowNotFoundError(`No exam with id ${examId} found`);
   }
 
-  const subs = await db.query.examSubmissions.findMany({
+  let subs = await db.query.examSubmissions.findMany({
     where: (examSubmissions, { and }) =>
       and(
         eq(examSubmissions.studentId, studentId),
@@ -387,6 +397,16 @@ export async function getExamSubmissions(studentId: number, examId: number) {
               examId: false,
               createdAt: false,
             },
+            with: {
+              correctChoices: {
+                where: eq(schema.questionChoices.isCorrect, true),
+                columns: {
+                  isCorrect: false,
+                  questionId: false,
+                  createdAt: false
+                }
+              },
+            }
           },
           questionChoice: {
             columns: {
