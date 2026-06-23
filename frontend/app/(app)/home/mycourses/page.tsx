@@ -58,7 +58,7 @@ function page() {
           <CourseComp
             key={enrollment.course.id}
             index={i}
-            id={enrollment.course.id.toString()}
+            id={enrollment.course.id}
             title={enrollment.course.title}
             description={enrollment.course.description}
             price={enrollment.course.price}

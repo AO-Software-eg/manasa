@@ -2,18 +2,19 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { useLectureProgress } from '@/app/hooks/queries/useLectures';
+import { userData } from '@/types';
 
 type Props = {
-  id: string;
+  id: number;
   index: number;
   title: string;
   description: string | null;
   price?: number;
   imageUrl: string;
   instructor?: string;
-  progress?: number;
   discount?: number;
-  userData?: unknown;
+  userData?: userData;
   isPriority?: boolean;
   enrolledCourseIds?: Set<number>;
   isMyCoursesPage?: boolean;
@@ -26,34 +27,34 @@ export default function CourseComp({
   price,
   imageUrl,
   instructor,
-  progress = 0,
   userData,
   isPriority = false,
   enrolledCourseIds,
   isMyCoursesPage = false,
 }: Props) {
   const isPurchased = enrolledCourseIds?.has(Number(id));
-
-
-
-
   const isOwned = isPurchased || isMyCoursesPage;
+  const shouldFetchProgress = !!userData && (isPurchased || isMyCoursesPage);
 
+  const { data } = useLectureProgress(
+    userData?.id,
+    id,
+    shouldFetchProgress,
+  ) ;
 
   return (
     <Link
       href={
-        userData
-          ? `/home/courses/${id}`
-          : `/login?redirect=/home/courses/${id}`
+        userData ? `/home/courses/${id}` : `/login?redirect=/home/courses/${id}`
       }
     >
       <div
         className={`group relative rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-xl cursor-pointer h-full flex flex-col
-        ${isOwned
+        ${
+          isOwned
             ? 'bg-[#1b1b17] border border-[#e6d3a3]/30'
             : 'bg-white/5 border border-white/10 hover:bg-white/10'
-          }`}
+        }`}
       >
         {/* Purchased Badge */}
         {isOwned && (
@@ -75,9 +76,9 @@ export default function CourseComp({
           />
 
           {/* Progress Badge */}
-          {isOwned && progress >= 0 && (
+          {isOwned && (
             <div className="absolute top-3 right-3 z-20 bg-black/70 backdrop-blur-sm text-[#e6d3a3] text-xs font-bold px-2.5 py-1 rounded-full">
-              {progress}%
+              {data?.progressPercentage ?? 0}%
             </div>
           )}
         </div>
@@ -85,9 +86,7 @@ export default function CourseComp({
         {/* Content */}
         <div className="p-5 flex flex-col gap-3 flex-1">
           {/* Title */}
-          <h3 className="text-xl font-bold text-white line-clamp-2">
-            {title}
-          </h3>
+          <h3 className="text-xl font-bold text-white line-clamp-2">{title}</h3>
 
           {!userData ? (
             <>
@@ -121,7 +120,6 @@ export default function CourseComp({
               <p className="text-sm text-gray-400 line-clamp-2">
                 {description}
               </p>
-
 
               <div className="flex items-center justify-between mt-auto pt-3">
                 {isOwned ? (

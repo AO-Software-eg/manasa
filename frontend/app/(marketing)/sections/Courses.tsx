@@ -10,13 +10,18 @@ import { useGetEnrollments } from '@/app/hooks/queries/useEnroll';
 export default function Courses() {
   const { data: courses, isLoading, isError, error, refetch } = useCourses();
   const { data: userData } = useMe();
-  
+
+
   const { data: enrollments, isLoading: enrollLoading, isError: enrollError } = useGetEnrollments(userData?.id?.toString() ?? '');
 
-  const enrolledCourseIds  = new Set<number>(
-    enrollments?.map((e:any) => Number(e.course.id)) ?? []
+  const enrolledCourseIds = new Set<number>(
+    enrollments?.map((e: any) => Number(e.course.id)) ?? []
   )
 
+  console.log(
+    enrollError,
+    enrolledCourseIds
+  )
 
   if (isLoading) {
     return <CoursesLoading />;
@@ -47,7 +52,7 @@ export default function Courses() {
             key={course.id}
             enrolledCourseIds={enrolledCourseIds}
             index={i}
-            id={course.id.toString()}
+            id={course.id}
             title={course.title}
             description={course.description}
             price={course.price}

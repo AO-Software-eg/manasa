@@ -3,7 +3,7 @@
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { api } from '@/app/hooks/api';
 import axios from 'axios';
-import { ExamQuestion, ExamQuestionChoice } from '@/types/exams';
+import { ExamQuestion, ExamQuestionChoice,ExamSubmissionResponse} from '@/types/exams';
 import { useRouter } from 'next/navigation';
 
 export const useExams = (examId: number) => {
@@ -88,18 +88,36 @@ export const useGetExamSubmissions = (userId: number) => {
     staleTime: 10 * 60 * 1000,
   })
 }
-export const useGetOnSubmit = (examId: number, userId: number) => {
-  return useQuery({
-    queryKey: ["examId", examId],
-    enabled: !isNaN(examId),
+type UseGetOnSubmitOptions = {
+  enabled?: boolean;
+};
+
+export const useGetOnSubmit = (
+  examId: number,
+  userId?: number,
+  options?: UseGetOnSubmitOptions
+) => {
+  return useQuery<ExamSubmissionResponse>({
+    queryKey: ['exam', examId, userId],
+
+    enabled:
+      !isNaN(examId) &&
+      !!userId &&
+      (options?.enabled ?? true),
+
     queryFn: async () => {
-      const res = await api.get(`/users/${userId}/grades/${examId}`);
-      if (!res.data) throw new Error('جدث خطأ اثناء تحميل التصحيح');
-      return res.data
+      const res = await api.get(
+        `/users/${userId}/grades/${examId}`
+      );
+
+      if (!res.data) {
+        throw new Error('حدث خطأ أثناء تحميل التصحيح');
+      }
+
+      return res.data;
     },
+
     refetchOnMount: true,
     refetchOnWindowFocus: false,
-    
-  })
-
-}
+  });
+};

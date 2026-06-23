@@ -18,6 +18,7 @@ import { Lock } from 'lucide-react';
 import { useGetExamSubmissions } from '@/app/hooks/queries/useExams';
 import { useMe } from '@/app/hooks/queries/useMe';
 import { useState } from 'react';
+import { useLectureProgress } from '@/app/hooks/queries/useLectures';
 
 function NotAuthorized() {
   return (
@@ -50,7 +51,6 @@ export default function Page() {
 
   const courseId = Array.isArray(params.id) ? params.id[0] : params.id;
 
-  
   const {
     data: course,
     isLoading: coursesLoading,
@@ -63,7 +63,7 @@ export default function Page() {
   const { data: submittedExams } = useGetExamSubmissions(userId);
 
   const solvedExamIds = new Set(
-    submittedExams?.map((exam: any) => exam.examId)
+    submittedExams?.map((exam: any) => exam.examId),
   );
 
   const {
@@ -73,6 +73,8 @@ export default function Page() {
     error,
     refetch,
   } = useLectures(courseId ?? '');
+
+  const { data } = useLectureProgress(userData?.id, Number(courseId));
 
   if (!courseId) return null;
 
@@ -181,8 +183,16 @@ export default function Page() {
                           </button>
                         ))}
 
-                        {exams.map((exam) => {
-                          const isSolved = solvedExamIds.has(exam.id);
+                        {exams.map((exam, index) => {
+                          const solvedExamCount = data?.solvedExamCount ?? 0;
+
+                          const isSolved = index < solvedExamCount;
+
+                          const isCurrentExam = index === solvedExamCount;
+
+                          const isLocked = index > solvedExamCount;
+
+                          const disabled = isSolved || isLocked;
 
                           return (
                             <div
@@ -190,23 +200,42 @@ export default function Page() {
                               className="w-full flex items-center justify-between"
                             >
                               <button
-                                disabled={isSolved}
+                                disabled={disabled}
                                 onClick={() => {
-                                  if (!isSolved) setOpenExamId(exam.id);
+                                  if (isCurrentExam) {
+                                    setOpenExamId(exam.id);
+                                  }
                                 }}
-                                className="flex items-center justify-between w-full rounded-xl border border-zinc-700 bg-zinc-900/60 p-4 transition-all hover:border-emerald-500 hover:bg-zinc-800 disabled:opacity-50"
+                                className={`
+          flex items-center justify-between
+          w-full rounded-xl border
+          p-4 transition-all
+
+          ${
+            isLocked
+              ? 'border-zinc-800 bg-zinc-900/40'
+              : 'border-zinc-700 bg-zinc-900/60 hover:border-emerald-500 hover:bg-zinc-800'
+          }
+
+          disabled:opacity-50
+        `}
                               >
                                 <div className="flex items-center gap-3">
                                   <span className="font-medium text-zinc-100">
                                     {exam.title}
                                   </span>
                                 </div>
+
                                 <span className="text-sm text-zinc-400">
-                                  {isSolved ? 'تم الحل' : 'اختبار'}
+                                  {isSolved
+                                    ? 'تم الحل'
+                                    : isLocked
+                                      ? 'مغلق'
+                                      : 'اختبار'}
                                 </span>
                               </button>
 
-                              {!isSolved && (
+                              {isCurrentExam && (
                                 <PopUp
                                   open={openExamId === exam.id}
                                   title="هل انت متأكد من بدأ الأمتحان ؟"
@@ -214,6 +243,7 @@ export default function Page() {
                                   confirmText="بدء الأمتحان"
                                   confirmClassName="bg-green-500 hover:bg-green-600"
                                   onClose={() => setOpenExamId(null)}
+                                  pending={false}
                                   onConfirm={() =>
                                     router.push(
                                       `/home/courses/${courseId}/lectures/${asset.id}/exams/${exam.id}`,

@@ -21,13 +21,19 @@ export type ExamSubmission = {
 
 // get exam grades
 
+export type ExamSubmissionResponse = {
+  exam: Exam;
+
+  submissions: Submissions[];
+};
+
+
 export type Exam = {
   createdAt: string;
   id: number;
   lectureId: number;
   title: string;
-
-}
+};
 
 export type Submissions = {
   id: number;
@@ -41,12 +47,19 @@ export type Submissions = {
   };
   answerSubmissions: AnswerGrade[];
 };
-export type AnswerGrade= {
+export type AnswerGrade = {
   studentId: number;
   examSubmissionId: number;
+
   question: {
     id: number;
     question: string;
+    correctChoices: [
+      {
+        id: number;
+        choiceText: string;
+      },
+    ];
   };
   questionChoice: {
     id: number;

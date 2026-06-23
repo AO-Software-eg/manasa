@@ -11,6 +11,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import Link from 'next/link';
 
 type Submission = {
     id: number;
@@ -26,7 +27,8 @@ type Submission = {
 
 export default function Page() {
     const { data: userData } = useMe();
-    const { data: submissions } = useGetExamSubmissions(userData?.id ?? NaN);
+    const userId = userData?.id;
+    const { data: submissions } = useGetExamSubmissions(userId);
 
     const formatDate = (dateString: string) => {
         return new Intl.DateTimeFormat('ar-EG', {
@@ -46,11 +48,21 @@ export default function Page() {
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead className="text-right text-white">رقم المحاولة</TableHead>
-                            <TableHead className="text-right text-white">الامتحان</TableHead>
-                            <TableHead className="text-right text-white">الدرجة</TableHead>
-                            <TableHead className="text-right text-white">عدد الأسئلة</TableHead>
-                            <TableHead className="text-right text-white">تاريخ التقديم</TableHead>
+                            <TableHead className="text-right text-slate-300">
+                                رقم المحاولة
+                            </TableHead>
+                            <TableHead className="text-right text-slate-300">
+                                الدرجة
+                            </TableHead>
+                            <TableHead className="text-right text-slate-300">
+                                عدد الأسئلة
+                            </TableHead>
+                            <TableHead className="text-right text-slate-300">
+                                تاريخ التقديم
+                            </TableHead>
+                            <TableHead className="text-right text-slate-300">
+                                النتايج
+                            </TableHead>
                         </TableRow>
                     </TableHeader>
 
@@ -64,7 +76,10 @@ export default function Page() {
                                 <TableCell className="text-right text-white">
                                     <div className="flex flex-col gap-1">
                                         <span>{submission.exam.title.trim()}</span>
-                                        <Badge variant="outline" className="w-fit text-xs text-white">
+                                        <Badge
+                                            variant="outline"
+                                            className="w-fit text-xs text-white"
+                                        >
                                             #{submission.exam.id}
                                         </Badge>
                                     </div>
@@ -88,6 +103,13 @@ export default function Page() {
 
                                 <TableCell className="text-right text-white">
                                     {formatDate(submission.createdAt)}
+                                </TableCell>
+                                <TableCell className="text-right text-slate-300">
+                                    <Link href={`/home/history/exams_results/${submission.id}?examId=${submission.exam.id}`}>
+                                        <button className="bg-slate-800 p-2 rounded-2xl transition-opacity hover:opacity-65">
+                                            تصحيح الاجابات
+                                        </button>
+                                    </Link>
                                 </TableCell>
                             </TableRow>
                         ))}

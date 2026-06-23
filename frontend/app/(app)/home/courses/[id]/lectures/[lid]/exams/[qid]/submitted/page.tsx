@@ -18,7 +18,7 @@ import {
 import { useQueryClient } from '@tanstack/react-query';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ExamGrade } from '@/types';
+import { Submissions } from '@/types';
 
 function Page() {
   const { data: user } = useMe();
@@ -110,7 +110,7 @@ function Page() {
 
               <TableBody>
                 {data.submissions.length ? (
-                  data.submissions.map((submission: ExamGrade) => (
+                  data.submissions.map((submission: Submissions) => (
                     <TableRow
                       key={submission.id}
                       className="border-slate-700 hover:bg-slate-800"

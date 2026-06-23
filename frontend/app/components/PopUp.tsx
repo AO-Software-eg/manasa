@@ -1,5 +1,6 @@
 type PopUpProps = {
   open: boolean;
+  pending: boolean;
   title: string;
   description: string;
   confirmText: string;
@@ -16,6 +17,7 @@ function PopUp({
   confirmClassName,
   onClose,
   onConfirm,
+  pending
 }: PopUpProps) {
   return (
     <div
@@ -43,7 +45,8 @@ function PopUp({
 
           <button
             onClick={onConfirm}
-            className={`${confirmClassName} px-5 py-2 rounded-xl transition`}
+            disabled={pending}
+            className={`${confirmClassName} px-5 py-2 rounded-xl transition disabled:opacity-50 disabled:pointer-events-none`}
           >
             {confirmText}
           </button>

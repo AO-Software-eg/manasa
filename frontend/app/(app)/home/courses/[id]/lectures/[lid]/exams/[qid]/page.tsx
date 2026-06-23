@@ -372,16 +372,18 @@ function Page() {
         confirmClassName="bg-red-500 hover:bg-red-600"
         onClose={() => setOpenOnExit(false)}
         onConfirm={() => setOnExit(true)}
+        pending={false}
       />
 
       <PopUp
         open={onSubmit}
         title="هل أنت متأكد أنك تريد تقديم الامتحان؟"
         description="تأكد من مراجعة إجاباتك قبل تقديم الامتحان."
-        confirmText="تقديم الامتحان"
+        confirmText={SubmitExam.isPending ? "جاري ارسال الاجابات" : "تقديم الامتحان"}
         confirmClassName="bg-green-600 hover:bg-green-700"
         onClose={() => setOnSubmit(false)}
         onConfirm={handleSubmitData}
+        pending={SubmitExam.isPending}
       />
     </div>
   );

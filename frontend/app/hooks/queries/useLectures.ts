@@ -1,6 +1,8 @@
 import { api } from '@/app/hooks/api';
 import { useQuery } from '@tanstack/react-query';
-import { lecture, lectureVideoSchema } from '@/types/lecture';
+import { lectureVideoSchema } from '@/types/lecture';
+import { progressSchema } from '@/types';
+
 
 export function useLectures(courseID: string) {
   return useQuery({
@@ -45,4 +47,22 @@ export function useVideo(
       };
     },
   });
+}
+export function useLectureProgress(userId?: number, courseId?: number, enabled = true) {
+  return useQuery<progressSchema>({
+    queryKey: ['progress', userId, courseId],
+    enabled: enabled && !!userId && !!courseId,
+    staleTime: 1000 * 60 * 5,
+    queryFn: async () => {
+      const res = await api.get(`/users/${userId}/progress/${courseId}`);
+      console.log(res.data);
+
+      if (!res.data) {
+        throw new Error('لا يوجد نشاط');
+      }
+
+
+      return res.data
+    }
+  })
 }
