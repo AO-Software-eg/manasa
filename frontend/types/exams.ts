@@ -1,32 +1,56 @@
-import { z } from 'zod';
+// post and get  Exam operations
+export type ExamQuestionChoice = {
+  id: number;
+  choiceText: string;
+};
 
+export type ExamQuestion = {
+  id: number;
+  question: string;
+  questionChoices: ExamQuestionChoice[];
+};
 
-const examQuestionChoiceSchema = z.object({
-  id: z.number(),
-  choiceText: z.string(),
-});
+export type ExamSubmission = {
+  studentId: number;
+  examId: number;
+  answers: Array<{
+    questionId: number;
+    choiceId: number;
+  }>;
+};
 
-export type ExamQuestionChoice = z.infer<typeof examQuestionChoiceSchema>;
+// get exam grades
 
+export type Exam = {
+  createdAt: string;
+  id: number;
+  lectureId: number;
+  title: string;
 
-const examQuestionSchema = z.object({
-  id: z.number(),
-  question: z.string(),
-  questionChoices: examQuestionChoiceSchema.array(),
-});
-export type ExamQuestion = z.infer<typeof examQuestionSchema>;
+}
 
-
-
- const examSubmissionSchema = z.object({
-  studentId: z.number(),
-  examId: z.number(),
-  answers: z.array(
-    z.object({
-      questionId: z.number(),
-      choiceId: z.number(),
-    }),
-  ),
-});
-
-export type examSubmissionSchema = z.infer<typeof examQuestionSchema>;
+export type Submissions = {
+  id: number;
+  studentId: number;
+  createdAt: string;
+  grade: number;
+  questionCount: number;
+  exam: {
+    id: number;
+    title: string;
+  };
+  answerSubmissions: AnswerGrade[];
+};
+export type AnswerGrade= {
+  studentId: number;
+  examSubmissionId: number;
+  question: {
+    id: number;
+    question: string;
+  };
+  questionChoice: {
+    id: number;
+    choiceText: string;
+    isCorrect: boolean;
+  };
+};

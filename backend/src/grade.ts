@@ -6,9 +6,9 @@ export type Grade = {
   questionCount: number;
 };
 
-export async function gradeExam(data: any): Promise<Grade> {
-  schema.examSubmissionSchema.parse(data);
-
+export async function gradeExam(
+  data: schema.examSubmissionData,
+): Promise<Grade> {
   const questions = await db.getExamQuestions(data.examId);
   let grade = 0;
 

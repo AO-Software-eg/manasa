@@ -64,6 +64,11 @@ export type InsertCourseEnrollment =
 export type SelectExamSubmission = typeof schema.examSubmissions.$inferSelect;
 export type InsertExamSubmission = typeof schema.examSubmissions.$inferInsert;
 
+export type SelectAnswerSubmission =
+  typeof schema.answerSubmissions.$inferSelect;
+export type InsertAnswerSubmission =
+  typeof schema.answerSubmissions.$inferInsert;
+
 export type RelationLecture = Awaited<
   ReturnType<typeof getCourseLectures>
 >[number];
@@ -284,8 +289,21 @@ export async function getQuestionChoice(
   return res[0];
 }
 
-export async function addExamSubmission(submission: InsertExamSubmission) {
-  await db.insert(schema.examSubmissions).values(submission);
+export async function addExamSubmission(
+  submission: InsertExamSubmission,
+): Promise<number> {
+  const [result] = await db
+    .insert(schema.examSubmissions)
+    .values(submission)
+    .returning({ id: schema.examSubmissions.id });
+
+  return result.id;
+}
+
+export async function addAnswerSubmissions(
+  answerSubmissions: InsertAnswerSubmission[],
+) {
+  await db.insert(schema.answerSubmissions).values(answerSubmissions);
 }
 
 // returns all the exam submissions a student has made
@@ -301,6 +319,37 @@ export async function getStudentExamSubmissions(studentId: number) {
         columns: {
           id: true,
           title: true,
+        },
+      },
+      answerSubmissions: {
+        columns: {
+          questionId: false,
+          choiceId: false,
+          createdAt: false,
+        },
+        with: {
+          question: {
+            columns: {
+              examId: false,
+              createdAt: false,
+            },
+            with: {
+              correctChoices: {
+                where: eq(schema.questionChoices.isCorrect, true),
+                columns: {
+                  isCorrect: false,
+                  questionId: false,
+                  createdAt: false,
+                }
+              }
+            }
+          },
+          questionChoice: {
+            columns: {
+              questionId: false,
+              createdAt: false,
+            },
+          },
         },
       },
     },
@@ -325,7 +374,7 @@ export async function getExamSubmissions(studentId: number, examId: number) {
     throw new RowNotFoundError(`No exam with id ${examId} found`);
   }
 
-  const subs = await db.query.examSubmissions.findMany({
+  let subs = await db.query.examSubmissions.findMany({
     where: (examSubmissions, { and }) =>
       and(
         eq(examSubmissions.studentId, studentId),
@@ -333,6 +382,40 @@ export async function getExamSubmissions(studentId: number, examId: number) {
       ),
     columns: {
       examId: false,
+    },
+    with: {
+      answerSubmissions: {
+        columns: {
+          questionId: false,
+          choiceId: false,
+          createdAt: false,
+          studentId: false,
+        },
+        with: {
+          question: {
+            columns: {
+              examId: false,
+              createdAt: false,
+            },
+            with: {
+              correctChoices: {
+                where: eq(schema.questionChoices.isCorrect, true),
+                columns: {
+                  isCorrect: false,
+                  questionId: false,
+                  createdAt: false
+                }
+              },
+            }
+          },
+          questionChoice: {
+            columns: {
+              questionId: false,
+              createdAt: false,
+            },
+          },
+        },
+      },
     },
   });
 
