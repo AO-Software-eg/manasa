@@ -477,7 +477,7 @@ export async function getUserLectures(studentId: number, courseId: number) {
         },
         with: {
           examSubmissions: {
-            where: eq(schema.examSubmissions.studentId, 42),
+            where: eq(schema.examSubmissions.studentId, studentId),
             columns: {
               examId: false,
               studentId: false,
