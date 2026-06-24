@@ -304,6 +304,7 @@ router.route('/me').get(async (req: Request, res: Response) => {
 
     return res.status(200).json(user);
   } catch (err: any) {
+    console.log(err);
     if (err instanceof db.RowNotFoundError) {
       res.status(404).json({ message: 'المستخدم غير موجود' });
     }
