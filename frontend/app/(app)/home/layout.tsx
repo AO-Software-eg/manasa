@@ -3,7 +3,7 @@
 import SideNav from '../../components/SideNav';
 import '../../globals.css';
 import { Cairo } from 'next/font/google';
-import Chatbot from '@/app/components/Chatbot';
+import Script from 'next/script';
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
 
@@ -37,6 +37,11 @@ export default function DashboardLayout({
           className={`${isExamPage ? '' : 'flex-1  mt-16 p-4 lg:h-[calc(102dvh-5rem)] lg:overflow-y-auto overflow-x-hidden'}`}
         >
           {children}
+
+        <Script
+          src="https://player.vdocipher.com/v2/api.js"
+          strategy="afterInteractive"
+        />
         </main>
     
     </div>
