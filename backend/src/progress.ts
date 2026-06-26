@@ -54,10 +54,10 @@ export function getUserProgress(
     }
   }
 
-  return {
+  const progress: UserCourseProgress = {
     videoCount: videoCount,
     completedVideoCount: completedVideoCount,
-    videoCompletionPercentage: (videoCount / completedVideoCount) * 100,
+    videoCompletionPercentage: (completedVideoCount / videoCount) * 100,
 
     solvedExamCount: solvedExamCount,
     examCount: examCount,
@@ -67,4 +67,6 @@ export function getUserProgress(
     finishedLectureCount: finishedLectureCount,
     progressPercentage: (finishedLectureCount / lectureCount) * 100,
   };
+
+  return progress;
 }
