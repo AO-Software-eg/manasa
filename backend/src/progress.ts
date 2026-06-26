@@ -1,12 +1,17 @@
 import * as db from './database.ts';
 
 export type UserCourseProgress = {
-  progressPercentage: number;
-  solvedExamCount: number;
+  videoCount: number;
+  completedVideoCount: number;
+  videoCompletionPercentage: number;
+
   examCount: number;
+  solvedExamCount: number;
+  examProgressPercentage: number;
+
+  progressPercentage: number;
   lectureCount: number;
   finishedLectureCount: number;
-  examProgressPercentage: number;
 };
 
 export function getUserProgress(
@@ -14,6 +19,10 @@ export function getUserProgress(
 ): UserCourseProgress {
   let examCount = 0;
   let solvedExamCount = 0;
+
+  let videoCount = 0;
+  let completedVideoCount = 0;
+
   let lectureCount = 0;
   let finishedLectureCount = 0;
 
@@ -30,12 +39,26 @@ export function getUserProgress(
       }
     }
 
-    if (examsDone) {
+    let videosDone = true;
+    for (const video of lecture.lectureVideos) {
+      videoCount++;
+      if (video.lectureVideoCompletions.length) {
+        completedVideoCount++;
+      } else {
+        videosDone = false;
+      }
+    }
+
+    if (examsDone && videosDone) {
       finishedLectureCount++;
     }
   }
 
   return {
+    videoCount: videoCount,
+    completedVideoCount: completedVideoCount,
+    videoCompletionPercentage: (videoCount / completedVideoCount) * 100,
+
     solvedExamCount: solvedExamCount,
     examCount: examCount,
     examProgressPercentage: (solvedExamCount / examCount) * 100,

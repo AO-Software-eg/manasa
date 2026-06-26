@@ -20,6 +20,7 @@
     "skipLibCheck": true,
 
     "rewriteRelativeImportExtensions": true,
-    "allowImportingTsExtensions": true
+    "allowImportingTsExtensions": true,
+    "noEmit": true
   }
 }

@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import { drizzle } from 'drizzle-orm/node-postgres';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, inArray } from 'drizzle-orm';
 
 import * as schema from '../drizzle/schema.ts';
 import * as schemaRelations from '../drizzle/relations.ts';
@@ -342,9 +342,9 @@ export async function getStudentExamSubmissions(studentId: number) {
                   isCorrect: false,
                   questionId: false,
                   createdAt: false,
-                }
-              }
-            }
+                },
+              },
+            },
           },
           questionChoice: {
             columns: {
@@ -405,10 +405,10 @@ export async function getExamSubmissions(studentId: number, examId: number) {
                 columns: {
                   isCorrect: false,
                   questionId: false,
-                  createdAt: false
-                }
+                  createdAt: false,
+                },
               },
-            }
+            },
           },
           questionChoice: {
             columns: {
@@ -480,6 +480,20 @@ export async function getUserLectures(studentId: number, courseId: number) {
             where: eq(schema.examSubmissions.studentId, studentId),
             columns: {
               examId: false,
+              studentId: false,
+            },
+          },
+        },
+      },
+      lectureVideos: {
+        columns: {
+          lectureId: false,
+        },
+        with: {
+          lectureVideoCompletions: {
+            where: eq(schema.lectureVideoCompletions.studentId, studentId),
+            columns: {
+              videoId: false,
               studentId: false,
             },
           },

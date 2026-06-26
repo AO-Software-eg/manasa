@@ -14,7 +14,7 @@ const router = express.Router();
 router
   .route('/users/:userId/progress/:courseId')
   .get(async (req: Request, res: Response) => {
-    const {userId, courseId} = req.params;
+    const { userId, courseId } = req.params;
     if (typeof userId !== 'string') {
       return res.status(401).json({ message: 'Invalid user ID paramater' });
     }
@@ -39,10 +39,9 @@ router
 
       return res.status(200).json(data);
     } catch (err: any) {
+      console.log(err);
       if (err instanceof db.RowNotFoundError) {
-        return res
-          .status(404)
-          .json({ message: `${err.message}` });
+        return res.status(404).json({ message: `${err.message}` });
       }
 
       return res.status(500).send();

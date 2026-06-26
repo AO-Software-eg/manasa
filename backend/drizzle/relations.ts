@@ -8,16 +8,21 @@ import {
   examSubmissions,
   users,
   courses,
+  lectureVideoCompletions,
   courseEnrollments,
   answerSubmissions,
 } from './schema.ts';
 
-export const lectureVideosRelations = relations(lectureVideos, ({ one }) => ({
-  lecture: one(lectures, {
-    fields: [lectureVideos.lectureId],
-    references: [lectures.id],
+export const lectureVideosRelations = relations(
+  lectureVideos,
+  ({ one, many }) => ({
+    lecture: one(lectures, {
+      fields: [lectureVideos.lectureId],
+      references: [lectures.id],
+    }),
+    lectureVideoCompletions: many(lectureVideoCompletions),
   }),
-}));
+);
 
 export const lecturesRelations = relations(lectures, ({ one, many }) => ({
   lectureVideos: many(lectureVideos),
@@ -50,7 +55,7 @@ export const questionChoicesRelations = relations(
 
 export const questionsRelations = relations(questions, ({ one, many }) => ({
   questionChoices: many(questionChoices),
-  correctChoices: many(questionChoices),  // Secondary mapping, just makes more sense in certain cases
+  correctChoices: many(questionChoices),
   exam: one(exams, {
     fields: [questions.examId],
     references: [exams.id],
@@ -75,6 +80,7 @@ export const examSubmissionsRelations = relations(
 
 export const usersRelations = relations(users, ({ many }) => ({
   examSubmissions: many(examSubmissions),
+  lectureVideoCompletions: many(lectureVideoCompletions),
   courseEnrollments: many(courseEnrollments),
   answerSubmissions: many(answerSubmissions),
 }));
@@ -83,6 +89,20 @@ export const coursesRelations = relations(courses, ({ many }) => ({
   lectures: many(lectures),
   courseEnrollments: many(courseEnrollments),
 }));
+
+export const lectureVideoCompletionsRelations = relations(
+  lectureVideoCompletions,
+  ({ one }) => ({
+    user: one(users, {
+      fields: [lectureVideoCompletions.studentId],
+      references: [users.id],
+    }),
+    lectureVideo: one(lectureVideos, {
+      fields: [lectureVideoCompletions.videoId],
+      references: [lectureVideos.id],
+    }),
+  }),
+);
 
 export const courseEnrollmentsRelations = relations(
   courseEnrollments,
