@@ -35,7 +35,8 @@ router
         Number(courseId),
       );
 
-      const data = progress.getUserProgress(lectures);
+      const data: progress.UserCourseProgress =
+        progress.getUserProgress(lectures);
 
       return res.status(200).json(data);
     } catch (err: any) {

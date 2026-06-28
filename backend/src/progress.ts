@@ -54,10 +54,10 @@ export function getUserProgress(
     }
   }
 
-  return {
+  let progress: UserCourseProgress = {
     videoCount: videoCount,
     completedVideoCount: completedVideoCount,
-    videoCompletionPercentage: (videoCount / completedVideoCount) * 100,
+    videoCompletionPercentage: (completedVideoCount / videoCount) * 100,
 
     solvedExamCount: solvedExamCount,
     examCount: examCount,
@@ -67,4 +67,23 @@ export function getUserProgress(
     finishedLectureCount: finishedLectureCount,
     progressPercentage: (finishedLectureCount / lectureCount) * 100,
   };
+
+  progress = sanitizeZeroDivisionOutput(progress);
+
+  return progress;
+}
+
+function sanitizeZeroDivisionOutput(
+  data: UserCourseProgress,
+): UserCourseProgress {
+  const result = { ...data };
+
+  for (const [key, val] of Object.entries(result)) {
+    if (typeof val === 'number') {
+      if (!isFinite(val) || isNaN(val)) {
+        (result as any)[key] = 0;
+      }
+    }
+  }
+  return result;
 }

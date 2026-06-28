@@ -26,7 +26,7 @@ export default function DashboardLayout({
       className={`${isExamPage ? '' : 'min-h-screen flex'}  bg-[#0d0d0d] text-white ${cairo.className}`}
     >
       {!isExamPage && (
-        <>
+        <>111
           <SideNav collapsed={collapsed} setCollapsed={setCollapsed} />
           {/* <Chatbot /> */}
         </>
