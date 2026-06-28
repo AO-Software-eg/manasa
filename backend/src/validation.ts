@@ -53,3 +53,13 @@ export const signupSchema = z
   .refine((data) => data.studentPhone !== data.parentPhone, {
     error: 'Student and parent phone numbers must differ.',
   });
+
+export const buyItemSchema = z.object({
+  itemId: z.number(),
+  itemType: z.enum(['course']),
+  phoneNumber: z
+    .string()
+    .regex(EGYPT_MOBILE_REGEX, 'Invalid egyptian mobile phone number'),
+});
+
+export type buyItemData = z.infer<typeof buyItemSchema>;
