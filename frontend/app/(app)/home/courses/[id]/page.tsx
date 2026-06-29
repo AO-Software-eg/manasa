@@ -11,7 +11,7 @@ import { useEnroll } from '@/app/hooks/queries/useEnroll';
 import { useMe } from '@/app/hooks/queries/useMe';
 import { useGetEnrollments } from '@/app/hooks/queries/useEnroll';
 import { toast } from 'sonner';
-
+import { usePayment } from '@/app/hooks/queries/usePayment';
 
 export default function CoursePage() {
   const params = useParams();
@@ -61,22 +61,37 @@ function CourseData({ course }: CourseDataProps) {
 
   const enrollMutation = useEnroll();
   const router = useRouter();
+  const paymentMutation = usePayment();
 
   const handleEnroll = () => {
     if (!userData?.id) return;
 
-    enrollMutation.mutate(
+    paymentMutation.mutate(
       {
-        studentId: Number(userData.id),
-        courseId: Number(course.id),
+        itemId: Number(course.id),
+        phoneNumber: userData.studentPhone,
       },
       {
-        onSuccess: () => {
-          toast.success('تم الانضمام إلى الكورس بنجاح');
-          router.push(`/home/courses/${course.id}/lectures`);
-        },
+        onSuccess: (data) => {
+          const paymentKey = data.payment_keys[0].key;
+          const url = `https://accept.paymob.com/api/acceptance/iframes/1056311?payment_token=${paymentKey}`
+          window.location.href = url;
+        }
       },
     );
+
+    // enrollMutation.mutate(
+    //   {
+    //     studentId: Number(userData.id),
+    //     courseId: Number(course.id),
+    //   },
+    //   {
+    //     onSuccess: () => {
+    //       toast.success('تم الانضمام إلى الكورس بنجاح');
+    //       router.push(`/home/courses/${course.id}/lectures`);
+    //     },
+    //   },
+    // );
   };
 
   const {
@@ -97,7 +112,6 @@ function CourseData({ course }: CourseDataProps) {
         {isPurchased ? (
           <>
             <div className="mb-6">
-
               <h2 className="text-3xl font-bold text-[#e6d3a3] mb-3">
                 تم شراء هذا الكورس
               </h2>
@@ -116,7 +130,6 @@ function CourseData({ course }: CourseDataProps) {
           </>
         ) : (
           <>
-
             <h2 className="text-3xl font-bold mb-4 text-[#e6d3a3]">
               المحتوى مقفل
             </h2>
