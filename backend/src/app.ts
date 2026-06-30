@@ -15,7 +15,7 @@ if (!process.env.FRONTEND_LOCAL_URL) {
 
 app.use(
   cors({
-    origin: process.env.FRONTEND_LOCAL_URL,
+    origin: true,
     credentials: true,
   }),
 );
