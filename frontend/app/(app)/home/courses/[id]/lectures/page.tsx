@@ -244,6 +244,7 @@ export default function Page() {
                                   confirmClassName="bg-green-500 hover:bg-green-600"
                                   onClose={() => setOpenExamId(null)}
                                   pending={false}
+                                  done={false}
                                   onConfirm={() =>
                                     router.push(
                                       `/home/courses/${courseId}/lectures/${asset.id}/exams/${exam.id}`,
