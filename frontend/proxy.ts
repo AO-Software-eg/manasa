@@ -2,44 +2,44 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { api } from './app/hooks/api';
 
-// async function isLoggedIn(request: NextRequest): Promise<boolean> {
-//   const sessionCookie = request.cookies.get('user_token');
+async function isLoggedIn(request: NextRequest): Promise<boolean> {
+  const sessionCookie = request.cookies.get('user_token');
 
-//   if (sessionCookie) {
-//     try {
-//       const res = await api.get('/me', {
-//         headers: {
-//           Cookie: `user_token=${sessionCookie.value}`,
-//         },
-//       });
+  if (sessionCookie) {
+    try {
+      const res = await api.get('/me', {
+        headers: {
+          Cookie: `user_token=${sessionCookie.value}`,
+        },
+      });
 
-//       return true;
-//     } catch (err: any) {
-//       console.log(err);
-//       return false;
-//     }
-//   }
+      return true;
+    } catch (err: any) {
+      console.log(err);
+      return false;
+    }
+  }
 
-//   return false;
-// }
+  return false;
+}
 
 export default async function proxy(request: NextRequest) {
-  // const url = request.nextUrl.clone();
-  // const loggedIn = await isLoggedIn(request);
+  const url = request.nextUrl.clone();
+  const loggedIn = await isLoggedIn(request);
 
-  // if (url.pathname == '/login' || url.pathname == '/signup') {
-  //   if (loggedIn) {
-  //     url.pathname = '/home';
-  //     return NextResponse.redirect(url);
-  //   }
-  // } else if (url.pathname.startsWith('/home')) {
-  //   if (!loggedIn) {
-  //     url.pathname = '/login';
-  //     return NextResponse.redirect(url); // instead of .rewrite(url) because it was making bugs while routing .
-  //   }
-  // }
+  if (url.pathname == '/login' || url.pathname == '/signup') {
+    if (loggedIn) {
+      url.pathname = '/home';
+      return NextResponse.redirect(url);
+    }
+  } else if (url.pathname.startsWith('/home')) {
+    if (!loggedIn) {
+      url.pathname = '/login';
+      return NextResponse.redirect(url); // instead of .rewrite(url) because it was making bugs while routing .
+    }
+  }
 
-  // return NextResponse.next();
+  return NextResponse.next();
 }
 
 export const config = {
