@@ -1,6 +1,6 @@
-// import { NextResponse } from 'next/server';
-// import type { NextRequest } from 'next/server';
-// import { api } from './app/hooks/api';
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import { api } from './app/hooks/api';
 
 // async function isLoggedIn(request: NextRequest): Promise<boolean> {
 //   const sessionCookie = request.cookies.get('user_token');
@@ -23,25 +23,25 @@
 //   return false;
 // }
 
-// export default async function proxy(request: NextRequest) {
-//   const url = request.nextUrl.clone();
-//   const loggedIn = await isLoggedIn(request);
+export default async function proxy(request: NextRequest) {
+  // const url = request.nextUrl.clone();
+  // const loggedIn = await isLoggedIn(request);
 
-//   if (url.pathname == '/login' || url.pathname == '/signup') {
-//     if (loggedIn) {
-//       url.pathname = '/home';
-//       return NextResponse.redirect(url);
-//     }
-//   } else if (url.pathname.startsWith('/home')) {
-//     if (!loggedIn) {
-//       url.pathname = '/login';
-//       return NextResponse.redirect(url); // instead of .rewrite(url) because it was making bugs while routing .
-//     }
-//   }
+  // if (url.pathname == '/login' || url.pathname == '/signup') {
+  //   if (loggedIn) {
+  //     url.pathname = '/home';
+  //     return NextResponse.redirect(url);
+  //   }
+  // } else if (url.pathname.startsWith('/home')) {
+  //   if (!loggedIn) {
+  //     url.pathname = '/login';
+  //     return NextResponse.redirect(url); // instead of .rewrite(url) because it was making bugs while routing .
+  //   }
+  // }
 
-//   return NextResponse.next();
-// }
+  // return NextResponse.next();
+}
 
-// export const config = {
-//   matcher: ['/login', '/home/:path*', '/signup'],
-// };
+export const config = {
+  matcher: ['/login', '/home/:path*', '/signup'],
+};
