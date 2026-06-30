@@ -34,7 +34,7 @@ function PaymentResultInner() {
   }, [enrollments, isLoading, courseId, router]);
 
   return (
-    <div className="min-h-screen bg-[#090908] px-4 py-10 text-white" dir="rtl">
+    <div className="min-h-screen bg-[#090908] px-4 py-10 mt-20 text-white" dir="rtl">
       <div className="container mx-auto max-w-3xl">
         <CardLayout classname="mx-auto flex flex-col items-center gap-6 text-center bg-[#121212] border-[#3b3b34]/50">
           <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[#1C1C18] text-[#e6d3a3] shadow-lg shadow-[#0000001a]">

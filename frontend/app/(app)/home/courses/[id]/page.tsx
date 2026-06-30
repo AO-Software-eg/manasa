@@ -12,6 +12,7 @@ import { useMe } from '@/app/hooks/queries/useMe';
 import { useGetEnrollments } from '@/app/hooks/queries/useEnroll';
 import { toast } from 'sonner';
 import { usePayment } from '@/app/hooks/queries/usePayment';
+import { courses } from '@/types';
 
 export default function CoursePage() {
   const params = useParams();
@@ -50,10 +51,7 @@ export default function CoursePage() {
 }
 
 interface CourseDataProps {
-  course: {
-    title: string;
-    id: string;
-  };
+  course: courses;
 }
 
 function CourseData({ course }: CourseDataProps) {
@@ -66,32 +64,34 @@ function CourseData({ course }: CourseDataProps) {
   const handleEnroll = () => {
     if (!userData?.id) return;
 
-    paymentMutation.mutate(
-      {
-        itemId: Number(course.id),
-        phoneNumber: userData.studentPhone,
-      },
-      {
-        onSuccess: (data) => {
-          const paymentKey = data.payment_keys[0].key;
-          const url = `https://accept.paymob.com/api/acceptance/iframes/1056311?payment_token=${paymentKey}`
-          window.location.href = url;
-        }
-      },
-    );
-
-    // enrollMutation.mutate(
-    //   {
-    //     studentId: Number(userData.id),
-    //     courseId: Number(course.id),
-    //   },
-    //   {
-    //     onSuccess: () => {
-    //       toast.success('تم الانضمام إلى الكورس بنجاح');
-    //       router.push(`/home/courses/${course.id}/lectures`);
-    //     },
-    //   },
-    // );
+    if (course.price > 0) {
+      paymentMutation.mutate(
+        {
+          itemId: Number(course.id),
+          phoneNumber: userData.studentPhone,
+        },
+        {
+          onSuccess: (data) => {
+            const paymentKey = data.payment_keys[0].key;
+            const url = `https://accept.paymob.com/api/acceptance/iframes/1056311?payment_token=${paymentKey}`;
+            window.location.href = url;
+          },
+        },
+      );
+    } else {
+      enrollMutation.mutate(
+        {
+          studentId: Number(userData.id),
+          courseId: Number(course.id),
+        },
+        {
+          onSuccess: () => {
+            toast.success('تم الانضمام إلى الكورس بنجاح');
+            router.push(`/home/courses/${course.id}/lectures`);
+          },
+        },
+      );
+    }
   };
 
   const {
