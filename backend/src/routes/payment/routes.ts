@@ -127,7 +127,7 @@ router
         special_reference: `${payment.id}-${payment.createdAt}`,
         expiration: 3600,
         notification_url: `${process.env.NGROK_BASE_URL}/payment/paymob-callback`,
-        redirection_url: `https://manasa-deploy-main-git-paymob-abdelrahman1devs-projects.vercel.app/payment/result?courseId=${buyData.itemId}`,
+        redirection_url: `${process.env.FRONTEND_LOCAL_URL}/payment/result?courseId=${buyData.itemId}`,
       });
 
       const headers: HeadersInit = new Headers();
