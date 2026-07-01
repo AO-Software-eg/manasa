@@ -1,7 +1,6 @@
 'use client';
-import Image from 'next/image';
 import { useState, useRef, useEffect } from 'react';
-import { Menu, Origami, UserPlus } from 'lucide-react';
+import { Menu, Origami } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
@@ -52,7 +51,7 @@ function Header() {
   const path = usePathname();
   const isUserPage = path.startsWith('/home');
   const { data: userData, isError } = useMe();
- 
+
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -100,10 +99,10 @@ function Header() {
                   <>
                     <Link href={'/home'} onClick={() => setIsMenuOpen(false)}>
                       <button className="px-5 py-2 bg-[#e6d3a3] text-[#1C1C18] rounded-xl font-semibold hover:bg-[#d4c38c] transition-all duration-300">
-                       اذهب إلى التطبيق
+                        اذهب إلى التطبيق
                       </button>
                     </Link>
-                    <button 
+                    <button
                       className="px-4 py-2 bg-transparent border border-[#e6d3a3] text-[#e6d3a3] rounded-xl hover:bg-[#e6d3a3]/10 transition-all duration-300"
                       onClick={() => {
                         api.post('/logout', {}).then(() => {
@@ -172,7 +171,7 @@ function Header() {
                           اذهب إلى التطبيق
                         </button>
                       </Link>
-                      <button 
+                      <button
                         className="w-full px-4 py-3 border border-[#e6d3a3] text-[#e6d3a3] rounded-xl"
                         onClick={() => {
                           api.post('/logout', {}).then(() => {

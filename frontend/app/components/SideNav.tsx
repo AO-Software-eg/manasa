@@ -24,6 +24,7 @@ import {
   BookMarked
 } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
+import { HeaderProgressBar } from '../hooks/global';
 
 const navGroups = [
   {
@@ -132,6 +133,7 @@ function SideNav({
             <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-[#c4a95a]" />
           </button>
         </div>
+        <HeaderProgressBar />
       </header>
 
       {/* ─── Desktop Sidebar ─── */}
@@ -358,7 +360,7 @@ function SideNav({
                             {coursesCount}
                           </span>
                         )}
-                             {!collapsed && item.badge && item.name === "اشتراكاتي" && (
+                        {!collapsed && item.badge && item.name === "اشتراكاتي" && (
                           <span className="bg-[#2a2820] text-[#c4a95a] text-[10px] font-semibold px-1.5 py-0.5 rounded-full">
                             {enrollmentCount}
                           </span>

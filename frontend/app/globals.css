@@ -1,8 +1,18 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
+@import 'nprogress/nprogress.css';
 
 @custom-variant dark (&:is(.dark *));
+
+#nprogress .bar {
+  height: 4px;
+  background: #ffd97a;
+}
+#nprogress .peg {
+  box-shadow:
+    0 0 5px #ffd97a;
+}
 
 img {
   -webkit-user-drag: none;
