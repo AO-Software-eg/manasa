@@ -6,62 +6,39 @@ import { annotate } from 'rough-notation';
 import { useMe } from '@/app/hooks/queries/useMe';
 
 function Cta() {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const textRef = useRef<HTMLSpanElement>(null);
   const { data: userData, isError } = useMe();
   const loggedIn = !isError && !!userData;
-
-  useEffect(() => {
-    if (!sectionRef.current || !textRef.current) return;
-
-    const annotation = annotate(textRef.current, {
-      type: 'highlight',
-      color: '#e6d3a3',
-      padding: 4,
-    });
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          annotation.show();
-        }
-      },
-      { threshold: 0.4 }
-    );
-
-    observer.observe(sectionRef.current);
-
-    return () => observer.disconnect();
-  }, []);
-
   const isLoggedIn = loggedIn === true;
 
   return (
-    <section
-      ref={sectionRef}
-      className="w-[80%] min-h-fit flex mt-20 flex-col gap-20 p-8 rounded-4xl items-center justify-center bg-[#e6d3a3]/10"
-    >
-      <h1 className="text-5xl md:text-6xl font-bold text-center mt-10 mb-5 text-[#E5E5E5] leading-tight">
-        {isLoggedIn ? (
-          <>
-            استكمل رحلتك مع{' '}
-            <span ref={textRef}>زملائك</span>{' '}
-            في منصة السلطان
-          </>
-        ) : (
-          <>
-            انضم الآن إلى{' '}
-            <span ref={textRef}>زملائك</span>{' '}
-            في منصة السلطان
-          </>
-        )}
-      </h1>
+    <section className="w-full py-24 px-6 flex flex-col items-center bg-background border-t border-border">
+      <div className="w-full max-w-5xl px-8 py-16 rounded-3xl bg-secondary/40 border border-border flex flex-col items-center text-center gap-8 shadow-xs backdrop-blur-xs relative overflow-hidden">
+        {/* Glow effect */}
+        <div className="absolute -top-40 -left-40 w-96 h-96 bg-primary/10 rounded-full filter blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-primary/10 rounded-full filter blur-3xl pointer-events-none" />
 
-      <Link href={isLoggedIn ? '/user/courses' : '/signup'}>
-        <button className="w-full px-6 mb-5 py-4 rounded-xl text-xl font-semibold bg-[#e6d3a3] hover:bg-[#d4c38c] text-[#1C1C18] shadow-xl hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300 cursor-pointer max-w-md mx-auto">
-          {isLoggedIn ? 'اذهب إلى الكورسات' : 'انشئ حسابك الآن !'}
-        </button>
-      </Link>
+        <h3 className="text-3xl md:text-5xl font-bold text-foreground leading-tight max-w-3xl relative z-10">
+          {isLoggedIn ? (
+            <>
+              استكمل رحلتك مع <span className="text-primary underline decoration-wavy decoration-primary/40 underline-offset-8">زملائك</span> في منصة السلطان
+            </>
+          ) : (
+            <>
+              انضم الآن إلى <span className="text-primary underline decoration-wavy decoration-primary/40 underline-offset-8">زملائك</span> في منصة السلطان
+            </>
+          )}
+        </h3>
+
+        <p className="text-muted-foreground text-sm md:text-base max-w-xl relative z-10">
+          سجل حسابك مجاناً اليوم، وتصفح المحاضرات المجانية والمدفوعة، وتابع تحصيلك الدراسي خطوة بخطوة.
+        </p>
+
+        <Link href={isLoggedIn ? '/home/courses' : '/signup'} className="relative z-10 w-full sm:w-auto mt-2">
+          <button className="w-full sm:w-auto px-10 py-4 rounded-xl text-lg font-bold bg-primary text-primary-foreground hover:bg-primary/95 shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-300 cursor-pointer">
+            {isLoggedIn ? 'اذهب إلى الكورسات' : 'انشئ حسابك الآن مجاناً'}
+          </button>
+        </Link>
+      </div>
     </section>
   );
 }

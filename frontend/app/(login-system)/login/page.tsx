@@ -62,25 +62,27 @@ function LoginContent() {
   };
 
   return (
-    <section className="w-full min-h-screen flex flex-row-reverse gap-10 lg:gap-20 p-5 items-center justify-center ">
-      <div className="left-sec w-full bg-[#1C1C18] p-6 rounded-lg shadow-sm shadow-[#e6d3a3] border-2 border-[#e6d3a3] gap-10 flex flex-col text-cemter ">
-        <h1 className="text-4xl text-center font-bold text-[#e6d3a3]">
+    <section className="w-full min-h-screen flex flex-row-reverse gap-10 lg:gap-20 p-6 items-center justify-center bg-background text-foreground">
+      <div className="left-sec w-full max-w-md bg-card p-8 rounded-2xl border border-border shadow-md gap-8 flex flex-col transition-all duration-300">
+        <h3 className="text-3xl text-center font-bold text-primary">
           تسجيل الدخول
-        </h1>
-        <form onSubmit={onsubmit} className={`w-full ${cairo.className}`}>
-          <div className="mb-4">
-            <label htmlFor="email" className="block text-[#e6d3a3] mb-2">
+        </h3>
+        <form onSubmit={onsubmit} className={`w-full ${cairo.className} space-y-5`}>
+          <div>
+            <label htmlFor="email" className="block text-sm font-semibold text-foreground/80 mb-2">
               البريد الإلكتروني
             </label>
             <input
               type="email"
               id="email"
               name="email"
-              className="bg-[#1C1C18] rounded-lg  w-full outline-none  text-[#e6d3a3] placeholder:text-[#e6d3a3] border-2 border-[#e6d3a3]  p-2 placeholder:opacity-70"
+              required
+              placeholder="name@example.com"
+              className="bg-secondary/20 rounded-xl w-full outline-none text-foreground placeholder:text-muted-foreground/60 border border-border focus:border-primary p-3 transition-colors placeholder:text-sm"
             />
           </div>
-          <div className="mb-4">
-            <label htmlFor="password" className="block text-[#e6d3a3] mb-2">
+          <div>
+            <label htmlFor="password" className="block text-sm font-semibold text-foreground/80 mb-2">
               كلمة المرور
             </label>
             <div className="relative">
@@ -88,52 +90,56 @@ function LoginContent() {
                 type={showPassword ? 'text' : 'password'}
                 id="password"
                 name="password"
-                onKeyUp={() => setShowPassword(false)}
-                className="bg-[#1C1C18] rounded-lg w-full  outline-none  text-[#e6d3a3] placeholder:text-[#e6d3a3] border-2 border-[#e6d3a3] p-2 placeholder:opacity-70"
+                required
+                placeholder="••••••••"
+                className="bg-secondary/20 rounded-xl w-full outline-none text-foreground placeholder:text-muted-foreground/60 border border-border focus:border-primary p-3 transition-colors placeholder:text-sm"
               />
               {showPassword ? (
                 <EyeOff
-                  size={20}
-                  className="absolute top-1/2 left-3 -translate-y-1/2 cursor-pointer text-[#e6d3a3]"
+                  size={18}
+                  className="absolute top-1/2 left-3 -translate-y-1/2 cursor-pointer text-muted-foreground hover:text-primary transition-colors"
                   onClick={() => setShowPassword(false)}
                 />
               ) : (
                 <Eye
-                  size={20}
-                  className="absolute top-1/2 left-3 -translate-y-1/2 cursor-pointer text-[#e6d3a3]"
+                  size={18}
+                  className="absolute top-1/2 left-3 -translate-y-1/2 cursor-pointer text-muted-foreground hover:text-primary transition-colors"
                   onClick={() => setShowPassword(true)}
                 />
               )}
             </div>
 
-            <span className="text-sm text-[#e6d3a3] mt-2 block">
+            <span className="text-xs text-muted-foreground mt-2 block">
               هل نسيت كلمة السر ؟{' '}
-              <a href="/forgot-password" className="text-[#e6d3a3] underline">
+              <Link href="/forgot-password" className="text-primary hover:underline font-semibold">
                 إعادة تعيين
-              </a>
+              </Link>
             </span>
           </div>
+
           <button
             type="submit"
-            className="bg-[#e6d3a3] w-full text-[#1C1C18] rounded-lg font-bold py-2 px-4  hover:bg-[#d4c090] transition duration-200"
+            className="bg-primary w-full text-primary-foreground rounded-xl font-bold py-3 px-4 hover:bg-primary/95 transition duration-200 cursor-pointer shadow-sm mt-2"
           >
             تسجيل الدخول
           </button>
-          <span className="text-sm text-[#e6d3a3] mt-4 block">
+          
+          <span className="text-sm text-muted-foreground text-center mt-4 block">
             ليس لديك حساب؟{' '}
-            <Link href="/signup" className="text-[#e6d3a3] underline">
-              إنشاء حساب
+            <Link href="/signup" className="text-primary hover:underline font-semibold">
+              إنشاء حساب جديد
             </Link>
           </span>
         </form>
       </div>
-      <div className="right-sec w-full hidden lg:block">
+      <div className="right-sec w-full hidden lg:block max-w-xl">
         <Image
           src="https://ytgu3s3xxa.ufs.sh/f/GNGTKtuqz7dpgf6RiFw36KrGuXiUhxb1d9ywkNe7cSPIOfET"
           alt="Login Image"
           width={800}
           height={800}
-          className="w-full h-auto "
+          className="w-full h-auto object-contain opacity-85 dark:opacity-75 transition-opacity duration-300"
+          priority
         />
       </div>
     </section>

@@ -91,16 +91,16 @@ function Page() {
   }, [timeDone]);
   if (isLoading) {
     return (
-      <div className="w-full min-h-screen bg-[#131313] flex items-center justify-center p-6">
-        <Card className="w-full max-w-md bg-[#1a1a1a] border-slate-700 text-white">
+      <div className="w-full min-h-screen bg-background flex items-center justify-center p-6 text-foreground">
+        <Card className="w-full max-w-md bg-card border-border">
           <CardContent className="flex flex-col items-center gap-4 py-10">
-            <div className="h-10 w-10 rounded-full border-4 border-slate-700 border-t-white animate-spin" />
+            <div className="h-10 w-10 rounded-full border-4 border-muted border-t-primary animate-spin" />
 
             <h2 className="text-xl font-semibold">
               جاري تحميل بيانات الامتحان
             </h2>
 
-            <p className="text-slate-400 text-center">
+            <p className="text-muted-foreground text-center">
               برجاء الانتظار قليلاً...
             </p>
           </CardContent>
@@ -111,19 +111,19 @@ function Page() {
 
   if (error) {
     return (
-      <div className="w-full min-h-screen bg-[#131313] flex items-center justify-center p-6">
-        <Card className="w-full max-w-md bg-[#1a1a1a] border-red-800 text-white">
+      <div className="w-full min-h-screen bg-background flex items-center justify-center p-6 text-foreground">
+        <Card className="w-full max-w-md bg-card border-destructive">
           <CardContent className="flex flex-col items-center gap-4 py-10">
 
-            <h2 className="text-2xl font-semibold">
+            <h2 className="text-2xl font-semibold text-destructive">
               حدث خطأ
             </h2>
 
-            <p className="text-slate-400 text-center">
+            <p className="text-muted-foreground text-center">
               تعذر تحميل بيانات الامتحان
             </p>
 
-            <Button onClick={() => window.location.reload()}>
+            <Button onClick={() => window.location.reload()} className="cursor-pointer">
               إعادة المحاولة
             </Button>
 
@@ -186,11 +186,11 @@ function Page() {
     : undefined;
 
   return (
-    <div className="max-w-full flex flex-col p-4 gap-4 min-h-screen bg-[#0d0d0d] text-white">
+    <div className="max-w-full flex flex-col p-4 gap-4 min-h-screen bg-background text-foreground pt-28">
       {/* Top Actions */}
       <div className="flex flex-row-reverse items-start my-4 p-4 justify-between w-full">
         <button
-          className="flex items-center bg-red-500/20 border border-red-500/40 p-3 rounded-2xl flex-row-reverse gap-2 text-sm hover:bg-red-500/30 transition"
+          className="flex items-center bg-destructive/10 border border-destructive/30 p-3 rounded-2xl flex-row-reverse gap-2 text-sm text-destructive hover:bg-destructive/25 transition cursor-pointer"
           onClick={() => setOpenOnExit(true)}
         >
           <ChevronLeft size={16} />
@@ -198,7 +198,7 @@ function Page() {
         </button>
 
         <button
-          className="flex items-center bg-green-600 hover:bg-green-700 p-3 rounded-2xl flex-row-reverse gap-2 text-sm text-white transition"
+          className="flex items-center bg-primary hover:bg-primary/95 text-primary-foreground p-3 rounded-2xl flex-row-reverse gap-2 text-sm transition shadow-sm cursor-pointer"
           onClick={() => setOnSubmit(true)}
         >
           <Send size={16} />
@@ -209,24 +209,24 @@ function Page() {
       {/* Main Content */}
       <div className="flex-1 p-4 lg:h-[calc(102dvh-5rem)] lg:overflow-y-auto overflow-x-hidden">
         {/* Question Navigation */}
-        <div className="mb-10 w-full max-w-4xl mx-auto bg-[#111827] border border-gray-800 rounded-3xl p-6 shadow-lg">
+        <div className="mb-10 w-full max-w-4xl mx-auto bg-card border border-border rounded-3xl p-6 shadow-xs">
           {/* Timer */}
           <Timer timeDone={timeDone} setTimeDone={setTimeDone} />
 
           {/* Header */}
           <div className="flex items-center justify-between mb-4">
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-muted-foreground">
               السؤال {currentQuestion} من {questionCount}
             </p>
-            <p className="text-sm text-blue-400">
+            <p className="text-sm text-primary font-bold">
               {Object.keys(answers).length} / {questionCount} مجاب
             </p>
           </div>
 
           {/* Progress Bar */}
-          <div className="w-full h-2 bg-gray-800 rounded-full mb-6 overflow-hidden">
+          <div className="w-full h-2 bg-secondary rounded-full mb-6 overflow-hidden">
             <div
-              className="h-full bg-blue-600 transition-all duration-300"
+              className="h-full bg-primary transition-all duration-300"
               style={{
                 width: `${(Object.keys(answers).length / questionCount) * 100}%`,
               }}
@@ -252,14 +252,14 @@ function Page() {
                     onClick={() => gotoQuestion(questionNumber)}
                     className={`
                       w-12 h-12 rounded-2xl flex items-center justify-center
-                      text-sm font-semibold transition-all duration-200 border
+                      text-sm font-semibold transition-all duration-200 border cursor-pointer
                       ${isCurrent
-                        ? 'bg-blue-600 border-blue-400 scale-110 shadow-lg shadow-blue-500/30'
+                        ? 'bg-primary border-primary text-primary-foreground scale-110 shadow-md shadow-primary/30'
                         : isAnswered
-                          ? 'bg-green-600 border-green-400 hover:scale-105'
+                          ? 'bg-emerald-600 border-emerald-500 text-white hover:scale-105 shadow-xs'
                           : isVisited
-                            ? 'bg-yellow-500 border-yellow-300 text-black hover:scale-105'
-                            : 'bg-gray-800 border-gray-700 hover:bg-gray-700 hover:scale-105'
+                            ? 'bg-amber-500 border-amber-400 text-black hover:scale-105 shadow-xs'
+                            : 'bg-secondary border-border text-foreground hover:bg-secondary/80 hover:scale-105'
                       }
                     `}
                   >
@@ -270,21 +270,21 @@ function Page() {
           </div>
 
           {/* Legend */}
-          <div className="flex flex-wrap justify-center gap-5 mt-6 text-sm text-gray-400">
+          <div className="flex flex-wrap justify-center gap-5 mt-6 text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded bg-blue-600" />
+              <div className="w-4 h-4 rounded bg-primary" />
               الحالي
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded bg-green-600" />
+              <div className="w-4 h-4 rounded bg-emerald-600" />
               مجاب
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded bg-yellow-500" />
+              <div className="w-4 h-4 rounded bg-amber-500" />
               تمت زيارته
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded bg-gray-800 border border-gray-700" />
+              <div className="w-4 h-4 rounded bg-secondary border border-border" />
               غير مفتوح
             </div>
           </div>
@@ -294,7 +294,7 @@ function Page() {
           if (index + 1 !== currentQuestion) return null;
           return (
             <div key={question.id} className="max-w-4xl mx-auto">
-              <h1 className="text-3xl font-bold mb-4 text-right">
+              <h1 className="text-2xl md:text-3xl font-bold mb-6 text-right leading-tight">
                 {question.question}
               </h1>
               <RadioGroup
@@ -310,10 +310,9 @@ function Page() {
                     className={`
                       flex flex-row-reverse items-center gap-3 w-full rounded-2xl transition-all border
                       ${
-                      // BUG FIX: Compare number to number, not number to string.
                       selectedOption === option.id
-                        ? 'bg-blue-600 border-blue-400 shadow-lg shadow-blue-500/20'
-                        : 'bg-[#111827] border-gray-700 hover:border-blue-500 hover:bg-[#172036]'
+                        ? 'bg-primary/10 border-primary shadow-xs'
+                        : 'bg-card border-border hover:border-primary/50 hover:bg-secondary/40'
                       }
                     `}
                   >
@@ -324,7 +323,7 @@ function Page() {
                     />
                     <Label
                       htmlFor={option.id.toString()}
-                      className="w-full flex justify-end text-right py-5 px-2 cursor-pointer text-base"
+                      className="w-full flex justify-end text-right py-5 px-2 cursor-pointer text-base text-foreground font-semibold"
                     >
                       {option.choiceText}
                     </Label>
@@ -340,9 +339,9 @@ function Page() {
       <div className="flex justify-between items-center p-4">
         <button
           className={`
-            ${currentQuestion === 1 ? 'opacity-0 pointer-events-none' : 'hover:bg-gray-700'}
-            border border-gray-700 bg-[#111827] rounded-2xl px-5 py-3
-            flex items-center gap-2 flex-row-reverse transition
+            ${currentQuestion === 1 ? 'opacity-0 pointer-events-none' : 'hover:bg-secondary/80'}
+            border border-border bg-card rounded-2xl px-5 py-3
+            flex items-center gap-2 flex-row-reverse transition cursor-pointer text-foreground
           `}
           onClick={() => prevQuestion()}
           disabled={currentQuestion === 1}
@@ -353,8 +352,8 @@ function Page() {
 
         <button
           className={`
-            ${currentQuestion === questionCount ? 'opacity-50 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}
-            text-white px-5 py-3 rounded-2xl flex items-center gap-2 flex-row-reverse transition
+            ${currentQuestion === questionCount ? 'opacity-50 cursor-not-allowed' : 'bg-primary text-primary-foreground hover:bg-primary/90'}
+            px-5 py-3 rounded-2xl flex items-center gap-2 flex-row-reverse transition cursor-pointer font-semibold
           `}
           onClick={() => nextQuestion()}
           disabled={currentQuestion === questionCount}
@@ -369,7 +368,7 @@ function Page() {
         title="هل أنت متأكد أنك تريد الخروج؟"
         description="سيتم فقدان جميع الإجابات غير المحفوظة."
         confirmText="خروج"
-        confirmClassName="bg-red-500 hover:bg-red-600"
+        confirmClassName="bg-destructive hover:bg-destructive/90 text-destructive-foreground font-semibold"
         onClose={() => setOpenOnExit(false)}
         onConfirm={() => setOnExit(true)}
         pending={false}
@@ -380,7 +379,7 @@ function Page() {
         title="هل أنت متأكد أنك تريد تقديم الامتحان؟"
         description="تأكد من مراجعة إجاباتك قبل تقديم الامتحان."
         confirmText={SubmitExam.isPending ? "جاري ارسال الاجابات" : "تقديم الامتحان"}
-        confirmClassName="bg-green-600 hover:bg-green-700"
+        confirmClassName="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold"
         onClose={() => setOnSubmit(false)}
         onConfirm={handleSubmitData}
         pending={SubmitExam.isPending}

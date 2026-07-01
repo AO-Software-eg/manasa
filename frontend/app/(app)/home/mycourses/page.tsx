@@ -22,26 +22,26 @@ function page() {
 
   if (enrollments?.length < 1) {
     return (
-      <h1 className="text-6xl font-bold text-center mt-10 mb-5 text-[#E5E5E5]">
-       لا يوجد اي اشتراكات
-      </h1>
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <h3 className="text-2xl md:text-3xl font-bold text-center text-muted-foreground mt-10 mb-5">
+         لا يوجد أي اشتراكات حالية
+        </h3>
+      </div>
     )
   }
 
-
-  
   if (isLoading) {
     return <CoursesLoading />;
   }
 
   if (isError) return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-4">
-      <p className="text-red-500">
+      <p className="text-destructive">
         {error instanceof Error ? error.message : 'فشل تحميل الكورسات'}
       </p>
       <button
         onClick={() => refetch()}
-        className="px-4 py-2 bg-blue-500 text-white rounded"
+        className="px-5 py-2 bg-primary text-primary-foreground rounded-xl font-semibold hover:bg-primary/90 transition-colors shadow-sm"
       >
         أعد المحاولة
       </button>
@@ -49,11 +49,11 @@ function page() {
   );
 
   return (
-    <section className="w-full min-h-screen flex mt-20 flex-col gap-20 p-5 items-center justify-center">
-      <h1 className="text-6xl font-bold text-center mt-10 mb-5 text-[#E5E5E5]">
+    <section className="w-full min-h-screen flex mt-20 flex-col gap-12 p-5 items-center justify-start">
+      <h3 className="text-4xl md:text-5xl font-bold text-center mt-10 mb-5 text-foreground">
         الكورسات الملتحق بها
-      </h1>
-      <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-10">
+      </h3>
+      <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-10 max-w-5xl mx-auto">
         {enrollments?.map((enrollment: Enrollment, i: number) => (
           <CourseComp
             key={enrollment.course.id}

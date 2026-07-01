@@ -17,21 +17,21 @@ function StudentHome() {
         <div className="w-full max-w-6xl mt-26 mx-auto px-4 py-6 space-y-6" dir="rtl">
 
             {/*  Header نفس ستايل الداشبورد */}
-            <CardLayout classname="bg-linear-to-r from-[#1C1C18]/80 via-[#2a2a25]/80 to-[#3b3b34]/80 backdrop-blur-sm border-[#3b3b34]/50 flex flex-row justify-between items-center ">
+            <CardLayout classname="bg-linear-to-r from-card via-card/90 to-secondary border-border flex flex-row justify-between items-center shadow-md">
                 <div>
-                    <h1 className="text-2xl font-bold text-white">
+                    <h1 className="text-2xl font-bold text-foreground">
                         أهلاً بعودتك،{" "}
-                        <span className="text-[#e6d3a3]">
+                        <span className="text-primary">
                             {userData?.name || "طالب"}
                         </span>
 
                     </h1>
-                    <p className="text-gray-400 text-sm mt-1">
+                    <p className="text-muted-foreground text-sm mt-1">
                         كمل من حيث توقفت 👇
                     </p>
                 </div>
                 <button
-                    className="px-4 cursor-pointer py-2 text-white bg-[#e6d3a3]/50 rounded-lg text-sm hover:bg-[#5a5a52] transition"
+                    className="px-4 cursor-pointer py-2 text-primary-foreground bg-primary rounded-lg text-sm hover:bg-primary/90 transition shadow-sm"
 
                 >
                     <Link href={'/user'}>اذهب الى التطبيق</Link>
@@ -40,7 +40,7 @@ function StudentHome() {
 
    
             <CardLayout>
-                <h2 className="text-lg text-white font-semibold mb-4">استكمل التعلم</h2>
+                <h2 className="text-lg text-foreground font-semibold mb-4">استكمل التعلم</h2>
                 <RecentActivityCard title="" />
             </CardLayout>
 

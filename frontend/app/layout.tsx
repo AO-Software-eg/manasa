@@ -36,10 +36,9 @@ export default function RootLayout({
         'font-sans',
         geist.variable,
       )}
-    >
-      <body className="min-h-full flex bg-[#1C1C18]  flex-col"
       suppressHydrationWarning
-      >
+    >
+      <body className="min-h-full flex bg-background text-foreground flex-col">
         <Providers>
           <Toaster richColors position="top-right" />
           <Header />

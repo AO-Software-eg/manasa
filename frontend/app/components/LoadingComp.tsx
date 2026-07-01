@@ -1,11 +1,6 @@
-"use client";
-import {  Suspense, useEffect, useState } from "react";
-import spinnerAnimation from "@/public/Spinner.json";
-import dynamic from "next/dynamic";
+'use client';
 
-const Lottie = dynamic(() => import("lottie-react"), {
-  ssr: false,
-});
+import { useEffect, useState } from 'react';
 
 function LoadingComp() {
   const [visible, setVisible] = useState(false);
@@ -17,149 +12,81 @@ function LoadingComp() {
 
   return (
     <div
-      className="fixed inset-0 z-[9999] flex flex-col items-center justify-center overflow-hidden"
+      className="fixed inset-0 z-[9999] flex flex-col items-center justify-center overflow-hidden bg-background text-foreground transition-colors duration-300"
       style={{
-        background: "radial-gradient(ellipse at 60% 40%, #2a1f0e 0%, #111008 60%, #0a0905 100%)",
+        backgroundImage: 'radial-gradient(circle at center, var(--secondary) 0%, var(--background) 100%)',
       }}
     >
-      {/* Grain texture overlay */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E")`,
-          opacity: 0.6,
-          pointerEvents: "none",
-        }}
-      />
-
       {/* Ambient glow orb */}
       <div
+        className="absolute top-[30%] left-1/2 -translate-x-1/2 w-96 h-96 rounded-full opacity-30 pointer-events-none"
         style={{
-          position: "absolute",
-          top: "30%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          width: 500,
-          height: 500,
-          background: "radial-gradient(circle, rgba(180,130,60,0.08) 0%, transparent 70%)",
-          borderRadius: "50%",
-          pointerEvents: "none",
-          animation: "pulse 4s ease-in-out infinite",
+          background: 'radial-gradient(circle, var(--primary) 0%, transparent 70%)',
+          animation: 'pulse 4s ease-in-out infinite',
         }}
       />
 
       {/* Decorative top rule */}
       <div
+        className="flex items-center gap-3 mb-8 transition-all duration-700"
         style={{
-          opacity: visible ? 1 : 0,
-          transform: visible ? "scaleX(1)" : "scaleX(0)",
-          transition: "opacity 0.8s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)",
-          display: "flex",
-          alignItems: "center",
-          gap: 12,
-          marginBottom: 40,
+          opacity: visible ? 0.8 : 0,
+          transform: visible ? 'scaleX(1)' : 'scaleX(0.7)',
         }}
       >
-        <div style={{ height: 1, width: 80, background: "linear-gradient(to right, transparent, #c9a84c)" }} />
+        <div className="h-[1px] w-20" style={{ background: 'linear-gradient(to right, transparent, var(--primary))' }} />
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-          <rect x="6" y="0" width="2" height="14" rx="1" fill="#c9a84c" opacity="0.7" />
-          <rect x="0" y="6" width="14" height="2" rx="1" fill="#c9a84c" opacity="0.7" />
-          <rect x="3.5" y="3.5" width="7" height="7" rx="1" transform="rotate(45 7 7)" fill="none" stroke="#c9a84c" strokeWidth="1" opacity="0.4" />
+          <rect x="6" y="0" width="2" height="14" rx="1" fill="var(--primary)" opacity="0.8" />
+          <rect x="0" y="6" width="14" height="2" rx="1" fill="var(--primary)" opacity="0.8" />
+          <rect x="3.5" y="3.5" width="7" height="7" rx="1" transform="rotate(45 7 7)" fill="none" stroke="var(--primary)" strokeWidth="1" opacity="0.5" />
         </svg>
-        <div style={{ height: 1, width: 80, background: "linear-gradient(to left, transparent, #c9a84c)" }} />
+        <div className="h-[1px] w-20" style={{ background: 'linear-gradient(to left, transparent, var(--primary))' }} />
       </div>
 
       {/* Main title */}
       <div
+        className="text-center mb-10 transition-all duration-700 delay-75"
         style={{
           opacity: visible ? 1 : 0,
-          transform: visible ? "translateY(0)" : "translateY(20px)",
-          transition: "opacity 0.9s ease 0.15s, transform 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.15s",
-          textAlign: "center",
-          marginBottom: 8,
+          transform: visible ? 'translateY(0)' : 'translateY(15px)',
         }}
       >
-        <p
-          style={{
-            fontFamily: "'Cinzel', 'Trajan Pro', serif",
-            fontSize: 11,
-            letterSpacing: "0.35em",
-            color: "#c9a84c",
-            textTransform: "uppercase",
-            margin: 0,
-            marginBottom: 12,
-          }}
-        >
+        <p className="text-[10px] tracking-[0.3em] text-primary uppercase font-medium mb-3">
           Est. Since Ancient Times
         </p>
-        <h1
-          style={{
-            fontFamily: "'Playfair Display', Georgia, 'Times New Roman', serif",
-            fontSize: "clamp(2rem, 5vw, 3.5rem)",
-            fontWeight: 700,
-            fontStyle: "italic",
-            color: "#f0e6cc",
-            margin: 0,
-            lineHeight: 1.1,
-            letterSpacing: "-0.01em",
-            textShadow: "0 2px 40px rgba(201,168,76,0.2)",
-          }}
-        >
+        <h1 className="text-3xl md:text-5xl font-bold font-sans tracking-tight text-foreground leading-tight">
           السلطان للتاريخ
         </h1>
-        <p
-          style={{
-            fontFamily: "'Cinzel', Georgia, serif",
-            fontSize: "clamp(0.7rem, 1.5vw, 0.85rem)",
-            letterSpacing: "0.25em",
-            color: "#8a7455",
-            textTransform: "uppercase",
-            margin: "10px 0 0",
-          }}
-        >
+        <p className="text-[10px] md:text-xs tracking-[0.2em] text-muted-foreground uppercase mt-2">
           AlSultan for History
         </p>
       </div>
 
       {/* Spinner area */}
       <div
+        className="flex flex-col items-center gap-5 transition-all duration-700 delay-150"
         style={{
           opacity: visible ? 1 : 0,
-          transform: visible ? "translateY(0)" : "translateY(16px)",
-          transition: "opacity 0.9s ease 0.3s, transform 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.3s",
-          marginTop: 48,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: 16,
+          transform: visible ? 'translateY(0)' : 'translateY(15px)',
         }}
       >
-        <Suspense
-          fallback={
-            <div style={{ width: 40, height: 40, border: "2px solid #c9a84c33", borderTop: "2px solid #c9a84c", borderRadius: "50%", animation: "spin 1s linear infinite" }} />
-          }
-        >
-          <Lottie
-            animationData={spinnerAnimation}
-            loop
-            autoplay
-            style={{ width: 80, height: 80, filter: "sepia(1) saturate(1.5) hue-rotate(5deg) brightness(1.1)" }}
+        {/* Modern clean CSS loader */}
+        <div className="relative w-12 h-12">
+          <div className="absolute inset-0 rounded-full border-2 border-primary/20" />
+          <div 
+            className="absolute inset-0 rounded-full border-2 border-transparent border-t-primary" 
+            style={{ animation: 'spin 0.8s linear infinite' }}
           />
-        </Suspense>
+        </div>
 
         {/* Loading dots */}
-        <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+        <div className="flex gap-2 items-center">
           {[0, 1, 2].map((i) => (
             <div
               key={i}
+              className="w-1.5 h-1.5 rounded-full bg-primary opacity-70"
               style={{
-                width: 4,
-                height: 4,
-                borderRadius: "50%",
-                background: "#c9a84c",
                 animation: `dotBounce 1.4s ease-in-out ${i * 0.2}s infinite`,
-                opacity: 0.7,
               }}
             />
           ))}
@@ -168,27 +95,18 @@ function LoadingComp() {
 
       {/* Bottom rule */}
       <div
+        className="absolute bottom-10 transition-all duration-1000 delay-300 text-[10px] tracking-[0.2em] text-muted-foreground/60 uppercase font-sans"
         style={{
-          position: "absolute",
-          bottom: 40,
-          opacity: visible ? 0.4 : 0,
-          transition: "opacity 1s ease 0.5s",
-          fontFamily: "Georgia, serif",
-          fontSize: 11,
-          letterSpacing: "0.2em",
-          color: "#5a4a30",
-          textTransform: "uppercase",
+          opacity: visible ? 0.7 : 0,
         }}
       >
         Unveiling the past
       </div>
 
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Cinzel:wght@400;500&display=swap');
-
         @keyframes pulse {
-          0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-          50% { transform: translate(-50%, -50%) scale(1.15); opacity: 0.7; }
+          0%, 100% { transform: scale(1); opacity: 0.3; }
+          50% { transform: scale(1.15); opacity: 0.15; }
         }
         @keyframes spin {
           to { transform: rotate(360deg); }
