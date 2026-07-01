@@ -18,6 +18,7 @@ type Props = {
   isPriority?: boolean;
   enrolledCourseIds?: Set<number>;
   isMyCoursesPage?: boolean;
+  progress?: number;
 };
 
 export default function CourseComp({
@@ -31,6 +32,7 @@ export default function CourseComp({
   isPriority = false,
   enrolledCourseIds,
   isMyCoursesPage = false,
+  progress
 }: Props) {
   const isPurchased = enrolledCourseIds?.has(Number(id));
   const isOwned = isPurchased || isMyCoursesPage;
@@ -40,7 +42,7 @@ export default function CourseComp({
     userData?.id,
     id,
     shouldFetchProgress,
-  ) ;
+  );
 
   return (
     <Link
@@ -50,11 +52,10 @@ export default function CourseComp({
     >
       <div
         className={`group relative rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-xl cursor-pointer h-full flex flex-col
-        ${
-          isOwned
+        ${isOwned
             ? 'bg-[#1b1b17] border border-[#e6d3a3]/30'
             : 'bg-white/5 border border-white/10 hover:bg-white/10'
-        }`}
+          }`}
       >
         {/* Purchased Badge */}
         {isOwned && (

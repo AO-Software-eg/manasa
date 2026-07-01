@@ -47,11 +47,17 @@ function LoginContent() {
       const res = await api.post('/login', payload, { withCredentials: true });
 
       toast.success('تم الدخول بنجاح!');
-      await queryClient.refetchQueries({
+      await queryClient.invalidateQueries({
         queryKey: ['me'],
       });
 
-      router.push(redirect);
+      const user = await queryClient.fetchQuery({
+        queryKey: ['me'],
+      });
+
+      console.log(user);
+
+      router.replace(redirect);
     } catch (err: any) {
       console.log(err.response?.data?.message);
 

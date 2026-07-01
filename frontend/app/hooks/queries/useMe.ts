@@ -9,6 +9,7 @@ export function useMe() {
     queryFn: async () => {
       try {
         const res = await api.get('/me');
+        console.log(res.data)
         return res.data ?? null;
 
       } catch (err: unknown) {

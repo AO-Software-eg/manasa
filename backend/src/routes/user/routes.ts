@@ -249,8 +249,8 @@ router
 
       res.cookie('user_token', token, {
         httpOnly: true,
-        sameSite: 'strict',
-        secure: process.env.NODE_ENV == 'production',
+        sameSite: 'none',
+        secure: true,
         expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
       });
     } catch (err) {
