@@ -26,6 +26,9 @@ export type lectureVideoSchema = {
 
 
 export type progressSchema = {
+    videoCount: number;
+    completedVideoCount: number;
+    videoCompletionPercentage: number | null;
     solvedExamCount: number;
     examCount: number;
     examProgressPercentage: number;
@@ -33,3 +36,5 @@ export type progressSchema = {
     finishedLectureCount: number;
     progressPercentage: number;
 }
+
+
