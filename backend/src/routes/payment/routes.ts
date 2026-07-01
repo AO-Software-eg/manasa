@@ -80,10 +80,21 @@ router
       schema.buyItemSchema.parse(req.body);
       const buyData: schema.buyItemData = req.body;
 
+      const jwtPayload = auth.verifyToken(req.cookies.user_token);
+      const user: db.SelectUser = await db.getUserByEmail(jwtPayload.email);
+
       let price;
       let itemData: any;
       if (buyData.itemType == 'course') {
         const course: db.SelectCourse = await db.getCourseById(buyData.itemId);
+
+        if (await db.isUserEnrolled(user.id, course.id)) {
+          return res.status(409).json({
+            error: 'Conflict',
+            message: `The item with type '${buyData.itemType}' and id ${buyData.itemId} is already owned by the user.`,
+          });
+        }
+
         itemData = course;
         price = course.price;
       } else {
@@ -96,10 +107,7 @@ router
 
       const payment: db.SelectPaymentTransaction = await db.createPayment();
 
-      const jwtPayload = auth.verifyToken(req.cookies.user_token);
-      const user: db.SelectUser = await db.getUserByEmail(jwtPayload.email);
       const nameParts = user.name.trim().split(/\s+/);
-
       const firstName = nameParts[0];
       const lastName = nameParts.slice(1).join(' ');
 
