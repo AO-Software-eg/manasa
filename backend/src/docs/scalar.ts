@@ -4,7 +4,7 @@ import { openApiDocument } from './openapi.ts';
 export const scalarDocs = apiReference({
   content: openApiDocument,
 
-  theme: 'kepler',
+  theme: 'fastify',
 
   pageTitle: 'Alsultan API',
 

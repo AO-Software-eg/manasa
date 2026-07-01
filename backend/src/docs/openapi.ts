@@ -3,6 +3,7 @@ import { lecturesPaths } from './paths/lectures.ts';
 import { examsPaths } from './paths/exams.ts';
 import { usersPaths } from './paths/user.ts';
 import { videosPaths } from './paths/videos.ts';
+import { paymentPaths } from './paths/payment.ts';
 import * as schemas from './schemas/index.ts'
 
 
@@ -27,6 +28,7 @@ export const openApiDocument = {
     ...examsPaths,
     ...usersPaths,
     ...videosPaths,
+    ...paymentPaths,
   },
 
   components: {
@@ -36,6 +38,11 @@ export const openApiDocument = {
         in: 'cookie',
         name: 'user_token',
         description: 'JWT authentication cookie',
+      },
+      bearerAuth: {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
       },
     },
     schemas,
