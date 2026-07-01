@@ -5,6 +5,7 @@ import { Suspense, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useGetEnrollments } from '@/app/hooks/queries/useEnroll';
 import { useMe } from '@/app/hooks/queries/useMe';
+import { Enrollment } from '@/types';
 import CardLayout from '@/app/components/CardLayout';
 
 function PaymentResultInner() {
@@ -23,7 +24,7 @@ function PaymentResultInner() {
     if (isLoading || !enrollments) return;
 
     const enrolled = enrollments.some(
-      (e: any) => Number(e.course.id) === courseId,
+      (e: Enrollment) => Number(e.course.id) === courseId,
     );
 
     if (enrolled) {

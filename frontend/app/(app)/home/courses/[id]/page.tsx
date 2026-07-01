@@ -12,7 +12,7 @@ import { useMe } from '@/app/hooks/queries/useMe';
 import { useGetEnrollments } from '@/app/hooks/queries/useEnroll';
 import { toast } from 'sonner';
 import { usePayment } from '@/app/hooks/queries/usePayment';
-import { courses } from '@/types';
+import { courses, Enrollment } from '@/types';
 
 export default function CoursePage() {
   const params = useParams();
@@ -40,7 +40,7 @@ export default function CoursePage() {
   return (
     <div className="max-w-4xl mx-auto p-4">
       <div className="flex flex-row-reverse items-center justify-between">
-        <BackButton route="/home/courses" />
+        <BackButton />
         <h1 className="text-3xl font-bold my-4">{course.title}</h1>
       </div>
       <CourseImage title={course.title} />
@@ -101,7 +101,7 @@ function CourseData({ course }: CourseDataProps) {
   } = useGetEnrollments(userData?.id?.toString() ?? '');
 
   const enrolledCourseIds = new Set(
-    enrollments?.map((e: any) => Number(e.course.id)) ?? [],
+    enrollments?.map((e: Enrollment) => Number(e.course.id)) ?? [],
   );
 
   const isPurchased = enrolledCourseIds.has(Number(course.id));

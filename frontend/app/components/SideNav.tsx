@@ -138,7 +138,7 @@ function SideNav({
 
       {/* ─── Desktop Sidebar ─── */}
       <aside
-        className={`relative hidden lg:flex flex-col h-screen  pt-12 bg-[#141412] text-[#e6d3a3] border-l border-[#1f1f1c] transition-colors duration-300 ${collapsed ? 'w-17' : 'w-57.5'
+        className={`relative hidden right-0 lg:flex flex-col h-screen  pt-12 bg-[#141412] text-[#e6d3a3] border-l border-[#1f1f1c] transition-colors duration-300 ${collapsed ? 'w-17' : 'w-57.5'
           }`}
       >
         {/* Collapse toggle */}

@@ -19,7 +19,8 @@ import { useGetExamSubmissions } from '@/app/hooks/queries/useExams';
 import { useMe } from '@/app/hooks/queries/useMe';
 import { useState } from 'react';
 import { useLectureProgress } from '@/app/hooks/queries/useLectures';
-
+import { Exam } from '@/types';
+import { AxiosError } from 'axios';
 function NotAuthorized() {
   return (
     <section className="min-h-screen flex items-center justify-center">
@@ -63,7 +64,7 @@ export default function Page() {
   const { data: submittedExams } = useGetExamSubmissions(userId);
 
   const solvedExamIds = new Set(
-    submittedExams?.map((exam: any) => exam.examId),
+    submittedExams?.map((exam: Exam) => exam.id) || [],
   );
 
   const {
@@ -80,7 +81,7 @@ export default function Page() {
 
   if (coursesLoading || assetsLoading) return <LoadingComp />;
 
-  const status = (error as any)?.response?.status;
+  const status = (error as AxiosError)?.response?.status;
   if (status === 401 || status === 403) {
     return <NotAuthorized />;
   }
@@ -120,7 +121,7 @@ export default function Page() {
 
       <div className="relative z-10 mx-auto mt-20 max-w-4xl">
         <div className="mb-12">
-          <BackButton route="/" />
+          <BackButton />
           <h1 className="text-right text-4xl font-bold leading-tight text-[#e6d3a3] md:text-5xl">
             {course.title}
           </h1>
