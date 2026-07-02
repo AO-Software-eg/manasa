@@ -10,7 +10,7 @@ function CardLayout({
 }) {
   return (
     <div
-      className={`bg-[#1C1C18] w-full p-6 border-2 rounded-4xl border-[#3b3b34]/50 ${classname} `}
+      className={`bg-card text-foreground w-full p-6 border rounded-3xl border-border/80 shadow-sm transition-all duration-300 ${classname} `}
     >
       {children}
     </div>

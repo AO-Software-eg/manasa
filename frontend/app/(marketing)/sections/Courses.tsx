@@ -42,11 +42,18 @@ export default function Courses() {
   );
 
   return (
-    <section className="w-full min-h-screen flex mt-20 flex-col gap-20 p-5 items-center justify-center">
-      <h1 className="text-6xl font-bold text-center mt-10 mb-5 text-[#E5E5E5]">
-        الكورسات
-      </h1>
-      <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-10">
+    <section id="courses" className="w-full py-24 px-6 flex flex-col items-center bg-background border-t border-border">
+      <div className="text-center max-w-3xl mb-16">
+        <h2 className="text-sm font-semibold text-primary uppercase tracking-widest mb-3">دوراتنا الدراسية</h2>
+        <h3 className="text-4xl md:text-5xl font-bold text-foreground tracking-tight leading-tight">
+          تصفح الكورسات المتاحة
+        </h3>
+        <p className="text-muted-foreground text-base md:text-lg mt-4 max-w-xl mx-auto">
+          اختر الصف الدراسي الخاص بك وابدأ رحلتك التعليمية فوراً مع نخبة من أفضل الشروح التعليمية.
+        </p>
+      </div>
+
+      <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
         {courses && courses.map((course: courses, i: number) => (
           <CourseComp
             key={course.id}

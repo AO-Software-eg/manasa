@@ -67,3 +67,23 @@ export type AnswerGrade = {
     isCorrect: boolean;
   };
 };
+
+
+
+export type ExamStatus = 'solved' | 'current' | 'locked';
+ 
+/**
+ * Determines an exam's status based on its position in the list
+ * relative to how many exams the user has already solved.
+ */
+export function getExamStatus(index: number, solvedExamCount: number): ExamStatus {
+  if (index < solvedExamCount) return 'solved';
+  if (index === solvedExamCount) return 'current';
+  return 'locked';
+}
+ 
+export const EXAM_STATUS_LABEL: Record<ExamStatus, string> = {
+  solved: 'تم الحل',
+  locked: 'مغلق',
+  current: 'اختبار',
+};
