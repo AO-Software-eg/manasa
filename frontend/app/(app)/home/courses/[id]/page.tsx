@@ -11,7 +11,8 @@ import { useEnroll } from '@/app/hooks/queries/useEnroll';
 import { useMe } from '@/app/hooks/queries/useMe';
 import { useGetEnrollments } from '@/app/hooks/queries/useEnroll';
 import { toast } from 'sonner';
-
+import { usePayment } from '@/app/hooks/queries/usePayment';
+import { courses, Enrollment } from '@/types';
 
 export default function CoursePage() {
   const params = useParams();
@@ -39,8 +40,8 @@ export default function CoursePage() {
   return (
     <div className="max-w-4xl mx-auto p-4 text-foreground">
       <div className="flex flex-row-reverse items-center justify-between">
-        <BackButton route="/home/courses" />
-        <h1 className="text-2xl md:text-3xl font-bold my-4">{course.title}</h1>
+        <BackButton />
+        <h1 className="text-3xl font-bold my-4">{course.title}</h1>
       </div>
       <CourseImage title={course.title} />
       <ExpandableText text={course.description} />
@@ -50,10 +51,7 @@ export default function CoursePage() {
 }
 
 interface CourseDataProps {
-  course: {
-    title: string;
-    id: string;
-  };
+  course: courses;
 }
 
 function CourseData({ course }: CourseDataProps) {
@@ -61,22 +59,39 @@ function CourseData({ course }: CourseDataProps) {
 
   const enrollMutation = useEnroll();
   const router = useRouter();
+  const paymentMutation = usePayment();
 
   const handleEnroll = () => {
     if (!userData?.id) return;
 
-    enrollMutation.mutate(
-      {
-        studentId: Number(userData.id),
-        courseId: Number(course.id),
-      },
-      {
-        onSuccess: () => {
-          toast.success('تم الانضمام إلى الكورس بنجاح');
-          router.push(`/home/courses/${course.id}/lectures`);
+    if (course.price > 0) {
+      paymentMutation.mutate(
+        {
+          itemId: Number(course.id),
+          phoneNumber: userData.studentPhone,
         },
-      },
-    );
+        {
+          onSuccess: (data) => {
+            const paymentKey = data.payment_keys[0].key;
+            const url = `https://accept.paymob.com/api/acceptance/iframes/1056311?payment_token=${paymentKey}`;
+            window.location.href = url;
+          },
+        },
+      );
+    } else {
+      enrollMutation.mutate(
+        {
+          studentId: Number(userData.id),
+          courseId: Number(course.id),
+        },
+        {
+          onSuccess: () => {
+            toast.success('تم الانضمام إلى الكورس بنجاح');
+            router.push(`/home/courses/${course.id}/lectures`);
+          },
+        },
+      );
+    }
   };
 
   const {
@@ -84,7 +99,7 @@ function CourseData({ course }: CourseDataProps) {
   } = useGetEnrollments(userData?.id?.toString() ?? '');
 
   const enrolledCourseIds = new Set(
-    enrollments?.map((e: any) => Number(e.course.id)) ?? [],
+    enrollments?.map((e: Enrollment) => Number(e.course.id)) ?? [],
   );
 
   const isPurchased = enrolledCourseIds.has(Number(course.id));
@@ -95,7 +110,7 @@ function CourseData({ course }: CourseDataProps) {
         {isPurchased ? (
           <>
             <div className="mb-6">
-              <h2 className="text-2xl md:text-3xl font-bold text-primary mb-3">
+              <h2 className="text-3xl font-bold text-[#e6d3a3] mb-3">
                 تم شراء هذا الكورس
               </h2>
 
@@ -113,7 +128,7 @@ function CourseData({ course }: CourseDataProps) {
           </>
         ) : (
           <>
-            <h2 className="text-2xl md:text-3xl font-bold mb-4 text-primary">
+            <h2 className="text-3xl font-bold mb-4 text-[#e6d3a3]">
               المحتوى مقفل
             </h2>
 

@@ -18,6 +18,7 @@ type Props = {
   isPriority?: boolean;
   enrolledCourseIds?: Set<number>;
   isMyCoursesPage?: boolean;
+  progress?: number;
 };
 
 export default function CourseComp({
@@ -31,6 +32,7 @@ export default function CourseComp({
   isPriority = false,
   enrolledCourseIds,
   isMyCoursesPage = false,
+  progress
 }: Props) {
   const isPurchased = enrolledCourseIds?.has(Number(id));
   const isOwned = isPurchased || isMyCoursesPage;
@@ -40,7 +42,7 @@ export default function CourseComp({
     userData?.id,
     id,
     shouldFetchProgress,
-  ) ;
+  );
 
   return (
     <Link

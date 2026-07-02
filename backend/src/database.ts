@@ -4,6 +4,7 @@ import { eq, and, inArray } from 'drizzle-orm';
 
 import * as schema from '../drizzle/schema.ts';
 import * as schemaRelations from '../drizzle/relations.ts';
+import { PgBigInt53 } from 'drizzle-orm/pg-core';
 
 export class DataIntegrityError extends Error {
   constructor(message: string) {
@@ -68,6 +69,11 @@ export type SelectAnswerSubmission =
   typeof schema.answerSubmissions.$inferSelect;
 export type InsertAnswerSubmission =
   typeof schema.answerSubmissions.$inferInsert;
+
+export type SelectPaymentTransaction =
+  typeof schema.paymentTransactions.$inferSelect;
+export type InsertPaymentTransaction =
+  typeof schema.paymentTransactions.$inferInsert;
 
 export type RelationLecture = Awaited<
   ReturnType<typeof getCourseLectures>
@@ -503,6 +509,15 @@ export async function getUserLectures(studentId: number, courseId: number) {
   });
 
   return lectures;
+}
+
+export async function createPayment(): Promise<SelectPaymentTransaction> {
+  const [payment] = await db
+    .insert(schema.paymentTransactions)
+    .values({})
+    .returning();
+
+  return payment;
 }
 
 export default db;

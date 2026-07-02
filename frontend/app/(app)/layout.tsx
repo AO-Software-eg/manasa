@@ -6,6 +6,7 @@ import { Cairo } from 'next/font/google';
 import Script from 'next/script';
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
+import Chatbot from '../../components/Chatbot';
 
 const cairo = Cairo({
   subsets: ['arabic'],
@@ -28,7 +29,7 @@ export default function DashboardLayout({
       {!isExamPage && (
         <>111
           <SideNav collapsed={collapsed} setCollapsed={setCollapsed} />
-          {/* <Chatbot /> */}
+          <Chatbot />
         </>
       )}
 

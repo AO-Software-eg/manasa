@@ -24,6 +24,13 @@ export default function Page() {
   } = useCourseById(courseId ?? '');
 
   const { data: userData } = useMe();
+  const userId = userData?.id ?? 0;
+
+  const { data: submittedExams } = useGetExamSubmissions(userId);
+
+  const solvedExamIds = new Set(
+    submittedExams?.map((exam: Exam) => exam.id) || [],
+  );
 
   const {
     data: lectures = [],
@@ -80,7 +87,7 @@ export default function Page() {
       <div className="relative z-10 mx-auto mt-28 max-w-4xl px-4">
         <div className="mb-12 flex flex-col md:flex-row-reverse justify-between items-start md:items-center gap-4">
           <div className="flex items-center gap-4 flex-row-reverse w-full md:w-auto justify-between">
-            <BackButton route="/" />
+            <BackButton />
             <h1 className="text-right text-3xl font-bold leading-tight text-primary md:text-4xl">
               {course.title}
             </h1>

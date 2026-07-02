@@ -27,6 +27,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 
 import { api } from '@/app/hooks/api';
+import { AxiosError } from 'axios';
 
 const cairo = Cairo({ subsets: ['arabic'], weight: ['400', '700'] });
 
@@ -95,8 +96,8 @@ function Page() {
       toast.success('تم إنشاء الحساب بنجاح!');
       form.reset();
       router.push('/login');
-    } catch (err: any) {
-      console.log(err.response?.data?.message);
+    } catch (err: AxiosError | any) {
+      console.log(err.response?.data?.message );
 
       const message = err.response?.data?.message || 'حدث خطأ أثناء الدخول';
 

@@ -24,6 +24,7 @@ import {
   BookMarked
 } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
+import { HeaderProgressBar } from '../hooks/global';
 
 const navGroups = [
   {
@@ -132,11 +133,12 @@ function SideNav({
             <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-[#c4a95a]" />
           </button>
         </div>
+        <HeaderProgressBar />
       </header>
 
       {/* ─── Desktop Sidebar ─── */}
       <aside
-        className={`relative hidden lg:flex flex-col h-screen  pt-12 bg-[#141412] text-[#e6d3a3] border-l border-[#1f1f1c] transition-colors duration-300 ${collapsed ? 'w-17' : 'w-57.5'
+        className={`relative hidden right-0 lg:flex flex-col h-screen  pt-12 bg-[#141412] text-[#e6d3a3] border-l border-[#1f1f1c] transition-colors duration-300 ${collapsed ? 'w-17' : 'w-57.5'
           }`}
       >
         {/* Collapse toggle */}
@@ -358,7 +360,7 @@ function SideNav({
                             {coursesCount}
                           </span>
                         )}
-                             {!collapsed && item.badge && item.name === "اشتراكاتي" && (
+                        {!collapsed && item.badge && item.name === "اشتراكاتي" && (
                           <span className="bg-[#2a2820] text-[#c4a95a] text-[10px] font-semibold px-1.5 py-0.5 rounded-full">
                             {enrollmentCount}
                           </span>

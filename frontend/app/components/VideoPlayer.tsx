@@ -12,6 +12,14 @@ type Props = {
   videoData: VidData;
 };
 
+interface VdoPlayerInstance {
+  video: HTMLVideoElement;
+
+  api: {
+    getTotalCoveredArray(): Promise<number[]>;
+  };
+}
+
 export default function VideoPlayer({ videoData }: Props) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const lastPositionRef = useRef(0);
@@ -22,7 +30,7 @@ export default function VideoPlayer({ videoData }: Props) {
   useEffect(() => {
     if (!iframeRef.current) return;
 
-    let player: any;
+    let player: VdoPlayerInstance;
 
     const init = async () => {
       player = window.VdoPlayer.getInstance(iframeRef.current!);
