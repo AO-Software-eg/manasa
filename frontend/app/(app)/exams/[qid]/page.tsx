@@ -18,8 +18,6 @@ import { Button } from '@/components/ui/button';
 
 function Page() {
   const { qid } = useParams();
-  const { id } = useParams();
-  const { lid } = useParams();
   const examId = qid ? Number(qid) : NaN;
   const router = useRouter();
   const [currentQuestion, setCurrentQuestion] = useState(1);
@@ -65,14 +63,14 @@ function Page() {
       {
         onSuccess: (data) => {
           console.log('Exam submitted successfully:', data);
-          router.push(`/home/courses/${id}/lectures/${lid}/exams/${examId}/submitted`);
+          router.push(`/exams/${examId}/submitted`);
         },
         onError: (error) => {
           console.error(error);
         },
       }
     );
-  }, [answers, userData, examId, id, router, SubmitExam]);
+  }, [answers, userData, examId,  router, SubmitExam]);
 
   useEffect(() => {
     if (onExit) {
@@ -91,7 +89,7 @@ function Page() {
   }, [timeDone]);
   if (isLoading) {
     return (
-      <div className="w-full min-h-screen bg-[#131313] flex items-center justify-center p-6">
+      <div className="w-full min-h-screen bg-[#131313] flex items-center justify-center p-6 ">
         <Card className="w-full max-w-md bg-[#1a1a1a] border-slate-700 text-white">
           <CardContent className="flex flex-col items-center gap-4 py-10">
             <div className="h-10 w-10 rounded-full border-4 border-slate-700 border-t-white animate-spin" />
