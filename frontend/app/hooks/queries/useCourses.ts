@@ -1,4 +1,5 @@
 import { api } from '@/app/hooks/api';
+import { courses } from '@/types';
 import { useQuery } from '@tanstack/react-query';
 
 export function useCourses() {
@@ -15,8 +16,11 @@ export function useCourses() {
   });
 }
 
+
+
+
 export function useCourseById(id: string) {
-  return useQuery({
+  return useQuery<courses>({
     queryKey: ['course', id],
     enabled: !!id,
     staleTime: 1000 * 60 * 5,

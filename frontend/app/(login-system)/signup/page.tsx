@@ -1,5 +1,4 @@
 'use client';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useMemo, useState, useRef } from 'react';
 import {
@@ -97,7 +96,7 @@ function Page() {
       form.reset();
       router.push('/login');
     } catch (err: AxiosError | any) {
-      console.log(err.response?.data?.message );
+      console.log(err.response?.data?.message);
 
       const message = err.response?.data?.message || 'حدث خطأ أثناء الدخول';
 
@@ -108,8 +107,8 @@ function Page() {
   };
 
   return (
-    <section className="w-full min-h-screen flex flex-row-reverse gap-10 lg:gap-20 p-6 items-center justify-center bg-background text-foreground">
-      <div className="left-sec w-full max-w-lg bg-card p-8 rounded-2xl border border-border shadow-md gap-8 flex flex-col transition-all duration-300">
+    <section className="w-full mt-20 min-h-screen flex items-center justify-center p-6 bg-background text-foreground">
+      <div className="w-full max-w-3xl bg-card p-8 rounded-2xl border border-border shadow-md gap-8 flex flex-col transition-all duration-300">
         <h1 className="text-3xl text-center font-bold text-primary">
           إنشاء حساب
         </h1>
@@ -118,174 +117,177 @@ function Page() {
           onSubmit={form.handleSubmit(onsubmit)}
           className={`flex flex-col gap-4 ${cairo.className}`}
         >
-          <div>
-            <label htmlFor="email" className={labelCls}>
-              البريد الإلكتروني
-            </label>
-            <input
-              {...form.register('email')}
-              type="email"
-              id="email"
-              name="email"
-              placeholder="name@example.com"
-              className={inputCls}
-            />
-            {form.formState.errors.email && (
-              <p className={errorCls}>{form.formState.errors.email?.message}</p>
-            )}
-          </div>
-
-          {/* Name */}
-          <div>
-            <label htmlFor="name" className={labelCls}>
-              الاسم الكامل
-            </label>
-            <input
-              {...form.register('name')}
-              type="text"
-              id="name"
-              name="name"
-              placeholder="مثال : عبدالله محمد"
-              className={inputCls}
-            />
-            {form.formState.errors.name && (
-              <p className={errorCls}>{form.formState.errors.name?.message}</p>
-            )}
-          </div>
-
-          <div>
-            <label className={labelCls}>رقم هاتف الطالب</label>
-            <PhoneInput
-              value={form.watch('studentPhone')}
-              onChange={(val) => form.setValue('studentPhone', val)}
-            />
-
-            {form.formState.errors.studentPhone && (
-              <p className={errorCls}>
-                {form.formState.errors.studentPhone?.message}
-              </p>
-            )}
-          </div>
-
-          {/* parent phone */}
-          <div>
-            <label className={labelCls}>رقم هاتف ولي الأمر</label>
-            <PhoneInput
-              value={form.watch('parentPhone')}
-              onChange={(val) => form.setValue('parentPhone', val)}
-            />
-
-            {form.formState.errors.parentPhone && (
-              <p className={errorCls}>
-                {form.formState.errors.parentPhone?.message}
-              </p>
-            )}
-          </div>
-
-          {/* Governorate */}
-          <div>
-            <label htmlFor="governorate" className={labelCls}>
-              المحافظة
-            </label>
-            <GovCombo
-              value={form.watch('governorate')}
-              onChange={(val) => form.setValue('governorate', val)}
-            />
-            {form.formState.errors.governorate && (
-              <p className={errorCls}>
-                {form.formState.errors.governorate?.message}
-              </p>
-            )}
-          </div>
-          {/* Year & specialization */}
-          <div>
-            <label htmlFor="year" className={labelCls}>
-              الصف الدراسي
-            </label>
-            <YearCombo
-              year={form.watch('YearCombo')}
-              specialize={form.watch('specialization')}
-              onSpecializationChange={(val) =>
-                form.setValue('specialization', val)
-              }
-              onYearchange={(val) => form.setValue('YearCombo', val)}
-            />
-            {form.formState.errors.YearCombo && (
-              <p className={errorCls}>
-                {form.formState.errors.YearCombo?.message}
-              </p>
-            )}
-          </div>
-
-          {/* Password */}
-          <div>
-            <label htmlFor="password" className={labelCls}>
-              كلمة المرور
-            </label>
-            <div className="relative">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Email */}
+            <div>
+              <label htmlFor="email" className={labelCls}>
+                البريد الإلكتروني
+              </label>
               <input
-                {...form.register('password')}
-                type={showPassword ? 'text' : 'password'}
-                id="password"
-                name="password"
-                minLength={6}
-                placeholder="كلمة المرور (6 أحرف على الأقل)"
+                {...form.register('email')}
+                type="email"
+                id="email"
+                name="email"
+                placeholder="name@example.com"
                 className={inputCls}
               />
-              {showPassword ? (
-                <EyeOff
-                  size={18}
-                  className={eyeIconCls}
-                  onClick={() => setShowPassword(false)}
-                />
-              ) : (
-                <Eye
-                  size={18}
-                  className={eyeIconCls}
-                  onClick={() => setShowPassword(true)}
-                />
+              {form.formState.errors.email && (
+                <p className={errorCls}>{form.formState.errors.email?.message}</p>
               )}
             </div>
-            {form.formState.errors.password && (
-              <p className={errorCls}>
-                {form.formState.errors.password?.message}
-              </p>
-            )}
-          </div>
 
-          {/* Confirm password */}
-          <div>
-            <label htmlFor="confirmPassword" className={labelCls}>
-              تأكيد كلمة المرور
-            </label>
-            <div className="relative">
+            {/* Name */}
+            <div>
+              <label htmlFor="name" className={labelCls}>
+                الاسم الكامل
+              </label>
               <input
-                {...form.register('confirmPassword')}
-                type={showConfirmPassword ? 'text' : 'password'}
-                id="confirmPassword"
-                name="confirmPassword"
-                placeholder="••••••••"
+                {...form.register('name')}
+                type="text"
+                id="name"
+                name="name"
+                placeholder="مثال : عبدالله محمد"
                 className={inputCls}
               />
-              {showConfirmPassword ? (
-                <EyeOff
-                  size={18}
-                  className={eyeIconCls}
-                  onClick={() => setShowConfirmPassword(false)}
-                />
-              ) : (
-                <Eye
-                  size={18}
-                  className={eyeIconCls}
-                  onClick={() => setShowConfirmPassword(true)}
-                />
+              {form.formState.errors.name && (
+                <p className={errorCls}>{form.formState.errors.name?.message}</p>
               )}
             </div>
-            {form.formState.errors.confirmPassword && (
-              <p className={errorCls}>
-                {form.formState.errors.confirmPassword?.message}
-              </p>
-            )}
+
+            {/* Student phone */}
+            <div>
+              <label className={labelCls}>رقم هاتف الطالب</label>
+              <PhoneInput
+                value={form.watch('studentPhone')}
+                onChange={(val) => form.setValue('studentPhone', val)}
+              />
+              {form.formState.errors.studentPhone && (
+                <p className={errorCls}>
+                  {form.formState.errors.studentPhone?.message}
+                </p>
+              )}
+            </div>
+
+            {/* Parent phone */}
+            <div>
+              <label className={labelCls}>رقم هاتف ولي الأمر</label>
+              <PhoneInput
+                value={form.watch('parentPhone')}
+                onChange={(val) => form.setValue('parentPhone', val)}
+              />
+              {form.formState.errors.parentPhone && (
+                <p className={errorCls}>
+                  {form.formState.errors.parentPhone?.message}
+                </p>
+              )}
+            </div>
+
+            {/* Governorate */}
+            <div>
+              <label htmlFor="governorate" className={labelCls}>
+                المحافظة
+              </label>
+              <GovCombo
+                value={form.watch('governorate')}
+                onChange={(val) => form.setValue('governorate', val)}
+              />
+              {form.formState.errors.governorate && (
+                <p className={errorCls}>
+                  {form.formState.errors.governorate?.message}
+                </p>
+              )}
+            </div>
+
+            {/* Year & specialization */}
+            <div>
+              <label htmlFor="year" className={labelCls}>
+                الصف الدراسي
+              </label>
+              <YearCombo
+                year={form.watch('YearCombo')}
+                specialize={form.watch('specialization')}
+                onSpecializationChange={(val) =>
+                  form.setValue('specialization', val)
+                }
+                onYearchange={(val) => form.setValue('YearCombo', val)}
+              />
+              {form.formState.errors.YearCombo && (
+                <p className={errorCls}>
+                  {form.formState.errors.YearCombo?.message}
+                </p>
+              )}
+            </div>
+
+            {/* Password */}
+            <div>
+              <label htmlFor="password" className={labelCls}>
+                كلمة المرور
+              </label>
+              <div className="relative">
+                <input
+                  {...form.register('password')}
+                  type={showPassword ? 'text' : 'password'}
+                  id="password"
+                  name="password"
+                  minLength={6}
+                  placeholder="كلمة المرور (6 أحرف على الأقل)"
+                  className={inputCls}
+                />
+                {showPassword ? (
+                  <EyeOff
+                    size={18}
+                    className={eyeIconCls}
+                    onClick={() => setShowPassword(false)}
+                  />
+                ) : (
+                  <Eye
+                    size={18}
+                    className={eyeIconCls}
+                    onClick={() => setShowPassword(true)}
+                  />
+                )}
+              </div>
+              {form.formState.errors.password && (
+                <p className={errorCls}>
+                  {form.formState.errors.password?.message}
+                </p>
+              )}
+            </div>
+
+            {/* Confirm password */}
+            <div>
+              <label htmlFor="confirmPassword" className={labelCls}>
+                تأكيد كلمة المرور
+              </label>
+              <div className="relative">
+                <input
+                  {...form.register('confirmPassword')}
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  placeholder="••••••••"
+                  className={inputCls}
+                />
+                {showConfirmPassword ? (
+                  <EyeOff
+                    size={18}
+                    className={eyeIconCls}
+                    onClick={() => setShowConfirmPassword(false)}
+                  />
+                ) : (
+                  <Eye
+                    size={18}
+                    className={eyeIconCls}
+                    onClick={() => setShowConfirmPassword(true)}
+                  />
+                )}
+              </div>
+              {form.formState.errors.confirmPassword && (
+                <p className={errorCls}>
+                  {form.formState.errors.confirmPassword?.message}
+                </p>
+              )}
+            </div>
           </div>
 
           <button type="submit" disabled={isSubmitting} className={btnPrimaryCls}>
@@ -299,17 +301,6 @@ function Page() {
             </Link>
           </span>
         </form>
-      </div>
-
-      <div className="right-sec w-full hidden lg:block max-w-xl">
-        <Image
-          src="https://ytgu3s3xxa.ufs.sh/f/GNGTKtuqz7dpbQdjvm3StHrnFYB8615RChWXca7kgdwl0OMi"
-          alt="Signup Image"
-          width={800}
-          height={800}
-          className="w-full h-auto object-contain opacity-85 dark:opacity-75 transition-opacity duration-300"
-          priority
-        />
       </div>
     </section>
   );

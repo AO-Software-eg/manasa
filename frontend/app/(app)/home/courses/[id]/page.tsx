@@ -5,6 +5,7 @@ import BackButton from '@/app/components/BackBtn';
 import ExpandableText from '@/app/components/EcalpsedTxt';
 import Link from 'next/link';
 import LoadingComp from '@/app/components/LoadingComp';
+import { useEffect } from 'react';
 import { useCourseById } from '@/app/hooks/queries/useCourses';
 import { useParams, useRouter } from 'next/navigation';
 import { useEnroll } from '@/app/hooks/queries/useEnroll';
@@ -18,7 +19,7 @@ export default function CoursePage() {
   const params = useParams();
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
 
-  const { data: course, isLoading, isError, refetch } = useCourseById(id ?? '');
+  const { data, isLoading, isError, refetch } = useCourseById(id ?? '');
 
   if (isLoading) return <LoadingComp />;
 
@@ -35,26 +36,22 @@ export default function CoursePage() {
       </div>
     );
 
-  if (!course) return <h3 className="text-xl font-bold text-center mt-20">لم يتم العثور على الكورس</h3>;
+  if (!data) return <h3 className="text-xl font-bold text-center mt-20">لم يتم العثور على الكورس</h3>;
 
   return (
     <div className="max-w-4xl mx-auto p-4 text-foreground">
       <div className="flex flex-row-reverse items-center justify-between">
         <BackButton />
-        <h1 className="text-3xl font-bold my-4">{course.title}</h1>
+        <h1 className="text-3xl font-bold my-4">{data.title}</h1>
       </div>
-      <CourseImage title={course.title} />
-      <ExpandableText text={course.description} />
-      <CourseData course={course} />
+      <CourseImage title={data.title} />
+      <ExpandableText text={data.description} />
+      <CourseData course={data} />
     </div>
   );
 }
 
-interface CourseDataProps {
-  course: courses;
-}
-
-function CourseData({ course }: CourseDataProps) {
+function CourseData({ course }: {course: courses}) {
   const { data: userData } = useMe();
 
   const enrollMutation = useEnroll();
@@ -62,7 +59,7 @@ function CourseData({ course }: CourseDataProps) {
   const paymentMutation = usePayment();
 
   const handleEnroll = () => {
-    if (!userData?.id) return;
+    if (!userData?.id) return router.push('/login');
 
     if (course.price > 0) {
       paymentMutation.mutate(
@@ -103,6 +100,12 @@ function CourseData({ course }: CourseDataProps) {
   );
 
   const isPurchased = enrolledCourseIds.has(Number(course.id));
+
+  useEffect(() => {
+    if (isPurchased) {
+      router.replace(`/home/courses/${course.id}/lectures`);
+    }
+  }, [isPurchased, course.id, router]);
 
   return (
     <div className="mt-12">

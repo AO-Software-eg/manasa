@@ -5,7 +5,7 @@ export type courses = {
     price: number;
     year: string;
     specialization: string | null;
-    description: string | null;
+    description: string;
     tags: string | null;
 }
 

@@ -49,7 +49,7 @@ function page() {
   );
 
   return (
-    <section className="w-full min-h-screen flex mt-20 flex-col gap-12 p-5 items-center justify-start">
+    <section className="w-full  bg-background  border-t border-border min-h-screen flex flex-col gap-12 p-5 items-center justify-start">
       <h3 className="text-4xl md:text-5xl font-bold text-center mt-10 mb-5 text-foreground">
         الكورسات الملتحق بها
       </h3>

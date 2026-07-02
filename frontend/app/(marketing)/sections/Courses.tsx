@@ -44,7 +44,7 @@ export default function Courses() {
 
   return (
     <section id="courses" className="w-full py-24 px-6 flex flex-col items-center bg-background border-t border-border">
-      <div className="text-center max-w-3xl mb-16">
+      <div className="text-center max-w-3xl mb-18">
         <h2 className="text-sm font-semibold text-primary uppercase tracking-widest mb-3">دوراتنا الدراسية</h2>
         <h3 className="text-4xl md:text-5xl font-bold text-foreground tracking-tight leading-tight">
           تصفح الكورسات المتاحة
