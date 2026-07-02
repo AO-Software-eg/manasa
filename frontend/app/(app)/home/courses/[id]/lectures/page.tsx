@@ -9,7 +9,8 @@ import { useMe } from '@/app/hooks/queries/useMe';
 import LoadingComp from '@/app/components/LoadingComp';
 import NotAuthorized from '@/app/components/NotAuthorized';
 import LectureAccordionItem from '@/app/components/LectureAccordionItem';
-import { lecture } from '@/types';
+import { lecture , Exam} from '@/types';
+import { useGetExamSubmissions } from '@/app/hooks/queries/useExams';
 
 export default function Page() {
   const params = useParams();
