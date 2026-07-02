@@ -23,6 +23,6 @@ export async function getSessionData(): Promise<Object | null> {
   } catch (err: unknown) {
     console.log(err);
 
-    return null;
+    return null;    
   }
 }

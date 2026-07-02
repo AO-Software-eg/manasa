@@ -2,22 +2,20 @@
 
 import VideoPlayer from '@/app/components/VideoPlayer';
 import { useVideo } from '@/app/hooks/queries/useLectures';
-import { useParams } from 'next/navigation';
+import { useParams , useSearchParams } from 'next/navigation';
 import LoadingComp from '@/app/components/LoadingComp';
 import { PlayCircle } from 'lucide-react';
 
 export default function Page() {
   const params = useParams();
-
-  const lid = Array.isArray(params.lid)
-    ? params.lid[0]
-    : params.lid;
+  const searchParams = useSearchParams();
+  const lid = searchParams.get('lid') ?? null;
 
   const sid = Array.isArray(params.sid)
     ? params.sid[0]
     : params.sid;
 
-  if (!sid || !lid) return null;
+  if (!sid || !lid) return <h1 className='text-white'>حدث خطأ ما</h1>;
 
   const {
     data: videoData,

@@ -18,8 +18,6 @@ import { Button } from '@/components/ui/button';
 
 function Page() {
   const { qid } = useParams();
-  const { id } = useParams();
-  const { lid } = useParams();
   const examId = qid ? Number(qid) : NaN;
   const router = useRouter();
   const [currentQuestion, setCurrentQuestion] = useState(1);
@@ -65,14 +63,14 @@ function Page() {
       {
         onSuccess: (data) => {
           console.log('Exam submitted successfully:', data);
-          router.push(`/home/courses/${id}/lectures/${lid}/exams/${examId}/submitted`);
+          router.push(`/exams/${examId}/submitted`);
         },
         onError: (error) => {
           console.error(error);
         },
       }
     );
-  }, [answers, userData, examId, id, router, SubmitExam]);
+  }, [answers, userData, examId,  router, SubmitExam]);
 
   useEffect(() => {
     if (onExit) {

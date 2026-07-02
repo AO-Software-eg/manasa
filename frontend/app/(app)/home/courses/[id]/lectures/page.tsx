@@ -165,26 +165,26 @@ export default function Page() {
                             </p>
                           )}
 
-                          {videos.map((video) => (
-                            <button
-                              key={video.id}
-                              onClick={() =>
-                                router.push(
-                                  `/home/courses/${courseId}/lectures/${asset.id}/videos/${video.id}`,
-                                )
-                              }
-                              className="flex items-center justify-between rounded-xl border border-border bg-secondary/20 p-4 transition-all hover:border-primary/50 hover:bg-secondary/40 text-right cursor-pointer"
-                            >
-                              <div className="flex items-center gap-3">
-                                <span className="font-semibold text-foreground">
-                                  {video.title}
-                                </span>
-                              </div>
-                              <span className="text-sm text-primary font-medium">
-                                مشاهدة
+                        {videos.map((video) => (
+                          <button
+                            key={video.id}
+                            onClick={() =>
+                              router.push(
+                                `/videos/${video.id}?lid=${asset.id}`,
+                              )
+                            }
+                            className="flex items-center justify-between rounded-xl border border-zinc-700 bg-zinc-900/60 p-4 transition-all hover:border-blue-500 hover:bg-zinc-800"
+                          >
+                            <div className="flex items-center gap-3">
+                              <span className="font-medium text-zinc-100">
+                                {video.title}
                               </span>
-                            </button>
-                          ))}
+                            </div>
+                            <span className="text-sm text-zinc-400">
+                              مشاهدة
+                            </span>
+                          </button>
+                        ))}
 
                           {exams.map((exam, index) => {
                             const solvedExamCount = data?.solvedExamCount ?? 0;
@@ -235,32 +235,31 @@ export default function Page() {
                                   </span>
                                 </button>
 
-                                {isCurrentExam && (
-                                  <PopUp
-                                    open={openExamId === exam.id}
-                                    title="هل انت متأكد من بدأ الأمتحان ؟"
-                                    description="تنبيه هام جدا جدا جدا&#10;خلي بالك الامتحان مدته : 45 دقيقة&#10;مينفعش تخرج من الاختبار قبل ما تكون خلصت الاختبار ..."
-                                    confirmText="بدء الأمتحان"
-                                    confirmClassName="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg"
-                                    onClose={() => setOpenExamId(null)}
-                                    pending={false}
-                                    onConfirm={() =>
-                                      router.push(
-                                        `/home/courses/${courseId}/lectures/${asset.id}/exams/${exam.id}`,
-                                      )
-                                    }
-                                  />
-                                )}
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
-                );
-              })}
-            </div>
+                              {isCurrentExam && (
+                                <PopUp
+                                  open={openExamId === exam.id}
+                                  title="هل انت متأكد من بدأ الأمتحان ؟"
+                                  description="تنبيه هام جدا جدا جدا&#10;خلي بالك الامتحان مدته : 45 دقيقة&#10;مينفعش تخرج من الاختبار قبل ما تكون خلصت الاختبار ..."
+                                  confirmText="بدء الأمتحان"
+                                  confirmClassName="bg-green-500 hover:bg-green-600"
+                                  onClose={() => setOpenExamId(null)}
+                                  pending={false}
+                                  onConfirm={() =>
+                                    router.push(
+                                      `/exams/${exam.id}`,
+                                    )
+                                  }
+                                />
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+              );
+            })
           )}
         </div>
       </div>
