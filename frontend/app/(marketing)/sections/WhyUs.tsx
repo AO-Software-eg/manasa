@@ -58,14 +58,7 @@ function WhyUs() {
     },
   };
 
-  const cardVariants = {
-    hidden: { y: 30, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] },
-    },
-  };
+
 
   return (
     <section
@@ -96,7 +89,6 @@ function WhyUs() {
           return (
             <motion.div
               key={index}
-              variants={cardVariants}
               className="group relative bg-card text-foreground border border-border hover:border-primary/30 rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-lg flex flex-col justify-between overflow-hidden"
             >
               <div>
