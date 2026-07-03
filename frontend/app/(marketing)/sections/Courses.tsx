@@ -5,6 +5,7 @@ import CoursesLoading from '@/app/components/CoursesLoading';
 import { courses } from '@/types'
 import { useMe } from '@/app/hooks/queries/useMe';
 import { useGetEnrollments } from '@/app/hooks/queries/useEnroll';
+import { Enrollment } from '@/types';
 
 
 export default function Courses() {
@@ -15,7 +16,7 @@ export default function Courses() {
   const { data: enrollments, isLoading: enrollLoading, isError: enrollError } = useGetEnrollments(userData?.id?.toString() ?? '');
 
   const enrolledCourseIds = new Set<number>(
-    enrollments?.map((e: any) => Number(e.course.id)) ?? []
+    enrollments?.map((e: Enrollment) => Number(e.course.id)) ?? []
   )
 
   console.log(

@@ -371,6 +371,7 @@ function Page() {
         onClose={() => setOpenOnExit(false)}
         onConfirm={() => setOnExit(true)}
         pending={false}
+        done={false}
       />
 
       <PopUp
@@ -382,6 +383,7 @@ function Page() {
         onClose={() => setOnSubmit(false)}
         onConfirm={handleSubmitData}
         pending={SubmitExam.isPending}
+        done={SubmitExam.isSuccess}
       />
     </div>
   );

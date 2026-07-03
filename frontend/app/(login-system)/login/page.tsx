@@ -12,6 +12,7 @@ import { Eye, EyeOff } from 'lucide-react';
 
 import { Suspense } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 
 
 const cairo = Cairo({
@@ -47,12 +48,18 @@ function LoginContent() {
       const res = await api.post('/login', payload, { withCredentials: true });
 
       toast.success('تم الدخول بنجاح!');
-      await queryClient.refetchQueries({
+      await queryClient.invalidateQueries({
         queryKey: ['me'],
       });
 
-      router.push(redirect);
-    } catch (err: any) {
+      const user = await queryClient.fetchQuery({
+        queryKey: ['me'],
+      });
+
+      console.log(user);
+
+      router.replace(redirect);
+    } catch (err: AxiosError | any) {
       console.log(err.response?.data?.message);
 
       const message = err.response?.data?.message || 'حدث خطأ أثناء الدخول';

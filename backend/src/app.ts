@@ -1,7 +1,7 @@
 import express, { type Request, type Response } from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-
+import { scalarDocs } from "./docs/scalar.ts";
 import apiRouter from './routes/index.ts';
 
 const app = express();
@@ -21,5 +21,7 @@ app.use(
 );
 
 app.use('/', apiRouter);
+
+app.use("/docs", scalarDocs);
 
 export default app;
