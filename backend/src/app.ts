@@ -10,7 +10,7 @@ app.use(cookieParser());
 
 const limiter = rateLimit({
   windowMs: 1 * 60 * 1000,
-  limit: 20,
+  limit: 100,
   standardHeaders: true,
   legacyHeaders: false,
 });
