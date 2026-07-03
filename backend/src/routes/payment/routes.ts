@@ -108,8 +108,9 @@ router
       const payment: db.SelectPaymentTransaction = await db.createPayment();
 
       const nameParts = user.name.trim().split(/\s+/);
+
       const firstName = nameParts[0];
-      const lastName = nameParts.slice(1).join(' ');
+      const lastName = nameParts.slice(1).join(' ') || "NA"; // maybe empty if user has only one name
 
       const body: BodyInit = JSON.stringify({
         amount: price * 100,
@@ -155,9 +156,10 @@ router
       );
 
       if (!intentionRes.ok) {
+
+
         return res.status(intentionRes.status).json({
-          error: 'Paymob API Error',
-          details: intentionRes,
+          error: "Paymob API Error",
         });
       }
 
