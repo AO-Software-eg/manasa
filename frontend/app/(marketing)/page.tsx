@@ -3,8 +3,7 @@ import { useMe } from "../hooks/queries/useMe";
 import LandingHome from "../components/LandingHome";
 import LoadingComp from "../components/LoadingComp";
 import { useState, useEffect } from "react";
-import { redirect } from "next/navigation";
-import { userData } from "@/types";
+import { useRouter } from "next/navigation";
 
 
 export default function Home() {
@@ -18,7 +17,8 @@ export default function Home() {
   const isUser = userData ? true : false;
 
   if (isUser) {
-    redirect("/home");
+    const router = useRouter();
+    router.push("/home");
   }
 
   if (isLoading || !mounted) {

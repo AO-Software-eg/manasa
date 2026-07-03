@@ -6,7 +6,7 @@ import { Cairo } from 'next/font/google';
 import Script from 'next/script';
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
-import Chatbot from '../../components/Chatbot';
+import Chatbot from '../components/Chatbot';
 
 const cairo = Cairo({
   subsets: ['arabic'],
@@ -24,10 +24,10 @@ export default function DashboardLayout({
 
   return (
     <div
-      className={`${isExamPage ? '' : 'min-h-screen flex'}  bg-[#0d0d0d] text-white ${cairo.className}`}
+      className={`${isExamPage ? '' : 'min-h-screen flex'} bg-[#0d0d0d] text-white dark ${cairo.className}`}
     >
       {!isExamPage && (
-        <>111
+        <>
           <SideNav collapsed={collapsed} setCollapsed={setCollapsed} />
           <Chatbot />
         </>
@@ -35,7 +35,7 @@ export default function DashboardLayout({
 
         {/* Main */}
         <main
-          className={`${isExamPage ? '' : 'flex-1  mt-16 p-4 lg:h-[calc(102dvh-5rem)] lg:overflow-y-auto overflow-x-hidden'}`}
+          className={`${isExamPage ? '' : 'flex-1  mt-16 lg:h-[calc(102dvh-5rem)] lg:overflow-y-auto overflow-x-hidden'}`}
         >
           {children}
 

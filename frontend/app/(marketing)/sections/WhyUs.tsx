@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import {
   BookOpen,
   Headphones,
@@ -9,8 +9,9 @@ import {
   Sparkles,
   Users,
   Target,
+  ArrowUpRight,
 } from 'lucide-react';
-import { annotate } from 'rough-notation';
+import { motion } from 'framer-motion';
 
 const reasons = [
   {
@@ -20,115 +21,105 @@ const reasons = [
     icon: BookOpen,
   },
   {
-    title: 'دعم مستمر',
-    description: 'فريق الدعم متاح دائمًا لمساعدتك في أي استفسار أو مشكلة.',
+    title: 'دعم مستمر متواصل',
+    description: 'فريق الدعم متاح دائمًا لمساعدتك في أي استفسار أو مشكلة تواجهك.',
     icon: Headphones,
   },
   {
-    title: 'أسعار مناسبة',
-    description: 'خطط أسعار مرنة تناسب جميع الطلاب.',
+    title: 'أسعار مناسبة للجميع',
+    description: 'خطط أسعار مرنة واشتراكات مناسبة لجميع الطلاب بجميع المراحل.',
     icon: DollarSign,
   },
   {
-    title: 'محتوى محدث',
-    description: 'نقوم بتحديث المحتوى باستمرار لضمان أحدث المعلومات.',
+    title: 'محتوى محدث باستمرار',
+    description: 'نقوم بتحديث المحتوى باستمرار لضمان مواكبة أحدث نظم الامتحانات والتقييم.',
     icon: RefreshCcw,
   },
   {
-    title: 'تعلم تفاعلي',
-    description: 'فيديوهات وتمارين تفاعلية لتجربة تعلم ممتعة.',
+    title: 'تعلم تفاعلي ذكي',
+    description: 'فيديوهات شرح وتمارين تفاعلية تجعل تجربة التعلم ممتعة وسهلة الفهم.',
     icon: Sparkles,
   },
   {
-    title: 'مجتمع داعم',
-    description: 'تواصل مع طلاب آخرين وشارك المعرفة.',
+    title: 'مجتمع طلابي متكامل',
+    description: 'تواصل مع زملائك وشارك المعرفة والاستفسارات في مساحات نقاش مخصصة.',
     icon: Users,
-  },
-  {
-    title: 'توجيه شخصي',
-    description: 'نساعدك بخطة مخصصة لتحقيق أهدافك.',
-    icon: Target,
   },
 ];
 
 function WhyUs() {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const titleRef = useRef<HTMLSpanElement>(null);
-  const descRef = useRef<HTMLSpanElement>(null);
-
-  useEffect(() => {
-    if (!sectionRef.current || !titleRef.current || !descRef.current) return;
-
-    const titleAnnotation = annotate(titleRef.current, {
-      type: 'underline',
-      color: '#e6d3a3',
-      strokeWidth: 3,
-    });
-
-    const descAnnotation = annotate(descRef.current, {
-      type: 'highlight',
-      color: '#e6d3a3',
-    });
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          titleAnnotation.show();
-          setTimeout(() => descAnnotation.show(), 300); // sequence
-        }
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
       },
-      { threshold: 0.4 },
-    );
+    },
+  };
 
-    observer.observe(sectionRef.current);
-
-    return () => observer.disconnect();
-  }, []);
+  const cardVariants = {
+    hidden: { y: 30, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] },
+    },
+  };
 
   return (
     <section
-      ref={sectionRef}
-      className="w-full py-24 px-6 flex flex-col items-center"
+      id="features"
+      className="relative w-full py-24 px-6 flex flex-col items-center border-t border-border bg-background"
     >
-      {/* Title */}
-      <div className="text-center max-w-2xl mb-16">
-        <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-          لماذا <span ref={titleRef}>تختارنا؟</span>
-        </h1>
-
-        <p className="text-white/70 text-lg mt-10">
-          منصة تعليمية{' '}
-          <span ref={descRef}>
-            متكاملة تساعدك على فهم التاريخ بطريقة حديثة وفعالة
-          </span>{' '}
-          ، مع دعم مستمر ومحتوى عالي الجودة يناسب جميع المستويات.
+      {/* Title / Header */}
+      <div className="text-center max-w-3xl mb-16">
+        <h2 className="text-sm font-semibold text-primary uppercase tracking-widest mb-3">ميزات المنصة</h2>
+        <h3 className="text-4xl md:text-5xl font-bold text-foreground mb-4 tracking-tight leading-tight">
+          لماذا تختار منصة السلطان؟
+        </h3>
+        <p className="text-muted-foreground text-base md:text-lg leading-relaxed max-w-2xl mx-auto">
+          منصة تعليمية متكاملة تساعدك على فهم مادة التاريخ بطريقة حديثة ومبتكرة، بعيداً عن الحفظ التقليدي وبأعلى درجات الكفاءة.
         </p>
       </div>
 
-      {/* Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl w-full">
+      {/* Bento Grid */}
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl w-full"
+      >
         {reasons.map((reason, index) => {
           const Icon = reason.icon;
           return (
-            <div
+            <motion.div
               key={index}
-              className="group bg-white/5 border border-white/10 rounded-2xl p-6  hover:bg-white/10 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl"
+              variants={cardVariants}
+              className="group relative bg-card text-foreground border border-border hover:border-primary/30 rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-lg flex flex-col justify-between overflow-hidden"
             >
-              <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-[#e6d3a3]/20 mb-4">
-                <Icon className="text-[#e6d3a3]" size={24} />
+              <div>
+                <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-primary/10 text-primary mb-5 group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300">
+                  <Icon size={22} className="transition-transform duration-300" />
+                </div>
+
+                <h4 className="text-xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors duration-300">
+                  {reason.title}
+                </h4>
+
+                <p className="text-muted-foreground leading-relaxed text-sm">
+                  {reason.description}
+                </p>
               </div>
 
-              <h3 className="text-xl font-bold text-white mb-2">
-                {reason.title}
-              </h3>
-
-              <p className="text-gray-400 leading-relaxed text-sm">
-                {reason.description}
-              </p>
-            </div>
+              <div className="flex justify-end mt-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <ArrowUpRight size={18} className="text-primary" />
+              </div>
+            </motion.div>
           );
         })}
-      </div>
+      </motion.div>
     </section>
   );
 }
