@@ -42,6 +42,6 @@ export default async function proxy(request: NextRequest) {
   return NextResponse.next();
 }
 
-export const config = {
-  matcher: ['/login', '/home/:path*', '/signup'],
-};
+// export const config = {
+//   matcher: ['/login', '/home/:path*', '/signup'],
+// };
