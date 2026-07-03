@@ -80,10 +80,21 @@ router
       schema.buyItemSchema.parse(req.body);
       const buyData: schema.buyItemData = req.body;
 
+      const jwtPayload = auth.verifyToken(req.cookies.user_token);
+      const user: db.SelectUser = await db.getUserByEmail(jwtPayload.email);
+
       let price;
       let itemData: any;
       if (buyData.itemType == 'course') {
         const course: db.SelectCourse = await db.getCourseById(buyData.itemId);
+
+        if (await db.isUserEnrolled(user.id, course.id)) {
+          return res.status(409).json({
+            error: 'Conflict',
+            message: `The item with type '${buyData.itemType}' and id ${buyData.itemId} is already owned by the user.`,
+          });
+        }
+
         itemData = course;
         price = course.price;
       } else {
@@ -96,12 +107,10 @@ router
 
       const payment: db.SelectPaymentTransaction = await db.createPayment();
 
-      const jwtPayload = auth.verifyToken(req.cookies.user_token);
-      const user: db.SelectUser = await db.getUserByEmail(jwtPayload.email);
       const nameParts = user.name.trim().split(/\s+/);
 
       const firstName = nameParts[0];
-      const lastName = nameParts.slice(1).join(' ');
+      const lastName = nameParts.slice(1).join(' ') || "NA"; // maybe empty if user has only one name
 
       const body: BodyInit = JSON.stringify({
         amount: price * 100,
@@ -127,7 +136,7 @@ router
         special_reference: `${payment.id}-${payment.createdAt}`,
         expiration: 3600,
         notification_url: `${process.env.NGROK_BASE_URL}/payment/paymob-callback`,
-        redirection_url: `https://manasa-deploy-main-git-paymob-abdelrahman1devs-projects.vercel.app/payment/result?courseId=${buyData.itemId}`,
+        redirection_url: `${process.env.FRONTEND_LOCAL_URL}/payment/result?courseId=${buyData.itemId}`,
       });
 
       const headers: HeadersInit = new Headers();
@@ -147,9 +156,10 @@ router
       );
 
       if (!intentionRes.ok) {
+
+
         return res.status(intentionRes.status).json({
-          error: 'Paymob API Error',
-          details: intentionRes,
+          error: "Paymob API Error",
         });
       }
 

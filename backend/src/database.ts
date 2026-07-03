@@ -116,7 +116,7 @@ export async function insertUser(user: InsertUser) {
   await db.insert(schema.users).values(user);
 }
 
-export async function getCourseById(id: PgBigInt53): Promise<SelectCourse> {
+export async function getCourseById(id: number): Promise<SelectCourse> {
   const res = await db
     .select()
     .from(schema.courses)

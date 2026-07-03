@@ -1,11 +1,12 @@
 'use client';
 
-import SideNav from '../../components/SideNav';
-import '../../globals.css';
+import SideNav from '../components/SideNav';
+import '../globals.css';
 import { Cairo } from 'next/font/google';
-import Chatbot from '@/app/components/Chatbot';
+import Script from 'next/script';
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
+import Chatbot from '../components/Chatbot';
 
 const cairo = Cairo({
   subsets: ['arabic'],
@@ -23,20 +24,25 @@ export default function DashboardLayout({
 
   return (
     <div
-      className={`${isExamPage ? '' : 'min-h-screen flex'}  bg-[#0d0d0d] text-white ${cairo.className}`}
+      className={`${isExamPage ? '' : 'min-h-screen flex'} bg-[#0d0d0d] text-white dark ${cairo.className}`}
     >
       {!isExamPage && (
         <>
           <SideNav collapsed={collapsed} setCollapsed={setCollapsed} />
-          {/* <Chatbot /> */}
+          <Chatbot />
         </>
       )}
 
         {/* Main */}
         <main
-          className={`${isExamPage ? '' : 'flex-1  mt-16 p-4 lg:h-[calc(102dvh-5rem)] lg:overflow-y-auto overflow-x-hidden'}`}
+          className={`${isExamPage ? '' : 'flex-1  mt-16 lg:h-[calc(102dvh-5rem)] lg:overflow-y-auto overflow-x-hidden'}`}
         >
           {children}
+
+        <Script
+          src="https://player.vdocipher.com/v2/api.js"
+          strategy="afterInteractive"
+        />
         </main>
     
     </div>

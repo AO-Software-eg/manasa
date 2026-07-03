@@ -45,7 +45,7 @@ function Page() {
 
   if (isLoading) {
     return (
-      <div className="w-full min-h-screen flex items-center justify-center text-white">
+      <div className="w-full min-h-screen flex items-center justify-center text-foreground bg-background">
         جاري التحميل...
       </div>
     );
@@ -53,7 +53,7 @@ function Page() {
 
   if (isError) {
     return (
-      <div className="w-full min-h-screen flex items-center justify-center text-red-500">
+      <div className="w-full min-h-screen flex items-center justify-center text-destructive bg-background">
         حدث خطأ أثناء تحميل البيانات
       </div>
     );
@@ -61,24 +61,24 @@ function Page() {
 
   if (!data) {
     return (
-      <div className="w-full min-h-screen flex items-center justify-center text-white">
+      <div className="w-full min-h-screen flex items-center justify-center text-foreground bg-background">
         لا توجد بيانات
       </div>
     );
   }
 
   return (
-    <div className="w-full min-h-screen bg-[#131313] p-6 space-y-6">
-      <Card className="bg-[#1a1a1a] border-slate-700 text-white">
+    <div className="w-full min-h-screen bg-background text-foreground p-6 space-y-6 pt-28">
+      <Card className="bg-card border-border text-foreground shadow-xs">
         <CardHeader>
           <CardTitle className="flex flex-col gap-3">
             <div className="flex justify-between items-center">
-              <div className="text-2xl">{data.exam.title}</div>
-              <Badge variant="outline" className="text-white">
+              <div className="text-2xl font-bold">{data.exam.title}</div>
+              <Badge variant="outline" className="text-foreground">
                 امتحان #{data.exam.id}
               </Badge>
             </div>
-            <div className="text-sm text-slate-400">
+            <div className="text-sm text-muted-foreground font-sans">
               <div>تاريخ إنشاء الامتحان: {formatDate(data.exam.createdAt)}</div>
               <div>Lecture ID: {data.exam.lectureId}</div>
             </div>
@@ -86,24 +86,24 @@ function Page() {
         </CardHeader>
 
         <CardContent>
-          <div className="overflow-hidden rounded-lg border border-slate-700">
+          <div className="overflow-hidden rounded-xl border border-border">
             <Table>
               <TableHeader>
-                <TableRow className="border-slate-700">
-                  <TableHead className="text-right text-slate-300">
+                <TableRow className="border-border bg-secondary/20">
+                  <TableHead className="text-right text-muted-foreground font-bold">
                     رقم المحاولة
                   </TableHead>
-                  <TableHead className="text-right text-slate-300">
+                  <TableHead className="text-right text-muted-foreground font-bold">
                     الدرجة
                   </TableHead>
-                  <TableHead className="text-right text-slate-300">
+                  <TableHead className="text-right text-muted-foreground font-bold">
                     عدد الأسئلة
                   </TableHead>
-                  <TableHead className="text-right text-slate-300">
+                  <TableHead className="text-right text-muted-foreground font-bold">
                     تاريخ التقديم
                   </TableHead>
-                  <TableHead className="text-right text-slate-300">
-                    النتايج
+                  <TableHead className="text-right text-muted-foreground font-bold">
+                    النتائج
                   </TableHead>
                 </TableRow>
               </TableHeader>
@@ -113,9 +113,9 @@ function Page() {
                   data.submissions.map((submission: Submissions) => (
                     <TableRow
                       key={submission.id}
-                      className="border-slate-700 hover:bg-slate-800"
+                      className="border-border hover:bg-secondary/40 transition-colors"
                     >
-                      <TableCell className="text-right">
+                      <TableCell className="text-right font-medium">
                         #{submission.id}
                       </TableCell>
                       <TableCell className="text-right">
@@ -132,13 +132,13 @@ function Page() {
                       <TableCell className="text-right">
                         {submission.questionCount}
                       </TableCell>
-                      <TableCell className="text-right text-slate-300">
+                      <TableCell className="text-right text-muted-foreground">
                         {formatDate(submission.createdAt)}
                       </TableCell>
-                      <TableCell className="text-right text-slate-300">
+                      <TableCell className="text-right">
                         <Link href={`/home/history/exams_results/${submission.id}?examId=${examId}`}>
-                          <button className="bg-slate-800 p-2 rounded-2xl transition-opacity hover:opacity-65">
-                            تصحيح الاجابات
+                          <button className="bg-secondary text-secondary-foreground hover:bg-primary hover:text-primary-foreground px-4 py-2 rounded-xl transition-all duration-300 font-semibold cursor-pointer shadow-xs text-xs md:text-sm">
+                            تصحيح الإجابات
                           </button>
                         </Link>
                       </TableCell>
@@ -147,8 +147,8 @@ function Page() {
                 ) : (
                   <TableRow>
                     <TableCell
-                      colSpan={4}
-                      className="text-center text-slate-400"
+                      colSpan={5}
+                      className="text-center text-muted-foreground py-6"
                     >
                       لا توجد محاولات لهذا الامتحان
                     </TableCell>
@@ -161,7 +161,7 @@ function Page() {
       </Card>
 
       <div className="flex justify-start">
-        <Button asChild>
+        <Button asChild className="rounded-xl px-6 cursor-pointer">
           <Link href={`/home/courses/${id}/lectures`}>العودة للكورس</Link>
         </Button>
       </div>

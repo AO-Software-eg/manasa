@@ -2,46 +2,59 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import CardLayout from '@/app/components/CardLayout';
 
 export default function PaymentFailedPage() {
   const router = useRouter();
 
   return (
-    <main className="min-h-screen bg-[#f8fafc] dark:bg-slate-950 px-4 py-10">
-      <section className="mx-auto flex w-full max-w-3xl flex-col items-center rounded-[2rem] border border-slate-200 bg-white/95 p-10 shadow-[0_25px_80px_rgba(15,23,42,0.08)] backdrop-blur dark:border-slate-800 dark:bg-slate-900/90">
-        <div className="mb-6 inline-flex h-24 w-24 items-center justify-center rounded-full bg-red-100 text-4xl text-red-600 dark:bg-red-950/40 dark:text-red-400">
-          &#10060;
-        </div>
+    <div
+      className="min-h-screen mt-20 bg-[#090908] px-4 py-10 text-white"
+      dir="rtl"
+    >
+      <div className="container mx-auto max-w-3xl">
+        <CardLayout classname="mx-auto flex flex-col items-center gap-6 text-center bg-[#121212] border-[#3b3b34]/50">
+          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-red-950/30 text-red-400 shadow-lg shadow-[#0000001a]">
+            <span className="text-5xl">✕</span>
+          </div>
 
-        <div className="text-center">
-          <h1 className="mb-4 text-4xl font-semibold text-slate-900 dark:text-slate-100">Payment Failed</h1>
-          <p className="max-w-xl text-sm leading-7 text-slate-600 dark:text-slate-300">
-            Your payment was not completed. Please try again or contact support if the issue persists.
-          </p>
-        </div>
+          <div>
+            <h1 className="text-4xl font-bold text-[#e6d3a3]">
+              فشل عملية الدفع
+            </h1>
 
-        <div className="mt-8 flex w-full flex-col gap-4 sm:flex-row sm:justify-center">
-          <button
-            type="button"
-            onClick={() => router.push('/home/wallet')}
-            className="inline-flex min-w-[160px] items-center justify-center rounded-full bg-red-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500/40"
-          >
-            Retry Payment
-          </button>
+            <p className="mt-3 text-sm leading-7 text-[#e6d3a3]/70">
+              لم تكتمل عملية الدفع بنجاح. يمكنك إعادة المحاولة أو التواصل مع
+              الدعم إذا استمرت المشكلة.
+            </p>
+          </div>
 
-          <Link
-            href="/home"
-            className="inline-flex min-w-[160px] items-center justify-center rounded-full border border-slate-300 bg-transparent px-6 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 hover:text-slate-900 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
-          >
-            Go to Home
-          </Link>
-        </div>
+          <div className="flex w-full flex-col gap-4 sm:flex-row sm:justify-center">
+            <button
+              onClick={() => router.push('/home/wallet')}
+              className="rounded-full bg-[#e6d3a3] px-6 py-3 font-semibold text-[#121212] transition hover:bg-[#d9c38b]"
+            >
+              إعادة المحاولة
+            </button>
 
-        <div className="mt-8 w-full rounded-3xl border border-slate-200 bg-slate-50 p-5 text-left text-sm text-slate-600 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300">
-          <p className="font-semibold text-slate-900 dark:text-slate-100">Need help?</p>
-          <p className="mt-2">If this keeps happening, contact our support team or check your payment details before retrying.</p>
-        </div>
-      </section>
-    </main>
+            <Link
+              href="/home"
+              className="rounded-full border border-[#3b3b34] px-6 py-3 font-semibold text-[#e6d3a3] transition hover:bg-[#1c1c18]"
+            >
+              العودة للرئيسية
+            </Link>
+          </div>
+
+          <div className="w-full rounded-3xl border border-[#3b3b34] bg-[#1a1a1a] px-6 py-5 text-right text-sm text-[#c4c4c4]">
+            <p className="font-semibold text-[#e6d3a3]">ماذا يمكنك أن تفعل؟</p>
+
+            <p className="mt-2">
+              تأكد من صحة بيانات البطاقة أو وسيلة الدفع، ثم أعد المحاولة. إذا تم
+              خصم المبلغ ولم يتم تسجيلك في الدورة، يرجى التواصل مع فريق الدعم.
+            </p>
+          </div>
+        </CardLayout>
+      </div>
+    </div>
   );
 }
