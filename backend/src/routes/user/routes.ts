@@ -293,11 +293,11 @@ router.route('/me').get(async (req: Request, res: Response) => {
 
   try {
     const payload = auth.verifyToken(req.cookies.user_token);
-    if (!payload.email) {
-      return res.status(500).json({ message: 'Email not found in token' });
+    if (!payload.id) {
+      return res.status(500).json({ message: 'ID not found in token' });
     }
 
-    const user: db.SelectUser = await db.getUserByEmail(payload.email);
+    const user: db.SelectUser = await db.getUserById(payload.id);
     if (user.password) {
       user.password = '';
     }

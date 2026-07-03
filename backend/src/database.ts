@@ -112,6 +112,19 @@ export async function getUserByEmail(email: string): Promise<SelectUser> {
   return res[0];
 }
 
+export async function getUserById(id: number): Promise<SelectUser> {
+  const res = await db
+    .select()
+    .from(schema.users)
+    .where(eq(schema.users.id, id));
+
+  if (res.length == 0) {
+    throw new RowNotFoundError(`المستخدم ذو المعرف ${id} غير موجود`);
+  }
+
+  return res[0];
+}
+
 export async function insertUser(user: InsertUser) {
   await db.insert(schema.users).values(user);
 }
