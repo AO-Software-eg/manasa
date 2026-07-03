@@ -57,6 +57,7 @@ export default function ExamItem({
           confirmClassName="bg-green-500 hover:bg-green-600"
           onClose={onCloseConfirm}
           pending={false}
+          done={false}
           onConfirm={onStartExam}
         />
       )}
