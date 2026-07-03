@@ -121,7 +121,6 @@ router
           last_name: lastName,
           email: user.email,
           phone_number: buyData.phoneNumber,
-
           apartment: 'NA',
           street: 'NA',
           building: 'NA',
