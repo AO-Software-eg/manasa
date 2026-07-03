@@ -1,7 +1,7 @@
 'use client';
 
-import SideNav from '../../components/SideNav';
-import '../../globals.css';
+import SideNav from '../components/SideNav';
+import '../globals.css';
 import { Cairo } from 'next/font/google';
 import Script from 'next/script';
 import { useState } from 'react';

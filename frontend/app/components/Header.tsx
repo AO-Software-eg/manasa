@@ -49,7 +49,7 @@ function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const path = usePathname();
-  const isUserPage = path.startsWith('/home');
+  const isUserPage = path.startsWith('/home') || path.startsWith('/exams') || path.startsWith('/videos');
   const { data: userData, isError } = useMe();
 
 

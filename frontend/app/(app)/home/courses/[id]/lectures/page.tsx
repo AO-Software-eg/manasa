@@ -168,7 +168,7 @@ export default function Page() {
                             key={video.id}
                             onClick={() =>
                               router.push(
-                                `/home/courses/${courseId}/lectures/${asset.id}/videos/${video.id}`,
+                                `/videos/${video.id}?lid=${asset.id}`,
                               )
                             }
                             className="flex items-center justify-between rounded-xl border border-zinc-700 bg-zinc-900/60 p-4 transition-all hover:border-blue-500 hover:bg-zinc-800"
@@ -248,7 +248,7 @@ export default function Page() {
                                   done={false}
                                   onConfirm={() =>
                                     router.push(
-                                      `/home/courses/${courseId}/lectures/${asset.id}/exams/${exam.id}`,
+                                      `/exams/${exam.id}`,
                                     )
                                   }
                                 />
