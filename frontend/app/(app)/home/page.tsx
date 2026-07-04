@@ -7,6 +7,7 @@ import RecentActivityCard from '@/app/components/RecentActivityCard';
 import { courses } from '@/types';
 import { useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
+import { useEffect } from 'react';
 
 
 
@@ -20,11 +21,13 @@ function page() {
   const { data: userData } = useMe();
   const { data: subscribedCourses } = useGetEnrollments(userData?.id ?? '');
   const queryClient = useQueryClient();
+useEffect(() => {
+  if (!userData?.id) return;
 
   queryClient.invalidateQueries({
-    queryKey: ['enrollments', userData?.id],
+    queryKey: ['enrollments', userData.id],
   });
-
+}, [queryClient, userData?.id]);
 
 
   const dashboardData = {
