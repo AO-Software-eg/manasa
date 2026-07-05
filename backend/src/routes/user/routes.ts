@@ -329,7 +329,7 @@ router.route('/users/balance').get(async (req: Request, res: Response) => {
   } catch (err: any) {
     console.log(err);
     if (err instanceof db.RowNotFoundError) {
-      res.status(404).json({ message: 'المستخدم غير موجود' });
+      res.status(404).json({ message: err.message });
     }
     return res.status(500).send();
   }
