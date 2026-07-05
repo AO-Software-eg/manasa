@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import { drizzle } from 'drizzle-orm/node-postgres';
-import { eq, and, inArray } from 'drizzle-orm';
+import { eq, and, inArray, sql } from 'drizzle-orm';
 
 import * as schema from '../drizzle/schema.ts';
 import * as schemaRelations from '../drizzle/relations.ts';
@@ -531,6 +531,34 @@ export async function createPayment(): Promise<SelectPaymentTransaction> {
     .returning();
 
   return payment;
+}
+
+export async function addToWalletBalance(studentId: number, amount: number) {
+  if (!isUserFoundById(studentId)) {
+    console.log('not found');
+    throw new RowNotFoundError(`User with id ${studentId} does not exist`);
+  }
+
+  console.log(`adding ${amount} to ${studentId}`);
+  // await db
+  //   .update(schema.wallets)
+  //   .set({
+  //     balance: sql`${schema.wallets.balance} + ${amount}`,
+  //   })
+  //   .where(eq(schema.wallets.studentId, studentId));
+
+  await db
+    .insert(schema.wallets)
+    .values({
+      studentId,
+      balance: amount,
+    })
+    .onConflictDoUpdate({
+      target: schema.wallets.studentId,
+      set: {
+        balance: sql`${schema.wallets.balance} + ${amount}`,
+      },
+    });
 }
 
 export default db;
