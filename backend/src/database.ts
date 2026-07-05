@@ -535,17 +535,8 @@ export async function createPayment(): Promise<SelectPaymentTransaction> {
 
 export async function addToWalletBalance(studentId: number, amount: number) {
   if (!isUserFoundById(studentId)) {
-    console.log('not found');
     throw new RowNotFoundError(`User with id ${studentId} does not exist`);
   }
-
-  console.log(`adding ${amount} to ${studentId}`);
-  // await db
-  //   .update(schema.wallets)
-  //   .set({
-  //     balance: sql`${schema.wallets.balance} + ${amount}`,
-  //   })
-  //   .where(eq(schema.wallets.studentId, studentId));
 
   await db
     .insert(schema.wallets)
@@ -559,6 +550,23 @@ export async function addToWalletBalance(studentId: number, amount: number) {
         balance: sql`${schema.wallets.balance} + ${amount}`,
       },
     });
+}
+
+export async function getBalance(studentId: number): Promise<number> {
+  if (!isUserFoundById(studentId)) {
+    throw new RowNotFoundError(`User with id ${studentId} does not exist`);
+  }
+
+  const res = await db
+    .select()
+    .from(schema.wallets)
+    .where(eq(schema.wallets.studentId, studentId));
+
+  if (res.length === 0) {
+    throw new RowNotFoundError(`User with id ${studentId} has no wallet`);
+  }
+
+  return res[0].balance;
 }
 
 export default db;
