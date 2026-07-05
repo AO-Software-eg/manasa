@@ -1,7 +1,11 @@
 export const BuyItemRequest = {
   type: 'object',
-  required: ['itemType', 'itemId', 'phoneNumber'],
+  required: ['type', 'itemType', 'itemId', 'phoneNumber'],
   properties: {
+    type: {
+      type: 'string',
+      enum: ['item'],
+    },
     itemType: {
       type: 'string',
       enum: ['course'],
@@ -13,7 +17,26 @@ export const BuyItemRequest = {
     },
     phoneNumber: {
       type: 'string',
-      example: '01012345678',
+      example: '+201281050635',
+    },
+  },
+};
+
+export const WalletDepositRequest = {
+  type: 'object',
+  required: ['type', 'amount', 'phoneNumber'],
+  properties: {
+    type: {
+      type: 'string',
+      enum: ['wallet-deposit'],
+    },
+    amount: {
+      type: 'integer',
+      example: 200,
+    },
+    phoneNumber: {
+      type: 'string',
+      example: '+201281050635',
     },
   },
 };

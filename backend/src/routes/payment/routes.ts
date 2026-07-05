@@ -190,8 +190,6 @@ router
       const firstName = nameParts[0];
       const lastName = nameParts.slice(1).join(' ') || 'NA'; // maybe empty if user has only one name
 
-      console.log(billData);
-
       const body: BodyInit = JSON.stringify({
         amount: billData.amount * 100,
         currency: 'EGP',

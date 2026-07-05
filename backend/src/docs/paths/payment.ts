@@ -4,7 +4,7 @@ export const paymentPaths = {
       tags: ['Payment'],
       summary: 'Create a Paymob payment intention',
       description:
-        'Creates a Paymob payment intention for purchasing a supported item (currently courses only).',
+        'Creates a Paymob payment intention for purchasing an item or depositing to a wallet.',
 
       security: [
         {
@@ -17,7 +17,10 @@ export const paymentPaths = {
         content: {
           'application/json': {
             schema: {
-              $ref: '#/components/schemas/BuyItemRequest',
+              oneOf: [
+                { $ref: '#/components/schemas/BuyItemRequest' },
+                { $ref: '#/components/schemas/WalletDepositRequest' },
+              ],
             },
           },
         },
@@ -37,17 +40,6 @@ export const paymentPaths = {
 
         '400': {
           description: 'Invalid request or unauthorized',
-          content: {
-            'application/json': {
-              schema: {
-                $ref: '#/components/schemas/ErrorResponse',
-              },
-            },
-          },
-        },
-
-        '404': {
-          description: 'Course not found',
           content: {
             'application/json': {
               schema: {
