@@ -180,6 +180,23 @@ export const courseEnrollments = pgTable("course_enrollments", {
 	primaryKey({ columns: [table.studentId, table.courseId], name: "course_enrollments_pkey"}),
 ]);
 
+export const wallets = pgTable("wallets", {
+	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
+	id: bigint({ mode: "number" }).generatedByDefaultAsIdentity({ name: "wallets_id_seq", startWith: 1, increment: 1, minValue: 1, maxValue: 9223372036854775807, cache: 1 }),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
+	studentId: bigint("student_id", { mode: "number" }).notNull(),
+	balance: integer().notNull(),
+}, (table) => [
+	foreignKey({
+			columns: [table.studentId],
+			foreignColumns: [users.id],
+			name: "wallets_student_id_fkey"
+		}).onUpdate("cascade").onDelete("cascade"),
+	primaryKey({ columns: [table.id, table.studentId], name: "wallets_pkey"}),
+	unique("wallets_student_id_key").on(table.studentId),
+]);
+
 export const answerSubmissions = pgTable("answer_submissions", {
 	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
