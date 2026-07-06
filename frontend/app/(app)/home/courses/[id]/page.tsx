@@ -5,7 +5,7 @@ import BackButton from '@/app/components/BackBtn';
 import ExpandableText from '@/app/components/EcalpsedTxt';
 import Link from 'next/link';
 import LoadingComp from '@/app/components/LoadingComp';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useCourseById } from '@/app/hooks/queries/useCourses';
 import { useParams, useRouter } from 'next/navigation';
 import { useEnroll } from '@/app/hooks/queries/useEnroll';
@@ -14,6 +14,8 @@ import { useGetEnrollments } from '@/app/hooks/queries/useEnroll';
 import { toast } from 'sonner';
 import { usePayment } from '@/app/hooks/queries/usePayment';
 import { courses, Enrollment } from '@/types';
+import popups from '@/app/components/PopUp';
+import PopUp from '@/app/components/PopUp';
 
 export default function CoursePage() {
   const params = useParams();
@@ -51,12 +53,13 @@ export default function CoursePage() {
   );
 }
 
-function CourseData({ course }: {course: courses}) {
+function CourseData({ course }: { course: courses }) {
   const { data: userData } = useMe();
 
   const enrollMutation = useEnroll();
   const router = useRouter();
   const paymentMutation = usePayment();
+  const [isopen, setIsOpen] = useState(false);
 
   const handleEnroll = () => {
     if (!userData?.id) return router.push('/login');
@@ -65,10 +68,11 @@ function CourseData({ course }: {course: courses}) {
       paymentMutation.mutate(
         {
           itemId: Number(course.id),
-          phoneNumber: userData.studentPhone,
+          phoneNumber: userData?.studentPhone,
         },
         {
           onSuccess: (data) => {
+            setIsOpen(false);
             const paymentKey = data.payment_keys[0].key;
             const url = `https://accept.paymob.com/api/acceptance/iframes/1056311?payment_token=${paymentKey}`;
             window.location.href = url;
@@ -139,15 +143,35 @@ function CourseData({ course }: {course: courses}) {
               قم بشراء الكورس للوصول إلى جميع الدروس والمواد التعليمية.
             </p>
 
-            <button
+            {/* <button
               onClick={handleEnroll}
               disabled={enrollMutation.isPending}
               className="px-12 py-4 bg-primary text-primary-foreground hover:bg-primary/95 border-2 border-transparent font-bold text-lg rounded-full shadow-md hover:shadow-lg hover:scale-102 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               {enrollMutation.isPending ? 'جاري الانضمام...' : 'شراء الكورس'}
+            </button> */}
+
+            <button onClick={() => setIsOpen(true)} className="px-12 py-4 bg-primary text-primary-foreground hover:bg-primary/95 border-2 border-transparent font-bold text-lg rounded-full shadow-md hover:shadow-lg hover:scale-102 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
+              الانضمام للكورس
             </button>
+
+            <PopUp open={isopen} title='اختار طريقه الدفع' onClose={() => setIsOpen(false)} description='اختر طريقة الدفع المناسبة لك'
+              buttons={
+                <div className="flex flex-col gap-4 mt-4">
+                  <button onClick={handleEnroll}
+                    disabled={enrollMutation.isPending}
+                    className="px-12 py-4 bg-primary text-primary-foreground hover:bg-primary/95 border-2 border-transparent font-bold text-lg rounded-full shadow-md hover:shadow-lg hover:scale-102 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
+                    الدفع عن طريق بوابة الدفع
+                  </button>
+                  <button className="px-12 py-4 bg-primary text-primary-foreground hover:bg-primary/95 border-2 border-transparent font-bold text-lg rounded-full shadow-md hover:shadow-lg hover:scale-102 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
+                    الدفع عن طريق رصيد المحفظة
+                  </button>
+                </div>
+              }
+            />
           </>
         )}
+
       </div>
     </div>
   );

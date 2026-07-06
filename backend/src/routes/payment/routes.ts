@@ -150,7 +150,7 @@ router
 
           billData.itemData = course;
           billData.amount = course.price;
-          billData.redirectionUrl = `${process.env.FRONTEND_LOCAL_URL}/payment/result?courseId=${buyData.itemId}`;
+          billData.redirectionUrl = `${process.env.FRONTEND_LOCAL_URL}/payment/result?type=course&courseId=${buyData.itemId}`;
           billData.phoneNumber = buyData.phoneNumber;
         } else {
           return res.status(501).json({
@@ -164,7 +164,7 @@ router
         billData.itemData = {};
         billData.amount = depositData.amount;
         billData.phoneNumber = depositData.phoneNumber;
-        billData.redirectionUrl = `${process.env.FRONTEND_LOCAL_URL}`;
+        billData.redirectionUrl = `${process.env.FRONTEND_LOCAL_URL}/payment/result?type=wallet&amount=${depositData.amount}`;
       } else {
         return res.status(400).json({
           error: 'Bad Request',
