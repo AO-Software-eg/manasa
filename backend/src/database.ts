@@ -533,4 +533,40 @@ export async function createPayment(): Promise<SelectPaymentTransaction> {
   return payment;
 }
 
+export async function getCourseEnrollment(
+  studentId: number,
+  lectureId: number,
+): Promise<SelectCourseEnrollment> {
+  const lectures = await db
+    .select()
+    .from(schema.lectures)
+    .where(eq(schema.lectures.id, lectureId));
+
+  if (lectures.length === 0) {
+    throw new RowNotFoundError(
+      `No lecture with id ${lectureId} has been found`,
+    );
+  }
+
+  const courseId = lectures[0].courseId;
+
+  const res = await db
+    .select()
+    .from(schema.courseEnrollments)
+    .where(
+      and(
+        eq(schema.courseEnrollments.studentId, studentId),
+        eq(schema.courseEnrollments.courseId, courseId),
+      ),
+    );
+
+  if (res.length === 0) {
+    throw new RowNotFoundError(
+      `No enrollment for student ${studentId} in course ${courseId} has been found`,
+    );
+  }
+
+  return res[0];
+}
+
 export default db;
