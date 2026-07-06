@@ -5,11 +5,11 @@ import {
   exams,
   questions,
   questionChoices,
+  courseEnrollments,
   examSubmissions,
   users,
   courses,
   lectureVideoCompletions,
-  courseEnrollments,
   answerSubmissions,
 } from './schema.ts';
 
@@ -66,6 +66,10 @@ export const questionsRelations = relations(questions, ({ one, many }) => ({
 export const examSubmissionsRelations = relations(
   examSubmissions,
   ({ one, many }) => ({
+    courseEnrollment: one(courseEnrollments, {
+      fields: [examSubmissions.enrollmentId],
+      references: [courseEnrollments.id],
+    }),
     exam: one(exams, {
       fields: [examSubmissions.examId],
       references: [exams.id],
@@ -78,10 +82,27 @@ export const examSubmissionsRelations = relations(
   }),
 );
 
+export const courseEnrollmentsRelations = relations(
+  courseEnrollments,
+  ({ one, many }) => ({
+    examSubmissions: many(examSubmissions),
+    lectureVideoCompletions: many(lectureVideoCompletions),
+    course: one(courses, {
+      fields: [courseEnrollments.courseId],
+      references: [courses.id],
+    }),
+    user: one(users, {
+      fields: [courseEnrollments.studentId],
+      references: [users.id],
+    }),
+  }),
+);
+
 export const usersRelations = relations(users, ({ many }) => ({
   examSubmissions: many(examSubmissions),
   lectureVideoCompletions: many(lectureVideoCompletions),
   courseEnrollments: many(courseEnrollments),
+  wallets: many(wallets),
   answerSubmissions: many(answerSubmissions),
 }));
 
@@ -93,6 +114,10 @@ export const coursesRelations = relations(courses, ({ many }) => ({
 export const lectureVideoCompletionsRelations = relations(
   lectureVideoCompletions,
   ({ one }) => ({
+    courseEnrollment: one(courseEnrollments, {
+      fields: [lectureVideoCompletions.enrollmentId],
+      references: [courseEnrollments.id],
+    }),
     user: one(users, {
       fields: [lectureVideoCompletions.studentId],
       references: [users.id],
@@ -104,19 +129,7 @@ export const lectureVideoCompletionsRelations = relations(
   }),
 );
 
-export const courseEnrollmentsRelations = relations(
-  courseEnrollments,
-  ({ one }) => ({
-    course: one(courses, {
-      fields: [courseEnrollments.courseId],
-      references: [courses.id],
-    }),
-    user: one(users, {
-      fields: [courseEnrollments.studentId],
-      references: [users.id],
-    }),
   }),
-);
 
 export const answerSubmissionsRelations = relations(
   answerSubmissions,
