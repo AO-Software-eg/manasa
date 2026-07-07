@@ -266,6 +266,7 @@ function SideNav({
             <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-[#c4a95a]" />
           </button>
         </div>
+          <HeaderProgressBar />
       </div>
 
       {/* ─── Notification Panel ─── */}
