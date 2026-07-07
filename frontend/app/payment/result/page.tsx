@@ -37,7 +37,7 @@ function PaymentResultInner() {
     // treat them as an immediate success redirect instead of running
     // the course-enrollment check below.
     if (type === 'wallet') {
-      router.replace('/payment/success?type=wallet');
+      router.replace('/home/wallet');
       return;
     }
 
