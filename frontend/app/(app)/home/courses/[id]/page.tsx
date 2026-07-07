@@ -60,12 +60,12 @@ function CourseData({ course }: { course: courses }) {
   const router = useRouter();
   const paymentMutation = usePayment();
   const [isopen, setIsOpen] = useState(false);
+  const isFree = course.price === 0;
 
-  const handleEnroll = () => {
+
+  const handlePurchase = () => {
     if (!userData?.id) return router.push('/login');
-
-    if (course.price > 0) {
-      paymentMutation.mutate(
+          paymentMutation.mutate(
         {
           itemId: Number(course.id),
           phoneNumber: userData?.studentPhone,
@@ -79,8 +79,11 @@ function CourseData({ course }: { course: courses }) {
           },
         },
       );
-    } else {
-      enrollMutation.mutate(
+  }
+
+  const handleEnroll = () => {
+    if (!userData?.id) return router.push('/login');
+        enrollMutation.mutate(
         {
           studentId: Number(userData.id),
           courseId: Number(course.id),
@@ -92,8 +95,7 @@ function CourseData({ course }: { course: courses }) {
           },
         },
       );
-    }
-  };
+  }
 
   const {
     data: enrollments,
@@ -143,22 +145,21 @@ function CourseData({ course }: { course: courses }) {
               قم بشراء الكورس للوصول إلى جميع الدروس والمواد التعليمية.
             </p>
 
-            {/* <button
-              onClick={handleEnroll}
-              disabled={enrollMutation.isPending}
-              className="px-12 py-4 bg-primary text-primary-foreground hover:bg-primary/95 border-2 border-transparent font-bold text-lg rounded-full shadow-md hover:shadow-lg hover:scale-102 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-            >
-              {enrollMutation.isPending ? 'جاري الانضمام...' : 'شراء الكورس'}
-            </button> */}
+  
 
-            <button onClick={() => setIsOpen(true)} className="px-12 py-4 bg-primary text-primary-foreground hover:bg-primary/95 border-2 border-transparent font-bold text-lg rounded-full shadow-md hover:shadow-lg hover:scale-102 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
-              الانضمام للكورس
+            <button onClick={() => isFree ? handleEnroll() : setIsOpen(true)} className="px-12 py-4 bg-primary text-primary-foreground hover:bg-primary/95 border-2 border-transparent font-bold text-lg rounded-full shadow-md hover:shadow-lg hover:scale-102 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
+              <div className='flex flex-col gap-1'>
+                   الانضمام للكورس
+              <span className='text-sm text-black font-semibold opacity-60'>
+                - {course.price > 0 ? ` بسعر ${course.price} جنيه` : ' مجاناً'} -
+              </span>
+              </div>
             </button>
 
-            <PopUp open={isopen} title='اختار طريقه الدفع' onClose={() => setIsOpen(false)} description='اختر طريقة الدفع المناسبة لك'
+            <PopUp open={isopen} title={` اختار طريقه الدفع لدفع ${course.price} ج`} onClose={() => setIsOpen(false)} description='اختر طريقة الدفع المناسبة لك'
               buttons={
                 <div className="flex flex-col gap-4 mt-4">
-                  <button onClick={handleEnroll}
+                  <button onClick={handlePurchase}
                     disabled={enrollMutation.isPending}
                     className="px-12 py-4 bg-primary text-primary-foreground hover:bg-primary/95 border-2 border-transparent font-bold text-lg rounded-full shadow-md hover:shadow-lg hover:scale-102 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
                     الدفع عن طريق بوابة الدفع
