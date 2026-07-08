@@ -10,6 +10,7 @@ import {
   courses,
   lectureVideoCompletions,
   courseEnrollments,
+  wallets,
   answerSubmissions,
 } from './schema.ts';
 
@@ -82,6 +83,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   examSubmissions: many(examSubmissions),
   lectureVideoCompletions: many(lectureVideoCompletions),
   courseEnrollments: many(courseEnrollments),
+  wallets: many(wallets),
   answerSubmissions: many(answerSubmissions),
 }));
 
@@ -117,6 +119,13 @@ export const courseEnrollmentsRelations = relations(
     }),
   }),
 );
+
+export const walletsRelations = relations(wallets, ({ one }) => ({
+  user: one(users, {
+    fields: [wallets.studentId],
+    references: [users.id],
+  }),
+}));
 
 export const answerSubmissionsRelations = relations(
   answerSubmissions,

@@ -377,7 +377,7 @@ function Page() {
         open={onSubmit}
         title="هل أنت متأكد أنك تريد تقديم الامتحان؟"
         description="تأكد من مراجعة إجاباتك قبل تقديم الامتحان."
-        confirmText={SubmitExam.isPending ? "جاري ارسال الاجابات" : "تقديم الامتحان"}
+        confirmText={SubmitExam.isPending ? "جاري ارسال الاجابات" : SubmitExam.isSuccess ? "تم التقديم" : "تقديم الامتحان"}
         confirmClassName="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold"
         onClose={() => setOnSubmit(false)}
         onConfirm={handleSubmitData}
