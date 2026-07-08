@@ -39,7 +39,9 @@ function page() {
   ];
 
   return (
-    <div className="flex flex-col gap-4 w-full mt-10" dir="rtl">
+    <div className="flex flex-col gap-4 w-full my-10 p-4" dir="rtl">
+
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <CardLayout classname="flex flex-col items-center gap-5 py-8">
           <button

@@ -57,6 +57,7 @@ export default function ExamItem({
           confirmClassName="bg-primary hover:bg-primary/90"
           onClose={onCloseConfirm}
           pending={false}
+          done={false}
           onConfirm={onStartExam}
         />
       )}

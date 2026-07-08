@@ -18,15 +18,6 @@ function HeroSec() {
     },
   };
 
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] },
-    },
-  };
-
   return (
     <section className="relative w-full min-h-[90vh] lg:min-h-screen overflow-hidden flex flex-col items-center justify-center pt-24 pb-12 px-6">
       {/* BACKGROUND ELEMENTS */}
@@ -75,7 +66,6 @@ function HeroSec() {
       >
         {/* Sub-badge */}
         <motion.div
-          variants={itemVariants}
           className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-border bg-secondary/80 text-primary text-xs md:text-sm font-semibold mb-6 shadow-xs backdrop-blur-xs"
         >
           <GraduationCap className="h-4 w-4" />
@@ -84,7 +74,6 @@ function HeroSec() {
 
         {/* Brand Headline */}
         <motion.h1
-          variants={itemVariants}
           className="text-5xl md:text-7xl font-bold mb-4 font-sans tracking-tight text-foreground leading-tight"
         >
           منصة السلطان
@@ -92,7 +81,6 @@ function HeroSec() {
 
         {/* Subject Subheading */}
         <motion.h2
-          variants={itemVariants}
           className="text-3xl md:text-5xl font-semibold mb-6 text-primary tracking-wide"
         >
           في مادة التاريخ
@@ -100,7 +88,6 @@ function HeroSec() {
 
         {/* Description */}
         <motion.p
-          variants={itemVariants}
           className="text-base md:text-lg text-muted-foreground max-w-2xl leading-relaxed mb-8 font-sans font-medium"
         >
           نقدم تجربة تعليمية فريدة ومبسطة لطلاب الثانوية العامة، تجمع بين الشرح التفصيلي، والربط التحليلي للأحداث، ومتابعة الأداء الذكية لتضمن تفوقك الأكاديمي.
@@ -108,7 +95,6 @@ function HeroSec() {
 
         {/* Action Buttons */}
         <motion.div
-          variants={itemVariants}
           className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto items-center justify-center mb-16"
         >
           <Link href="/signup" className="w-full sm:w-auto">
@@ -126,7 +112,6 @@ function HeroSec() {
 
         {/* Quick Stats Grid - Minimal and elegant */}
         <motion.div
-          variants={itemVariants}
           className="grid grid-cols-3 gap-6 md:gap-12 py-6 border-y border-border/80 w-full max-w-2xl mx-auto text-center"
         >
           <div className="flex flex-col items-center">

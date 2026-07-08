@@ -51,7 +51,7 @@ export default function Page() {
 
   return (
     <section className="min-h-screen bg-background text-foreground">
-      <div className="max-w-7xl mx-auto p-4 lg:p-8 mt-24">
+      <div className="max-w-7xl mx-auto p-4 lg:p-8 ">
         {/* Header */}
         <div className="mb-8 flex flex-col gap-3">
           <div className="flex items-center gap-2 text-primary">
