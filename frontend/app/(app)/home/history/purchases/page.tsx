@@ -25,7 +25,7 @@ export default function HistoryPage() {
 
   if (isError) {
     return (
-      <div className="flex justify-center items-center min-h-screen text-red-500">
+      <div className="flex justify-center items-center min-h-screen text-destructive">
         حدث خطأ أثناء تحميل السجل
       </div>
     );
@@ -38,7 +38,7 @@ export default function HistoryPage() {
       </h1>
 
       {!enrollments?.length ? (
-        <div className="text-center text-gray-500">
+        <div className="text-center text-muted-foreground">
           لا توجد أي كورسات تم شراؤها بعد
         </div>
       ) : (
@@ -46,7 +46,7 @@ export default function HistoryPage() {
           {enrollments.map((enrollment: Enrollment) => (
             <div
               key={enrollment.course.id}
-              className="bg-black  dark:bg-zinc-900 rounded-xl shadow p-5 border"
+              className="bg-card rounded-xl shadow p-5 border border-border"
             >
               <div className="flex justify-between items-center flex-wrap gap-3">
                 <div>
@@ -54,7 +54,7 @@ export default function HistoryPage() {
                     {enrollment.course?.title}
                   </h2>
 
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className="text-sm text-muted-foreground mt-1">
                     تم شراء الكورس بتاريخ:
                   </p>
 
@@ -69,7 +69,7 @@ export default function HistoryPage() {
                   </p>
                 </div>
 
-                <div className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">
+                <div className="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">
                   تم الاشتراك
                 </div>
               </div>

@@ -288,16 +288,16 @@ router.route('/logout').post(async (req: Request, res: Response) => {
 
 router.route('/me').get(async (req: Request, res: Response) => {
   if (!req.cookies.user_token) {
-    return res.status(401).send(); // end the request , return was not added
+    return res.status(401).send();
   }
 
   try {
     const payload = auth.verifyToken(req.cookies.user_token);
-    if (!payload.email) {
-      return res.status(500).json({ message: 'Email not found in token' });
+    if (!payload.id) {
+      return res.status(500).json({ message: 'ID not found in token' });
     }
 
-    const user: db.SelectUser = await db.getUserByEmail(payload.email);
+    const user: db.SelectUser = await db.getUserById(payload.id);
     if (user.password) {
       user.password = '';
     }
@@ -307,6 +307,29 @@ router.route('/me').get(async (req: Request, res: Response) => {
     console.log(err);
     if (err instanceof db.RowNotFoundError) {
       res.status(404).json({ message: 'المستخدم غير موجود' });
+    }
+    return res.status(500).send();
+  }
+});
+
+router.route('/users/balance').get(async (req: Request, res: Response) => {
+  if (!req.cookies.user_token) {
+    return res.status(401).send();
+  }
+
+  try {
+    const payload = auth.verifyToken(req.cookies.user_token);
+    if (!payload.id) {
+      return res.status(500).json({ message: 'ID not found in token' });
+    }
+
+    const balance: number = await db.getBalance(payload.id);
+
+    return res.status(200).json({ balance: balance });
+  } catch (err: any) {
+    console.log(err);
+    if (err instanceof db.RowNotFoundError) {
+      res.status(404).json({ message: err.message });
     }
     return res.status(500).send();
   }

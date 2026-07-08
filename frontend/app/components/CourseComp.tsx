@@ -2,7 +2,6 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useLectureProgress } from '@/app/hooks/queries/useLectures';
 import { userData } from '@/types';
 
 type Props = {
@@ -38,11 +37,7 @@ export default function CourseComp({
   const isOwned = isPurchased || isMyCoursesPage;
   const shouldFetchProgress = !!userData && (isPurchased || isMyCoursesPage);
 
-  const { data } = useLectureProgress(
-    userData?.id,
-    id,
-    shouldFetchProgress,
-  );
+
 
   return (
     <Link
@@ -60,7 +55,7 @@ export default function CourseComp({
       >
         {/* Purchased Badge */}
         {isOwned && (
-          <div className="absolute top-3 left-3 z-20 bg-emerald-600 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg">
+          <div className="absolute top-3 left-3 z-20 bg-primary text-primary-foreground text-xs font-semibold px-3 py-1 rounded-full shadow-lg">
             تم الشراء
           </div>
         )}
@@ -77,12 +72,7 @@ export default function CourseComp({
             className="object-cover transition-transform duration-500 group-hover:scale-105"
           />
 
-          {/* Progress Badge */}
-          {isOwned && (
-            <div className="absolute top-3 right-3 z-20 bg-black/75 backdrop-blur-xs text-primary text-xs font-bold px-2.5 py-1 rounded-full">
-              {data?.progressPercentage ?? 0}%
-            </div>
-          )}
+        
         </div>
 
         {/* Content */}

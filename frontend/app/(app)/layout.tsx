@@ -24,7 +24,7 @@ export default function DashboardLayout({
 
   return (
     <div
-      className={`${isExamPage ? '' : 'min-h-screen flex'} bg-[#0d0d0d] text-white dark ${cairo.className}`}
+      className={`${isExamPage ? '' : 'min-h-screen flex'} bg-background text-foreground ${cairo.className}`}
     >
       {!isExamPage && (
         <>

@@ -50,28 +50,33 @@ router.route('/:courseId/lectures').get(async (req: Request, res: Response) => {
       return res.status(401).json({ message: 'Invalid course ID paramater' });
     }
 
-const payload = auth.verifyToken(req.cookies.user_token);
+    const payload = auth.verifyToken(req.cookies.user_token);
 
-const userId = payload.id;
+    const userId = payload.id;
 
-console.log({
-  userId,
-  courseId: Number(courseId),
-});
+    if (!(await db.isUserFoundById(userId))) {
+      return res.status(403).json({
+        message: `Unauthorized, user with id ${userId} does not exist, Invalid user token?`,
+      });
+    }
 
-const enrolled = await db.isUserEnrolled(
-  userId,
-  Number(courseId),
-);
+    console.log({
+      userId,
+      courseId: Number(courseId),
+    });
 
-console.log({ enrolled });
+    console.log(payload);
+    console.log(req.cookies.user_token);
 
-if (!enrolled) {
-  return res.status(403).json({
-    message:
-      'Unauthorized, user does not have access to this course',
-  });
-}
+    const enrolled = await db.isUserEnrolled(userId, Number(courseId));
+
+    console.log({ enrolled });
+
+    if (!enrolled) {
+      return res.status(403).json({
+        message: 'Unauthorized, user does not have access to this course',
+      });
+    }
 
     const lectures: db.SelectLecture[] = await db.getCourseLectures(
       Number(courseId),

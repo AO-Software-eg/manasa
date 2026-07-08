@@ -7,6 +7,7 @@ import RecentActivityCard from '@/app/components/RecentActivityCard';
 import { courses } from '@/types';
 import { useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
+import { useEffect } from 'react';
 
 
 
@@ -20,11 +21,13 @@ function page() {
   const { data: userData } = useMe();
   const { data: subscribedCourses } = useGetEnrollments(userData?.id ?? '');
   const queryClient = useQueryClient();
+useEffect(() => {
+  if (!userData?.id) return;
 
   queryClient.invalidateQueries({
-    queryKey: ['enrollments', userData?.id],
+    queryKey: ['enrollments', userData.id],
   });
-
+}, [queryClient, userData?.id]);
 
 
   const dashboardData = {
@@ -59,12 +62,12 @@ function page() {
 
 
   return (
-    <div className="lg:grid flex flex-col lg:grid-cols-3  lg:col-span-3 p-4 gap-4 w-full">
-      <CardLayout classname="col-span-1 lg:col-span-3 bg-linear-to-r from-[#1C1C18]/80 via-[#2a2a25]/80 to-[#3b3b34]/80  border-[#3b3b34]/50 text-transparent bg-clip-text">
+    <div className="lg:grid flex flex-col lg:grid-cols-3 lg:col-span-3 p-4 gap-4 w-full">
+      <CardLayout classname="col-span-1 lg:col-span-3 bg-linear-to-r from-card/80 via-secondary/80 to-primary/10 border-border/60 text-transparent bg-clip-text">
         <h1 className="text-3xl font-bold">
           {userData ? (
-            <span className="text-white">
-              مرحباً، <span className="text-[#e6d3a3]"> {userData.name} !</span>
+            <span className="text-foreground">
+              مرحباً، <span className="text-primary"> {userData.name} !</span>
             </span>
           ) : (
             'لوحة التحكم'
@@ -92,17 +95,13 @@ function page() {
           </div>
 
           {/* Cards */}
-          <div className="flex flex-col gap-4 max-h-80 overflow-y-scroll ">
-            {
-              subscribedCourses?.length > 0 ? (
-                subscribedCourses?.map((enrollment: Enrollment, i: number) => (
-                  <Link key={enrollment.course.id} href={`/home/courses/${enrollment.course.id}`}>
-                    <CardLayout
-
-                      classname="flex items-center  justify-between p-4 rounded-2xl bg-[#1a1a1a] hover:bg-[#222] transition"
-                    >
+          <div className="flex flex-col gap-4 max-h-80 overflow-y-scroll">
+            {subscribedCourses?.length > 0 ? (
+              subscribedCourses?.map((enrollment: Enrollment) => (
+                <Link key={enrollment.course.id} href={`/home/courses/${enrollment.course.id}`}>
+                  <CardLayout classname="flex items-center justify-between p-4 rounded-2xl bg-card hover:bg-secondary/80 transition">
                       {/* Right side (image) */}
-                      <div className="w-14 h-14 rounded-xl overflow-hidden bg-black/30 flex items-center justify-center">
+                      <div className="w-14 h-14 rounded-xl overflow-hidden bg-card/70 flex items-center justify-center">
                         <img
                           src={enrollment.course.imageUrl}
                           alt={enrollment.course.title}
@@ -119,16 +118,16 @@ function page() {
                       </div>
 
                       {/* Left arrow */}
-                      <div className="text-gray-400">
+                      <div className="text-muted-foreground">
                         <ChevronLeft />
                       </div>
                     </CardLayout>
                   </Link>
                 ))
               ) : (
-                <div className='w-full text-center flex items-center justify-center flex-col gap-10 bg-[#31312a] px-2 py-4'>
-                  <h1 className="text-2xl font-semibold">  لم يتم الاشتراك في أي كورس</h1>
-                  <Link href={`/home/courses`} className="px-4 py-2 bg-amber-200 text-white rounded">
+                <div className="w-full text-center flex items-center justify-center flex-col gap-10 bg-secondary/80 px-2 py-4">
+                  <h1 className="text-2xl font-semibold">لم يتم الاشتراك في أي كورس</h1>
+                  <Link href={`/home/courses`} className="px-4 py-2 bg-primary text-primary-foreground rounded">
                     الذهاب لشراء الكورسات
                   </Link>
                 </div>

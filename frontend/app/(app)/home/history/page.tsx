@@ -27,7 +27,7 @@ function Page() {
                 {section.title}
               </h2>
 
-              <p className="text-gray-500 mt-2">
+              <p className="text-muted-foreground mt-2">
                 {section.description}
               </p>
             </div>

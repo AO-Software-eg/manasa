@@ -44,23 +44,23 @@ export default function Page() {
         <div className="container mx-auto py-6 px-4" dir="rtl">
             <h1 className="text-2xl font-bold mb-6">درجات الامتحانات</h1>
 
-            <div className="rounded-md border" dir="rtl">
+            <div className="rounded-md border border-border" dir="rtl">
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead className="text-right text-slate-300">
+                            <TableHead className="text-right text-muted-foreground">
                                 رقم المحاولة
                             </TableHead>
-                            <TableHead className="text-right text-slate-300">
+                            <TableHead className="text-right text-muted-foreground">
                                 الدرجة
                             </TableHead>
-                            <TableHead className="text-right text-slate-300">
+                            <TableHead className="text-right text-muted-foreground">
                                 عدد الأسئلة
                             </TableHead>
-                            <TableHead className="text-right text-slate-300">
+                            <TableHead className="text-right text-muted-foreground">
                                 تاريخ التقديم
                             </TableHead>
-                            <TableHead className="text-right text-slate-300">
+                            <TableHead className="text-right text-muted-foreground">
                                 النتايج
                             </TableHead>
                         </TableRow>
@@ -69,16 +69,16 @@ export default function Page() {
                     <TableBody>
                         {submissions?.map((submission: Submission) => (
                             <TableRow key={submission.id}>
-                                <TableCell className="text-right text-white">
+                                <TableCell className="text-right text-foreground">
                                     #{submission.id}
                                 </TableCell>
 
-                                <TableCell className="text-right text-white">
+                                <TableCell className="text-right text-foreground">
                                     <div className="flex flex-col gap-1">
                                         <span>{submission.exam.title.trim()}</span>
                                         <Badge
                                             variant="outline"
-                                            className="w-fit text-xs text-white"
+                                            className="w-fit text-xs text-foreground"
                                         >
                                             #{submission.exam.id}
                                         </Badge>
@@ -97,16 +97,16 @@ export default function Page() {
                                     </Badge>
                                 </TableCell>
 
-                                <TableCell className="text-right text-white">
+                                <TableCell className="text-right text-foreground">
                                     {submission.questionCount}
                                 </TableCell>
 
-                                <TableCell className="text-right text-white">
+                                <TableCell className="text-right text-foreground">
                                     {formatDate(submission.createdAt)}
                                 </TableCell>
-                                <TableCell className="text-right text-slate-300">
+                                <TableCell className="text-right text-muted-foreground">
                                     <Link href={`/home/history/exams_results/${submission.id}?examId=${submission.exam.id}`}>
-                                        <button className="bg-slate-800 p-2 rounded-2xl transition-opacity hover:opacity-65">
+                                        <button className="bg-secondary text-secondary-foreground p-2 rounded-2xl transition-opacity hover:opacity-65">
                                             تصحيح الاجابات
                                         </button>
                                     </Link>
