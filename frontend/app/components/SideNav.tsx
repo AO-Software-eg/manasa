@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { HeaderProgressBar } from '../hooks/global';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 
 const navGroups = [
   {
@@ -61,7 +62,7 @@ function UserAvatar({ name }: { name: string }) {
       .join('')
     : '؟';
   return (
-    <div className="w-9 h-9 rounded-lg bg-linear-to-br from-[#3d3928] to-[#5a5032] flex items-center justify-center text-[#e6d3a3] text-sm font-bold shrink-0">
+    <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-primary/30 to-secondary flex items-center justify-center text-primary text-sm font-bold shrink-0">
       {initials}
     </div>
   );
@@ -117,20 +118,21 @@ function SideNav({
   return (
     <>
       {/* ─── Desktop Header ─── */}
-      <header className="hidden lg:flex fixed top-0 right-0 left-0 z-50 h-12 bg-[#141412] border-b border-[#1f1f1c] items-center justify-between px-4">
-        <span className="text-[#e6d3a3] font-semibold text-sm">
+      <header className="hidden lg:flex fixed top-0 right-0 left-0 z-50 h-12 bg-background border-b border-border items-center justify-between px-4">
+        <span className="text-foreground font-semibold text-sm">
           منصة التعلم
         </span>
         <div className="flex items-center gap-1">
-          <button className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-[#1c1c18] text-[#9a9080] hover:text-[#e6d3a3] transition-colors">
+          <ThemeToggle />
+          <button className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-card text-muted-foreground hover:text-foreground transition-colors">
             <Search size={18} />
           </button>
           <button
             onClick={() => setIsNotifOpen(true)}
-            className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-[#1c1c18] text-[#9a9080] hover:text-[#e6d3a3] transition-colors relative"
+            className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-card text-muted-foreground hover:text-foreground transition-colors relative"
           >
             <BellRing size={18} />
-            <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-[#c4a95a]" />
+            <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-primary" />
           </button>
         </div>
         <HeaderProgressBar />
@@ -138,32 +140,32 @@ function SideNav({
 
       {/* ─── Desktop Sidebar ─── */}
       <aside
-        className={`relative hidden right-0 lg:flex flex-col h-screen  pt-12 bg-[#141412] text-[#e6d3a3] border-l border-[#1f1f1c] transition-colors duration-300 ${collapsed ? 'w-17' : 'w-57.5'
+        className={`relative hidden right-0 lg:flex flex-col h-screen  pt-12 bg-background text-foreground border-l border-border transition-colors duration-300 ${collapsed ? 'w-17' : 'w-57.5'
           }`}
       >
         {/* Collapse toggle */}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="absolute -left-3 top-17 z-10 w-6 h-6 rounded-full bg-[#141412] border border-[#2e2e27] flex items-center justify-center text-[#9a9080] hover:text-[#e6d3a3] hover:bg-[#1e1e1a] transition-colors shadow-sm"
+          className="absolute -left-3 top-17 z-10 w-6 h-6 rounded-full bg-background border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-card transition-colors shadow-sm"
           aria-label={collapsed ? 'توسيع' : 'طي'}
         >
           {collapsed ? <ChevronRight size={12} /> : <ChevronLeft size={12} />}
         </button>
 
         {/* Profile */}
-        <div className="p-3 border-b border-[#1f1f1c]">
+        <div className="p-3 border-b border-border">
           <Link href="/home/profile">
             <div
-              className={`flex items-center gap-2.5 p-2.5 rounded-xl cursor-pointer hover:bg-[#222219] transition-colors ${collapsed ? 'justify-center' : 'bg-[#1c1c18] border border-[#2a2a22] '
+              className={`flex items-center gap-2.5 p-2.5 rounded-xl cursor-pointer hover:bg-secondary transition-colors ${collapsed ? 'justify-center' : 'bg-card border border-border '
                 }`}
             >
               <UserAvatar name={userName} />
               {!collapsed && (
                 <div className="flex-1 min-w-0">
-                  <p className="text-[13px] font-semibold text-[#e6d3a3] truncate leading-tight">
+                  <p className="text-[13px] font-semibold text-foreground truncate leading-tight">
                     {userName}
                   </p>
-                  <p className="text-[11px] text-[#7a7060] mt-0.5"> {userName && userData?.year}</p>
+                  <p className="text-[11px] text-muted-foreground mt-0.5"> {userName && userData?.year}</p>
                 </div>
               )}
             </div>
@@ -175,7 +177,7 @@ function SideNav({
           {navGroups.map((group) => (
             <div key={group.label}>
               {!collapsed && (
-                <p className="text-[10px] uppercase tracking-widest text-[#4a4a42] px-2.5 mb-1.5 font-semibold">
+                <p className="text-[10px] uppercase tracking-widest text-muted-foreground px-2.5 mb-1.5 font-semibold">
                   {group.label}
                 </p>
               )}
@@ -189,12 +191,12 @@ function SideNav({
                         href={item.href}
                         className={`relative flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium transition-all ${collapsed ? 'justify-center' : ''
                           } ${active
-                            ? 'bg-[#252520] text-[#e6d3a3]'
-                            : 'text-[#7a7060] hover:bg-[#1c1c18] hover:text-[#c4b48a]'
+                            ? 'bg-secondary text-foreground'
+                            : 'text-muted-foreground hover:bg-card hover:text-primary'
                           }`}
                       >
                         {active && (
-                          <span className="absolute right-0 top-1/2 -translate-y-1/2 w-0.75 h-4.5 bg-[#c4a95a] rounded-r-none rounded-l-sm" />
+                          <span className="absolute right-0 top-1/2 -translate-y-1/2 w-0.75 h-4.5 bg-primary rounded-r-none rounded-l-sm" />
                         )}
                         <Icon
                           size={17}
@@ -205,12 +207,12 @@ function SideNav({
                           <span className="flex-1">{item.name}</span>
                         )}
                         {!collapsed && item.badge && item.name === "الدروس" && (
-                          <span className="bg-[#2a2820] text-[#c4a95a] text-[10px] font-semibold px-1.5 py-0.5 rounded-full">
+                          <span className="bg-secondary text-primary text-[10px] font-semibold px-1.5 py-0.5 rounded-full">
                             {coursesCount}
                           </span>
                         )}
                         {!collapsed && item.badge && item.name === "اشتراكاتي" && (
-                          <span className="bg-[#2a2820] text-[#c4a95a] text-[10px] font-semibold px-1.5 py-0.5 rounded-full">
+                          <span className="bg-secondary text-primary text-[10px] font-semibold px-1.5 py-0.5 rounded-full">
                             {enrollmentCount}
                           </span>
                         )}
@@ -225,13 +227,13 @@ function SideNav({
 
         {/* Footer social links */}
         {!collapsed && (
-          <div className="p-3 border-t border-[#1f1f1c]">
-            <div className="flex justify-center gap-3 p-2.5 bg-[#1a1a16] rounded-xl border border-[#252520]">
+          <div className="p-3 border-t border-border">
+            <div className="flex justify-center gap-3 p-2.5 bg-card rounded-xl border border-border">
               {socialLinks.map(({ icon: Icon, label }) => (
                 <button
                   key={label}
                   title={label}
-                  className="w-7 h-7 flex items-center justify-center rounded-lg text-[#5a5548] hover:bg-[#252520] hover:text-[#c4a95a] transition-colors"
+                  className="w-7 h-7 flex items-center justify-center rounded-lg text-muted-foreground hover:bg-secondary hover:text-primary transition-colors"
                 >
                   <Icon size={14} strokeWidth={1.8} />
                 </button>
@@ -242,28 +244,29 @@ function SideNav({
       </aside>
 
       {/* ─── Mobile Top Bar ─── */}
-      <div className="lg:hidden fixed top-0 right-0 left-0 z-50 flex items-center justify-between px-4 py-2.5 bg-[#141412] border-b border-[#1f1f1c]">
+      <div className="lg:hidden fixed top-0 right-0 left-0 z-50 flex items-center justify-between px-4 py-2.5 bg-background border-b border-border">
         <button
           onClick={() => setIsMenuOpen(true)}
-          className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-[#1c1c18] text-[#9a9080] hover:text-[#e6d3a3] transition-colors"
+          className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-card text-muted-foreground hover:text-foreground transition-colors"
         >
           <Menu size={20} />
         </button>
 
-        <span className="text-[#e6d3a3] font-semibold text-sm">
+        <span className="text-foreground font-semibold text-sm">
           منصة التعلم
         </span>
 
         <div className="flex items-center gap-1">
-          <button className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-[#1c1c18] text-[#9a9080] hover:text-[#e6d3a3] transition-colors">
+          <ThemeToggle />
+          <button className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-card text-muted-foreground hover:text-foreground transition-colors">
             <Search size={18} />
           </button>
           <button
             onClick={() => setIsNotifOpen(true)}
-            className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-[#1c1c18] text-[#9a9080] hover:text-[#e6d3a3] transition-colors relative"
+            className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-card text-muted-foreground hover:text-foreground transition-colors relative"
           >
             <BellRing size={18} />
-            <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-[#c4a95a]" />
+            <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-primary" />
           </button>
         </div>
           <HeaderProgressBar />
@@ -271,23 +274,23 @@ function SideNav({
 
       {/* ─── Notification Panel ─── */}
       {isNotifOpen && (
-        <div className="fixed inset-0 bg-black/60 z-50 flex items-start justify-center pt-16">
+        <div className="fixed inset-0 bg-background/80 z-50 flex items-start justify-center pt-16">
           <div
             ref={notifRef}
-            className="bg-[#141412] w-[90%] max-w-sm rounded-2xl border border-[#2a2a22] shadow-2xl overflow-hidden"
+            className="bg-card w-[90%] max-w-sm rounded-2xl border border-border shadow-2xl overflow-hidden"
           >
-            <div className="flex items-center justify-between px-4 py-3 border-b border-[#1f1f1c]">
-              <h2 className="text-[#e6d3a3] font-semibold text-sm">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+              <h2 className="text-foreground font-semibold text-sm">
                 الإشعارات
               </h2>
               <button
                 onClick={() => setIsNotifOpen(false)}
-                className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#1c1c18] text-[#7a7060] hover:text-[#e6d3a3] transition-colors"
+                className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors"
               >
                 <X size={16} />
               </button>
             </div>
-            <p className="text-center py-10 text-sm text-[#5a5548]">
+            <p className="text-center py-10 text-sm text-muted-foreground">
               لا توجد إشعارات جديدة
             </p>
           </div>
@@ -297,7 +300,7 @@ function SideNav({
       {/* ─── Mobile Sidebar Backdrop ─── */}
       {isMenuOpen && (
         <div
-          className="fixed inset-0 bg-black/60 z-40 "
+          className="fixed inset-0 bg-background/70 z-40"
           onClick={() => setIsMenuOpen(false)}
         />
       )}
@@ -305,25 +308,25 @@ function SideNav({
       {/* ─── Mobile Sidebar Drawer ─── */}
       <aside
         ref={menuRef}
-        className={`fixed top-0 right-0 h-screen w-[80%] max-w-70 bg-[#141412] text-[#e6d3a3] z-50 flex flex-col transform transition-transform duration-300 ease-out ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'
+        className={`fixed top-0 right-0 h-screen w-[80%] max-w-70 bg-background text-foreground z-50 flex flex-col transform transition-transform duration-300 ease-out ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'
           } lg:hidden`}
       >
         {/* Drawer header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-[#1f1f1c]">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-border">
           <button
             onClick={() => setIsMenuOpen(false)}
-            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#1c1c18] text-[#7a7060] hover:text-[#e6d3a3] transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-card text-muted-foreground hover:text-foreground transition-colors"
           >
             <X size={18} />
           </button>
           <Link href="/home/profile" onClick={() => setIsMenuOpen(false)}>
-            <div className="flex items-center gap-2.5 bg-[#1c1c18] px-3 py-2 rounded-xl border border-[#2a2a22]">
+            <div className="flex items-center gap-2.5 bg-card px-3 py-2 rounded-xl border border-border">
               <UserAvatar name={userName} />
               <div>
-                <p className="text-[13px] font-semibold text-[#e6d3a3] leading-tight">
+                <p className="text-[13px] font-semibold text-foreground leading-tight">
                   {userName}
                 </p>
-                <p className="text-[11px] text-[#7a7060]">{userName && userData?.year}</p>
+                <p className="text-[11px] text-muted-foreground">{userName && userData?.year}</p>
               </div>
             </div>
           </Link>
@@ -333,7 +336,7 @@ function SideNav({
         <nav className="flex-1 overflow-y-auto p-3 space-y-4">
           {navGroups.map((group) => (
             <div key={group.label}>
-              <p className="text-[10px] uppercase tracking-widest text-[#4a4a42] px-2 mb-1.5 font-semibold">
+              <p className="text-[10px] uppercase tracking-widest text-muted-foreground px-2 mb-1.5 font-semibold">
                 {group.label}
               </p>
               <ul className="space-y-0.5">
@@ -346,23 +349,23 @@ function SideNav({
                         href={item.href}
                         onClick={() => setIsMenuOpen(false)}
                         className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-colors ${active
-                          ? 'bg-[#252520] text-[#e6d3a3]'
-                          : 'text-[#7a7060] hover:bg-[#1c1c18] hover:text-[#c4b48a]'
+                          ? 'bg-secondary text-foreground'
+                          : 'text-muted-foreground hover:bg-card hover:text-primary'
 
                           }`}
                       >
                         {active && (
-                          <span className="absolute right-0 top-1/2 -translate-y-1/2 w-0.75 h-5 bg-[#c4a95a] rounded-r-none rounded-l-sm" />
+                          <span className="absolute right-0 top-1/2 -translate-y-1/2 w-0.75 h-5 bg-primary rounded-r-none rounded-l-sm" />
                         )}
                         <Icon size={18} strokeWidth={active ? 2.2 : 1.8} />
                         <span className="flex-1">{item.name}</span>
                         {!collapsed && item.badge && item.name === "الدروس" && coursesCount > 0 && (
-                          <span className="bg-[#2a2820] text-[#c4a95a] text-[10px] font-semibold px-1.5 py-0.5 rounded-full">
+                          <span className="bg-secondary text-primary text-[10px] font-semibold px-1.5 py-0.5 rounded-full">
                             {coursesCount}
                           </span>
                         )}
                         {!collapsed && item.badge && item.name === "اشتراكاتي" && (
-                          <span className="bg-[#2a2820] text-[#c4a95a] text-[10px] font-semibold px-1.5 py-0.5 rounded-full">
+                          <span className="bg-secondary text-primary text-[10px] font-semibold px-1.5 py-0.5 rounded-full">
                             {enrollmentCount}
                           </span>
                         )}
@@ -376,13 +379,13 @@ function SideNav({
         </nav>
 
         {/* Mobile drawer footer */}
-        <div className="p-3 border-t border-[#1f1f1c]">
-          <div className="flex justify-center gap-3 p-2.5 bg-[#1a1a16] rounded-xl border border-[#252520]">
+        <div className="p-3 border-t border-border">
+          <div className="flex justify-center gap-3 p-2.5 bg-card rounded-xl border border-border">
             {socialLinks.map(({ icon: Icon, label }) => (
               <button
                 key={label}
                 title={label}
-                className="w-8 h-8 flex items-center justify-center rounded-lg text-[#5a5548] hover:bg-[#252520] hover:text-[#c4a95a] transition-colors"
+                className="w-8 h-8 flex items-center justify-center rounded-lg text-muted-foreground hover:bg-secondary hover:text-primary transition-colors"
               >
                 <Icon size={15} strokeWidth={1.8} />
               </button>

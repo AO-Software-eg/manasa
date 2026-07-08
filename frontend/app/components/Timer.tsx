@@ -29,9 +29,9 @@ function Timer({
 
   return (
     <div className="flex justify-start w-full mb-4">
-      <p className="text-sm text-gray-400 flex items-center gap-2 w-1/2 justify-between">
+      <p className="text-sm text-muted-foreground flex items-center gap-2 w-1/2 justify-between">
         الوقت المتبقي:{' '}
-        <span className="text-2xl text-white">{`${minutes}:${seconds.toString().padStart(2, '0')}`}</span>
+        <span className="text-2xl text-foreground">{`${minutes}:${seconds.toString().padStart(2, '0')}`}</span>
       </p>
     </div>
   );

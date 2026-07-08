@@ -15,7 +15,7 @@ export default function Page() {
     ? params.sid[0]
     : params.sid;
 
-  if (!sid || !lid) return <h1 className='text-white'>حدث خطأ ما</h1>;
+  if (!sid || !lid) return <h1 className='text-foreground'>حدث خطأ ما</h1>;
 
   const {
     data: videoData,

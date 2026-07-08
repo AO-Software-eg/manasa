@@ -119,7 +119,7 @@ function CourseData({ course }: { course: courses }) {
         {isPurchased ? (
           <>
             <div className="mb-6">
-              <h2 className="text-3xl font-bold text-[#e6d3a3] mb-3">
+              <h2 className="text-3xl font-bold text-primary mb-3">
                 تم شراء هذا الكورس
               </h2>
 
@@ -137,7 +137,7 @@ function CourseData({ course }: { course: courses }) {
           </>
         ) : (
           <>
-            <h2 className="text-3xl font-bold mb-4 text-[#e6d3a3]">
+            <h2 className="text-3xl font-bold mb-4 text-primary">
               المحتوى مقفل
             </h2>
 
@@ -150,7 +150,7 @@ function CourseData({ course }: { course: courses }) {
             <button onClick={() => isFree ? handleEnroll() : setIsOpen(true)} className="px-12 py-4 bg-primary text-primary-foreground hover:bg-primary/95 border-2 border-transparent font-bold text-lg rounded-full shadow-md hover:shadow-lg hover:scale-102 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
               <div className='flex flex-col gap-1'>
                    الانضمام للكورس
-              <span className='text-sm text-black font-semibold opacity-60'>
+              <span className='text-sm text-primary-foreground/70 font-semibold opacity-80'>
                 - {course.price > 0 ? ` بسعر ${course.price} جنيه` : ' مجاناً'} -
               </span>
               </div>

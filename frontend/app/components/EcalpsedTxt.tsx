@@ -21,7 +21,7 @@ export default function ExpandableText({ text }: { text: string }) {
     <div>
       <p
         ref={textRef}
-        className={`text-lg text-gray-300 py-6 ${
+        className={`text-lg text-muted-foreground py-6 ${
           !expanded ? 'line-clamp-2 overflow-hidden' : ''
         }`}
       >
@@ -31,7 +31,7 @@ export default function ExpandableText({ text }: { text: string }) {
       {isOverflowing && (
         <button
           onClick={() => setExpanded(!expanded)}
-          className="text-blue-400 hover:underline"
+          className="text-primary hover:underline"
         >
           {expanded ? 'تقليص' : 'اقرأ المزيد'}
         </button>

@@ -38,7 +38,7 @@ export default function CourseAssetAccordion({
             href={asset.fileUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[#e6d3a3] text-sm hover:underline"
+            className="text-primary text-sm hover:underline"
           >
             تحميل
           </a>
@@ -50,7 +50,7 @@ export default function CourseAssetAccordion({
             href={asset.videoUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[#e6d3a3] text-sm hover:underline"
+            className="text-primary text-sm hover:underline"
           >
             مشاهدة
           </a>
@@ -60,7 +60,7 @@ export default function CourseAssetAccordion({
         return (
           <a
             href={`/homework/${asset.id}`}
-            className="text-[#e6d3a3] text-sm hover:underline"
+            className="text-primary text-sm hover:underline"
           >
             حل الواجب
           </a>
@@ -70,7 +70,7 @@ export default function CourseAssetAccordion({
         return (
           <a
             href={`/exam/${asset.id}`}
-            className="text-[#e6d3a3] text-sm hover:underline"
+            className="text-primary text-sm hover:underline"
           >
             دخول الامتحان
           </a>
@@ -86,18 +86,18 @@ export default function CourseAssetAccordion({
       {assets.map((asset) => (
         <div
           key={asset.id}
-          className="rounded-xl border border-[#e6d3a3]/30 overflow-hidden transition-all duration-300 hover:border-[#e6d3a3]/50"
+          className="rounded-xl border border-primary/30 overflow-hidden transition-all duration-300 hover:border-primary/50"
         >
           <button
             onClick={() => toggleExpand(asset.id)}
             className="w-full px-6 py-4 flex items-center justify-between gap-4 text-right"
           >
             <div className="flex flex-col items-end gap-1">
-              <h3 className="text-lg md:text-xl font-bold text-[#e6d3a3]">
+              <h3 className="text-lg md:text-xl font-bold text-primary">
                 {asset.title}
               </h3>
               {asset.duration && (
-                <span className="text-sm text-[#e6d3a3]/70">
+                <span className="text-sm text-primary/70">
                   {asset.duration}
                 </span>
               )}
@@ -105,16 +105,16 @@ export default function CourseAssetAccordion({
 
             <ChevronDown
               size={20}
-              className={`text-[#e6d3a3] transition-transform duration-300 ${
+              className={`text-primary transition-transform duration-300 ${
                 expandedId === asset.id ? 'rotate-180' : ''
               }`}
             />
           </button>
 
           {expandedId === asset.id && (
-            <div className="border-t border-[#e6d3a3]/30 px-6 py-4 space-y-4">
+            <div className="border-t border-primary/30 px-6 py-4 space-y-4">
               {asset.description && (
-                <p className="text-[#E5E5E5] text-sm leading-relaxed">
+                <p className="text-foreground text-sm leading-relaxed">
                   {asset.description}
                 </p>
               )}
@@ -128,9 +128,9 @@ export default function CourseAssetAccordion({
                   {asset.children.map((child) => (
                     <div
                       key={child.id}
-                      className="flex items-center justify-between bg-[#111] px-4 py-3 rounded-lg border border-[#e6d3a3]/20"
+                      className="flex items-center justify-between bg-card px-4 py-3 rounded-lg border border-primary/20"
                     >
-                      <span className="text-sm text-[#E5E5E5]">
+                      <span className="text-sm text-foreground">
                         {child.title}
                       </span>
                       {renderAction(child)}
@@ -142,7 +142,7 @@ export default function CourseAssetAccordion({
               {!asset.description &&
                 !asset.videoUrl &&
                 (!asset.children || asset.children.length === 0) && (
-                  <p className="text-[#E5E5E5]/70 text-sm">
+                  <p className="text-muted-foreground text-sm">
                     لا توجد تفاصيل إضافية
                   </p>
                 )}

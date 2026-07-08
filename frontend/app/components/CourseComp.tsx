@@ -55,7 +55,7 @@ export default function CourseComp({
       >
         {/* Purchased Badge */}
         {isOwned && (
-          <div className="absolute top-3 left-3 z-20 bg-emerald-600 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg">
+          <div className="absolute top-3 left-3 z-20 bg-primary text-primary-foreground text-xs font-semibold px-3 py-1 rounded-full shadow-lg">
             تم الشراء
           </div>
         )}

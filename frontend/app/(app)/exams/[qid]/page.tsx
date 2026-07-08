@@ -254,9 +254,9 @@ function Page() {
                       ${isCurrent
                         ? 'bg-primary border-primary text-primary-foreground scale-110 shadow-md shadow-primary/30'
                         : isAnswered
-                          ? 'bg-emerald-600 border-emerald-500 text-white hover:scale-105 shadow-xs'
+                          ? 'bg-primary border-primary text-primary-foreground hover:scale-105 shadow-xs'
                           : isVisited
-                            ? 'bg-amber-500 border-amber-400 text-black hover:scale-105 shadow-xs'
+                            ? 'bg-secondary border-primary/40 text-foreground hover:scale-105 shadow-xs'
                             : 'bg-secondary border-border text-foreground hover:bg-secondary/80 hover:scale-105'
                       }
                     `}
@@ -274,11 +274,11 @@ function Page() {
               الحالي
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded bg-emerald-600" />
+              <div className="w-4 h-4 rounded bg-primary" />
               مجاب
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded bg-amber-500" />
+              <div className="w-4 h-4 rounded bg-secondary border border-border" />
               تمت زيارته
             </div>
             <div className="flex items-center gap-2">
@@ -378,7 +378,7 @@ function Page() {
         title="هل أنت متأكد أنك تريد تقديم الامتحان؟"
         description="تأكد من مراجعة إجاباتك قبل تقديم الامتحان."
         confirmText={SubmitExam.isPending ? "جاري ارسال الاجابات" : SubmitExam.isSuccess ? "تم التقديم" : "تقديم الامتحان"}
-        confirmClassName="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold"
+        confirmClassName="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
         onClose={() => setOnSubmit(false)}
         onConfirm={handleSubmitData}
         pending={SubmitExam.isPending}
