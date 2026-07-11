@@ -52,6 +52,31 @@ async function addItem(buyData: schema.buyItemData, user: db.SelectUser) {
   }
 }
 
+async function getItemPrice(buyData: schema.buyItemData): Promise<number> {
+  if (buyData.itemType == 'course') {
+  } else {
+    throw new ResponseError(
+      501,
+      `The item type '${buyData.itemType}' is valid, but purchasing it is not yet supported.`,
+    );
+  }
+
+  switch (buyData.itemType) {
+    case 'course':
+      {
+        const course: db.SelectCourse = await db.getCourseById(buyData.itemId);
+        return course.price;
+      }
+      break;
+    default: {
+      throw new ResponseError(
+        501,
+        `The item type '${buyData.itemType}' is valid, but purchasing it is not yet supported.`,
+      );
+    }
+  }
+}
+
 router
   .route('/paymob-callback')
   .post(bodyParser.json(), async (req: Request, res: Response) => {
@@ -140,6 +165,52 @@ router
     }
   });
 
+router
+  .route('/buy-item-wallet')
+  .post(bodyParser.json(), async (req: Request, res: Response) => {
+    try {
+      const jwtPayload = auth.verifyToken(req.cookies.user_token);
+      const user: db.SelectUser = await db.getUserById(jwtPayload.id);
+
+      schema.buyItemSchema.parse(req.body);
+      const buyData: schema.buyItemData = req.body;
+      const price = await getItemPrice(buyData);
+      const balance = await db.getBalance(user.id);
+
+      if (balance < price) {
+        return res.status(400).json({
+          error: 'Bad Request',
+          message: `Insufficient funds in the wallet to complete the payment`,
+        });
+      }
+
+      await addItem(buyData, user);
+      await db.addToWalletBalance(user.id, -price);
+
+      return res.status(200).json({ message: `Item purchased successfully` });
+    } catch (err: any) {
+      console.log(err);
+
+      if (err instanceof ZodError) {
+        return res.status(400).json({
+          error: 'Bad Request',
+          message: 'Invalid request data',
+          details: err,
+        });
+      } else if (err instanceof db.RowNotFoundError) {
+        return res.status(400).json({
+          error: 'Bad Request',
+          message: 'Invalid request data: Not found in database',
+          details: err.message,
+        });
+      } else if (err instanceof jwt.JsonWebTokenError) {
+        return res.status(400).json({
+          error: 'Unauthorized Request',
+          message: 'User token error, possibly not logged in?',
+          details: err,
+        });
+      } else if (err instanceof ResponseError) {
+        return res.status(err.statusCode).json({ message: err.message });
       }
 
       return res.status(500).json({ details: err });
