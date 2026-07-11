@@ -10,6 +10,48 @@ import z, { ZodAny, ZodError } from 'zod';
 
 const router = express.Router();
 
+class ResponseError extends Error {
+  statusCode: number;
+
+  constructor(statusCode: number, message: string) {
+    super(message);
+    this.name = 'ResponseError';
+    this.statusCode = statusCode;
+  }
+}
+
+async function addItem(buyData: schema.buyItemData, user: db.SelectUser) {
+  switch (buyData.itemType) {
+    case 'course':
+      {
+        const courseEnrollment: db.InsertCourseEnrollment = {
+          studentId: user.id,
+          courseId: buyData.itemId,
+        };
+
+        try {
+          await db.addCourseEnrollment(courseEnrollment);
+        } catch (err: any) {
+          if (err instanceof db.NonUniqueDataError) {
+            throw new ResponseError(
+              400,
+              `The item with type ${buyData.itemType} and Id ${buyData.itemId} is already owned by the user ${user.id}`,
+            );
+          }
+
+          throw err;
+        }
+      }
+      break;
+    default: {
+      throw new ResponseError(
+        501,
+        `The item type '${buyData.itemType}' is valid, but purchasing it is not yet supported.`,
+      );
+    }
+  }
+}
+
 router
   .route('/paymob-callback')
   .post(bodyParser.json(), async (req: Request, res: Response) => {
@@ -54,20 +96,7 @@ router
         }
 
         if (schema.buyItemSchema.safeParse(buyData).success) {
-          console.log('buy data');
-          if (buyData.itemType == 'course') {
-            const courseEnrollment: db.InsertCourseEnrollment = {
-              studentId: user.id,
-              courseId: buyData.itemId,
-            };
-
-            await db.addCourseEnrollment(courseEnrollment);
-          } else {
-            return res.status(501).json({
-              error: 'Not Implemented',
-              message: `The item type '${buyData.itemType}' is valid, but purchasing it is not yet supported.`,
-            });
-          }
+          await addItem(buyData, user);
         } else if (schema.walletDepositSchema.safeParse(buyData).success) {
           console.log('deposit');
           await db.addToWalletBalance(user.id, buyData.amount);
@@ -103,6 +132,14 @@ router
           message: 'User token error, possibly not logged in?',
           details: err,
         });
+      } else if (err instanceof ResponseError) {
+        return res.status(err.statusCode).json({ message: err.message });
+      }
+
+      return res.status(500).json({ details: err });
+    }
+  });
+
       }
 
       return res.status(500).json({ details: err });
@@ -135,7 +172,6 @@ router
       if (schema.buyItemSchema.safeParse(req.body).success) {
         const buyData: schema.buyItemData = req.body;
 
-        let price;
         if (buyData.itemType == 'course') {
           const course: db.SelectCourse = await db.getCourseById(
             buyData.itemId,
@@ -253,7 +289,7 @@ router
       } else if (err instanceof db.RowNotFoundError) {
         return res.status(400).json({
           error: 'Bad Request',
-          message: 'Invalid request data',
+          message: 'Invalid request data: Not found in database',
           details: err.message,
         });
       } else if (err instanceof jwt.JsonWebTokenError) {
@@ -262,6 +298,8 @@ router
           message: 'User token error, possibly not logged in?',
           details: err,
         });
+      } else if (err instanceof ResponseError) {
+        return res.status(err.statusCode).json({ message: err.message });
       }
 
       return res.status(500).json({ details: err });
