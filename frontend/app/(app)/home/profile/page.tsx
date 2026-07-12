@@ -5,6 +5,7 @@ import UploadImage from "@/app/components/UploadImage";
 import CardLayout from "@/app/components/CardLayout";
 import { useState } from "react";
 import { Camera, LogOut, Mail, Phone, BookOpen, MapPin, Hash, Edit } from "lucide-react";
+import RecentActivityCard from "@/app/components/RecentActivityCard";
 
 function page() {
   const [showUpload, setShowUpload] = useState(false);
@@ -133,6 +134,8 @@ function page() {
           </div>
         </div>
       )}
+
+      <RecentActivityCard title="" />
     </div>
   );
 }
