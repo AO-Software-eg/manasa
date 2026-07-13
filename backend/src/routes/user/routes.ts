@@ -45,7 +45,7 @@ router
         return res.status(404).json({ message: `${err.message}` });
       }
 
-      return res.status(500).json({message: `${err.message}`});
+      return res.status(500).json({ message: `${err.message}` });
     }
   });
 
@@ -295,6 +295,12 @@ router.route('/me').get(async (req: Request, res: Response) => {
     const payload = auth.verifyToken(req.cookies.user_token);
     if (!payload.id) {
       return res.status(500).json({ message: 'ID not found in token' });
+    }
+
+    if (await db.isUserBanned(payload.id)) {
+      return res
+        .status(403)
+        .json({ message: 'تم حذر هذا المستخدم من استخدام المنصه' });
     }
 
     const user: db.SelectUser = await db.getUserById(payload.id);
