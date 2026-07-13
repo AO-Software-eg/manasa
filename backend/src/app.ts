@@ -33,12 +33,15 @@ app.get('/auth/akedly/challenge', async (_req, res) => {
 
 app.post('/auth/akedly/send', async (req, res) => {
   const { phoneNumber, powSolution, turnstileToken } = req.body;
+
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    'x-end-user-ip': req.ip ?? '',
+  };
+
   const r = await fetch('https://api.akedly.io/api/v1.2/transactions/send', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-end-user-ip': req.ip,
-    },
+    headers: headers,
     body: JSON.stringify({
       APIKey: process.env.AKEDLY_API_KEY,
       pipelineID: process.env.AKEDLY_PIPELINE_ID,
