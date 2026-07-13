@@ -118,6 +118,7 @@ export default function Page() {
                   openExamId={openExamId}
                   onOpenExam={setOpenExamId}
                   onCloseExam={() => setOpenExamId(null)}
+                  courseId={courseId}
                 />
               ))}
             </div>

@@ -15,6 +15,7 @@ interface LectureAccordionItemProps {
   openExamId: number | null;
   onOpenExam: (examId: number) => void;
   onCloseExam: () => void;
+  courseId: string;
 }
 
 export default function LectureAccordionItem({
@@ -23,6 +24,7 @@ export default function LectureAccordionItem({
   openExamId,
   onOpenExam,
   onCloseExam,
+  courseId
 }: LectureAccordionItemProps) {
   const router = useRouter();
 
@@ -65,7 +67,7 @@ export default function LectureAccordionItem({
                 isOpen={openExamId === exam.id}
                 onOpenConfirm={() => onOpenExam(exam.id)}
                 onCloseConfirm={onCloseExam}
-                onStartExam={() => router.push(`/exams/${exam.id}`)}
+                onStartExam={() => router.push(`/exams/${exam.id}?courseId=${courseId}`)}
               />
             ))}
           </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams , useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 import { useMe } from '@/app/hooks/queries/useMe';
 import { useGetOnSubmit } from '@/app/hooks/queries/useExams';
@@ -22,7 +22,9 @@ import { Submissions } from '@/types';
 
 function Page() {
   const { data: user } = useMe();
-  const { qid, id } = useParams();
+  const { qid } = useParams();
+  const searchParams = useSearchParams();
+  const courseId =searchParams.get('courseId');
   const examId = Number(qid);
 
   const { data, isLoading, isError } = useGetOnSubmit(examId, user?.id ?? '');
@@ -162,7 +164,7 @@ function Page() {
 
       <div className="flex justify-start">
         <Button asChild className="rounded-xl px-6 cursor-pointer">
-          <Link href={`/home/courses/${id}/lectures`}>العودة للكورس</Link>
+          <Link href={`/home/courses/${courseId}/lectures`}>العودة للكورس</Link>
         </Button>
       </div>
     </div>

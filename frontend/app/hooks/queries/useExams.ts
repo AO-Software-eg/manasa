@@ -6,10 +6,10 @@ import axios from 'axios';
 import { ExamQuestion, ExamQuestionChoice,ExamSubmissionResponse} from '@/types/exams';
 import { useRouter } from 'next/navigation';
 
-export const useExams = (examId: number) => {
+export const useExams = (examId: number , enabled: boolean) => {
   return useQuery({
     queryKey: ['exams', examId],
-    enabled: !isNaN(examId),
+    enabled,
     queryFn: async () => {
       const { data } = await api.get(`/exams/${examId}`);
       const questions = Array.isArray(data) ? data : data.questions ?? [];
@@ -92,6 +92,8 @@ type UseGetOnSubmitOptions = {
   enabled?: boolean;
 };
 
+
+
 export const useGetOnSubmit = (
   examId: number,
   userId?: number,
@@ -99,7 +101,6 @@ export const useGetOnSubmit = (
 ) => {
   return useQuery<ExamSubmissionResponse>({
     queryKey: ['exam', examId, userId],
-
     enabled:
       !isNaN(examId) &&
       !!userId &&

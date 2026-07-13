@@ -52,7 +52,7 @@ export function useLectureProgress(userId?: number, courseId?: number, enabled =
   return useQuery<progressSchema>({
     queryKey: ['progress', userId, courseId],
     enabled: enabled && !!userId && !!courseId,
-    staleTime: 1000 * 60 * 5,
+    staleTime: 0,
     queryFn: async () => {
       const res = await api.get(`/users/${userId}/progress/${courseId}`);
       console.log(res.data);

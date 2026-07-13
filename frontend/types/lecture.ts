@@ -35,6 +35,12 @@ export type progressSchema = {
     lectureCount: number;
     finishedLectureCount: number;
     progressPercentage: number;
+    exams: [
+        {
+            id: number,
+            completed: boolean,
+        }
+    ]
 }
 
 
