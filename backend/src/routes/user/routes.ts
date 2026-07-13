@@ -5,7 +5,7 @@ import * as auth from '../../auth.ts';
 import cookieParser from 'cookie-parser';
 import z, { date, ZodError } from 'zod';
 import bodyParser from 'body-parser';
-import { hashPassword, verifyPassword } from '../../hash.ts';
+import { hashString, verifyHash } from '../../hash.ts';
 
 import * as progress from '../../progress.ts';
 
@@ -45,7 +45,7 @@ router
         return res.status(404).json({ message: `${err.message}` });
       }
 
-      return res.status(500).json({message: `${err.message}`});
+      return res.status(500).json({ message: `${err.message}` });
     }
   });
 
@@ -196,7 +196,7 @@ router
         });
       }
 
-      const passwordHash = await hashPassword(data.password);
+      const passwordHash = await hashString(data.password);
       const user: db.InsertUser = {
         email: data.email,
         name: data.name,
@@ -235,7 +235,7 @@ router
 
       const user: db.SelectUser = await db.getUserByEmail(data.email);
 
-      if ((await verifyPassword(user.password, data.password)) == false) {
+      if ((await verifyHash(user.password, data.password)) == false) {
         return res.status(400).json({
           message: 'كلمة سر غير صحيحه',
         });
@@ -300,6 +300,8 @@ router.route('/me').get(async (req: Request, res: Response) => {
     const user: db.SelectUser = await db.getUserById(payload.id);
     if (user.password) {
       user.password = '';
+    } else {
+      throw new Error("Couldn't find password field to remove in SelectUser");
     }
 
     return res.status(200).json(user);
