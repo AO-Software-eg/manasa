@@ -1,4 +1,5 @@
 import express from 'express';
+import authRouter from './auth/auth.routes.ts';
 import coursesRouter from './courses/routes.ts';
 import userRouter from './user/user.routes.ts';
 import videosRouter from './videos/routes.ts';
@@ -14,5 +15,6 @@ router.use('/videos', videosRouter);
 router.use('/lectures', lecturesRouter);
 router.use('/exams', examsRouter);
 router.use('/user', userRouter);
+router.use('/auth', authRouter);
 
 export default router;
