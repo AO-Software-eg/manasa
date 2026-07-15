@@ -6,11 +6,12 @@ import { useMe } from '@/app/hooks/queries/useMe';
 import { useState } from 'react';
 
 function WalletPage() {
-  const [amount, setAmount] = useState(0);
+  const [amount, setAmount] = useState('');
   const { data: userData } = useMe();
   const walletMutation = useWallet();
   const { data: walletData } = useGetWallet();
   const balance = walletData?.balance || 0;
+  const numericAmount = Number(amount);
 
   const balanceData = [
     {
@@ -30,19 +31,19 @@ function WalletPage() {
   ];
 
   const handleWalletDeposit = () => {
-    if (amount < 50) {
+    if (Number(amount) < 50) {
       alert('الحد الأدنى للشحن هو ٥٠ ج.م');
       return;
     }
 
     walletMutation.mutate(
-      { amount, phoneNumber: userData?.studentPhone, type: 'wallet-deposit' },
+      { amount: numericAmount, phoneNumber: userData?.studentPhone, type: 'wallet-deposit' },
       {
         onSuccess: (data) => {
           const paymentKey = data.payment_keys[0].key;
           const url = `https://accept.paymob.com/api/acceptance/iframes/1056311?payment_token=${paymentKey}`;
           window.location.href = url;
-          setAmount(0);
+          setAmount('');
         },
       },
     );
@@ -84,9 +85,7 @@ function WalletPage() {
           <CardLayout classname="col-span-1 lg:col-span-3">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold text-primary">شحن الرصيد</h2>
-              <div className="text-sm text-primary/80">
-                الحد الأدنى ٥٠ ج.م
-              </div>
+              <div className="text-sm text-primary/80">الحد الأدنى ٥٠ ج.م</div>
             </div>
 
             <div className="mt-10 p-6 bg-gradient-to-r from-secondary/70 to-card/70 rounded-2xl border border-border/60">
@@ -98,25 +97,35 @@ function WalletPage() {
                   <div className="flex items-center gap-2">
                     <input
                       type="number"
+                      min={50}
+                      max={5000}
+                      maxLength={4}
                       placeholder="0.00"
-                      className="bg-transparent border border-border/70 rounded-xl px-4 py-3 text-2xl font-bold text-right text-primary w-32 focus:border-primary/50 focus:outline-none"
-                      min="50"
                       value={amount}
-                      onChange={(e) => setAmount(Number(e.target.value))}
+                      className="bg-transparent border border-border/70 rounded-xl px-4 py-3 text-2xl font-bold text-right text-primary w-32 focus:border-primary/50 focus:outline-none"
+                      onChange={(e) =>
+                        setAmount(
+                          e.target.value
+                        )
+                      }
                     />
                     <span className="text-primary/80 text-lg">ج.م</span>
                   </div>
                 </div>
                 <button
                   onClick={handleWalletDeposit}
-                  disabled={amount < 50}
+                  disabled={numericAmount < 50}
                   className="px-12 py-4 bg-gradient-to-r disabled:opacity-50 disabled:pointer-events-none from-primary to-primary/80 text-primary-foreground font-semibold rounded-xl hover:from-primary/90 hover:to-primary/70 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1 whitespace-nowrap ml-auto"
                 >
                   شحن الآن
                 </button>
                 <div className="flex gap-4 mt-4 lg:mt-0">
                   {[100, 200, 500, 1000].map((value) => (
-                    <button key={value} onClick={() => setAmount(value)} className="border border-border/60 rounded-xl px-4 py-2 text-primary hover:bg-secondary/60 transition-all">
+                    <button
+                      key={value}
+                      onClick={() => setAmount(value.toString())}
+                      className="border border-border/60 rounded-xl px-4 py-2 text-primary hover:bg-secondary/60 transition-all"
+                    >
                       {value} ج.م
                     </button>
                   ))}

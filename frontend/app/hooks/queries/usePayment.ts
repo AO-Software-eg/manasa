@@ -50,6 +50,8 @@ export const useWallet = () => {
   });
 };
 
+// get wallet balance
+
 
 export const useGetWallet = () => {
   return useQuery({
@@ -61,3 +63,22 @@ export const useGetWallet = () => {
     },
   });
 }
+
+
+// make payment for a course using wallet 
+
+
+export const useWalletPayment = () => {
+  return useMutation({
+    mutationFn: async ({ itemId, itemType = "course", phoneNumber, type = "item" }: payment) => {
+      const response = await api.post('/payment/buy-item-wallet', {
+        itemId,
+        itemType,
+        phoneNumber,
+        type
+      });
+      console.log(response.data)
+      return response.data;
+    },
+    })}
+
