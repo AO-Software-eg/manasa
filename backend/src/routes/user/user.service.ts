@@ -17,3 +17,12 @@ export async function getMe(userToken: string) {
 
   return user;
 }
+
+export async function getBalance(userToken: string) {
+  const payload = auth.verifyToken(userToken);
+  if (!payload.id) {
+    throw new Error("Malformed token: payload missing 'id' field");
+  }
+
+  return await db.getBalance(payload.id);
+}

@@ -18,5 +18,12 @@ export async function getMe(req: Request, res: Response) {
   return res.status(200).json(me);
 }
 
+export async function getBalance(req: Request, res: Response) {
+  if (!req.cookies.user_token) {
+    return res.status(401).send();
   }
+
+  const balance = await service.getBalance(req.cookies.user_token);
+
+  return res.status(200).json(balance);
 }
