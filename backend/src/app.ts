@@ -1,9 +1,10 @@
-import express, { type Request, type Response } from 'express';
+import express from 'express';
 import { rateLimit } from 'express-rate-limit';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { scalarDocs } from './docs/scalar.ts';
 import apiRouter from './routes/index.ts';
+import { errorHandler } from './routes/error.ts';
 
 const app = express();
 app.use(cookieParser());
@@ -31,6 +32,8 @@ app.use(
 );
 
 app.use('/', apiRouter);
+
+app.use(errorHandler);
 
 app.use('/docs', scalarDocs);
 
