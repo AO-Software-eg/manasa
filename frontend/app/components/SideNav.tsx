@@ -20,7 +20,6 @@ import {
   Mail,
   ChevronLeft,
   ChevronRight,
-  Search,
   BookMarked
 } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
@@ -124,9 +123,7 @@ function SideNav({
         </span>
         <div className="flex items-center gap-1">
           <ThemeToggle />
-          <button className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-card text-muted-foreground hover:text-foreground transition-colors">
-            <Search size={18} />
-          </button>
+    
           <button
             onClick={() => setIsNotifOpen(true)}
             className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-card text-muted-foreground hover:text-foreground transition-colors relative"
@@ -258,9 +255,7 @@ function SideNav({
 
         <div className="flex items-center gap-1">
           <ThemeToggle />
-          <button className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-card text-muted-foreground hover:text-foreground transition-colors">
-            <Search size={18} />
-          </button>
+         
           <button
             onClick={() => setIsNotifOpen(true)}
             className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-card text-muted-foreground hover:text-foreground transition-colors relative"

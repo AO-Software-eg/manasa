@@ -266,20 +266,6 @@ export async function isUserEnrolled(userId: number, courseId: number) {
 }
 
 export async function addCourseEnrollment(enrollment: InsertCourseEnrollment) {
-  const res = await db
-    .select()
-    .from(schema.courseEnrollments)
-    .where(
-      and(
-        eq(schema.courseEnrollments.studentId, enrollment.studentId),
-        eq(schema.courseEnrollments.courseId, enrollment.courseId),
-      ),
-    );
-
-  if (res.length) {
-    throw new NonUniqueDataError(res.length);
-  }
-
   await db.insert(schema.courseEnrollments).values(enrollment);
 }
 
@@ -547,40 +533,40 @@ export async function createPayment(): Promise<SelectPaymentTransaction> {
   return payment;
 }
 
-export async function getCourseEnrollment(
-  studentId: number,
-  lectureId: number,
-): Promise<SelectCourseEnrollment> {
-  const lectures = await db
-    .select()
-    .from(schema.lectures)
-    .where(eq(schema.lectures.id, lectureId));
-
-  if (lectures.length === 0) {
-    throw new RowNotFoundError(
-      `No lecture with id ${lectureId} has been found`,
-    );
+export async function addToWalletBalance(studentId: number, amount: number) {
+  if (!isUserFoundById(studentId)) {
+    throw new RowNotFoundError(`User with id ${studentId} does not exist`);
   }
 
-  const courseId = lectures[0].courseId;
+  await db
+    .insert(schema.wallets)
+    .values({
+      studentId,
+      balance: amount,
+    })
+    .onConflictDoUpdate({
+      target: schema.wallets.studentId,
+      set: {
+        balance: sql`${schema.wallets.balance} + ${amount}`,
+      },
+    });
+}
+
+export async function getBalance(studentId: number): Promise<number> {
+  if (!isUserFoundById(studentId)) {
+    throw new RowNotFoundError(`User with id ${studentId} does not exist`);
+  }
 
   const res = await db
     .select()
-    .from(schema.courseEnrollments)
-    .where(
-      and(
-        eq(schema.courseEnrollments.studentId, studentId),
-        eq(schema.courseEnrollments.courseId, courseId),
-      ),
-    );
+    .from(schema.wallets)
+    .where(eq(schema.wallets.studentId, studentId));
 
   if (res.length === 0) {
-    throw new RowNotFoundError(
-      `No enrollment for student ${studentId} in course ${courseId} has been found`,
-    );
+    throw new RowNotFoundError(`User with id ${studentId} has no wallet`);
   }
 
-  return res[0];
+  return res[0].balance;
 }
 
 export default db;
