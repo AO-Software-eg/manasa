@@ -74,6 +74,43 @@ export const paymentPaths = {
     },
   },
 
+  '/payment/buy-item-wallet': {
+    post: {
+      tags: ['Payment'],
+      summary: 'Buy an item using the wallet',
+      description: '',
+
+      requestBody: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: {
+              $ref: '#/components/schemas/BuyItemRequest',
+            },
+          },
+        },
+      },
+
+      responses: {
+        '200': {
+          description: 'Item purchased successfully',
+        },
+
+        '400': {
+          description: 'Bad Request | Unauthorized',
+        },
+
+        '501': {
+          description: 'Unsupported Item',
+        },
+
+        '500': {
+          description: 'Internal Error',
+        },
+      },
+    },
+  },
+
   '/payment/paymob-callback': {
     post: {
       tags: ['Payment'],

@@ -266,6 +266,20 @@ export async function isUserEnrolled(userId: number, courseId: number) {
 }
 
 export async function addCourseEnrollment(enrollment: InsertCourseEnrollment) {
+  const res = await db
+    .select()
+    .from(schema.courseEnrollments)
+    .where(
+      and(
+        eq(schema.courseEnrollments.studentId, enrollment.studentId),
+        eq(schema.courseEnrollments.courseId, enrollment.courseId),
+      ),
+    );
+
+  if (res.length) {
+    throw new NonUniqueDataError(res.length);
+  }
+
   await db.insert(schema.courseEnrollments).values(enrollment);
 }
 
