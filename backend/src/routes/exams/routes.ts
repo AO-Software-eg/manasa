@@ -38,13 +38,18 @@ router
 
       const grade: gr.Grade = await gr.gradeExam(data);
 
+      const enrollment: db.SelectCourseEnrollment =
+        await db.getCourseEnrollment(data.studentId, exam.lectureId);
+
       // Add exam submission
       const submission: db.InsertExamSubmission = {
         studentId: data.studentId,
         examId: exam.id,
         grade: grade.grade,
         questionCount: grade.questionCount,
+        enrollmentId: enrollment.id,
       };
+
       const submissionId: number = await db.addExamSubmission(submission);
 
       // Add submitted answers
@@ -65,7 +70,7 @@ router
           .status(422)
           .json({ message: 'Invalid exam submission data' });
       }
-      return res.status(500).send();
+      return res.status(500).json({ message: err.message });
     }
   });
 
