@@ -54,9 +54,10 @@ export default function ExamItem({
           title="هل انت متأكد من بدأ الأمتحان ؟"
           description="تنبيه هام جدا جدا جدا&#10;خلي بالك الامتحان مدته : 45 دقيقة&#10;مينفعش تخرج من الاختبار قبل ما تكون خلصت الاختبار ..."
           confirmText="بدء الأمتحان"
-          confirmClassName="bg-green-500 hover:bg-green-600"
+          confirmClassName="bg-primary hover:bg-primary/90"
           onClose={onCloseConfirm}
           pending={false}
+          done={false}
           onConfirm={onStartExam}
         />
       )}

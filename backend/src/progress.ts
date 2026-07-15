@@ -12,6 +12,8 @@ export type UserCourseProgress = {
   progressPercentage: number;
   lectureCount: number;
   finishedLectureCount: number;
+
+  exams: Array<any>;
 };
 
 export function getUserProgress(
@@ -26,6 +28,8 @@ export function getUserProgress(
   let lectureCount = 0;
   let finishedLectureCount = 0;
 
+  let exams = [];
+
   for (const lecture of lectures) {
     lectureCount++;
 
@@ -34,8 +38,16 @@ export function getUserProgress(
       examCount++;
       if (exam.examSubmissions.length) {
         solvedExamCount++;
+        exams.push({
+          id: exam.id,
+          completed: true,
+        });
       } else {
         examsDone = false;
+        exams.push({
+          id: exam.id,
+          completed: false,
+        });
       }
     }
 
@@ -66,6 +78,8 @@ export function getUserProgress(
     lectureCount: lectureCount,
     finishedLectureCount: finishedLectureCount,
     progressPercentage: (finishedLectureCount / lectureCount) * 100,
+
+    exams: exams,
   };
 
   progress = sanitizeZeroDivisionOutput(progress);

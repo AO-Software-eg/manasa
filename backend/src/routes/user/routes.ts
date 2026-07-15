@@ -5,7 +5,7 @@ import * as auth from '../../auth.ts';
 import cookieParser from 'cookie-parser';
 import z, { date, ZodError } from 'zod';
 import bodyParser from 'body-parser';
-import { hashPassword, verifyPassword } from '../../hash.ts';
+import { hashString, verifyHash } from '../../hash.ts';
 
 import * as progress from '../../progress.ts';
 
@@ -45,7 +45,7 @@ router
         return res.status(404).json({ message: `${err.message}` });
       }
 
-      return res.status(500).send();
+      return res.status(500).json({ message: `${err.message}` });
     }
   });
 
@@ -196,7 +196,7 @@ router
         });
       }
 
-      const passwordHash = await hashPassword(data.password);
+      const passwordHash = await hashString(data.password);
       const user: db.InsertUser = {
         email: data.email,
         name: data.name,
@@ -235,7 +235,7 @@ router
 
       const user: db.SelectUser = await db.getUserByEmail(data.email);
 
-      if ((await verifyPassword(user.password, data.password)) == false) {
+      if ((await verifyHash(user.password, data.password)) == false) {
         return res.status(400).json({
           message: 'كلمة سر غير صحيحه',
         });
@@ -288,7 +288,7 @@ router.route('/logout').post(async (req: Request, res: Response) => {
 
 router.route('/me').get(async (req: Request, res: Response) => {
   if (!req.cookies.user_token) {
-    return res.status(401).send(); // end the request , return was not added
+    return res.status(401).send();
   }
 
   try {
@@ -300,6 +300,8 @@ router.route('/me').get(async (req: Request, res: Response) => {
     const user: db.SelectUser = await db.getUserById(payload.id);
     if (user.password) {
       user.password = '';
+    } else {
+      throw new Error("Couldn't find password field to remove in SelectUser");
     }
 
     return res.status(200).json(user);
@@ -307,6 +309,29 @@ router.route('/me').get(async (req: Request, res: Response) => {
     console.log(err);
     if (err instanceof db.RowNotFoundError) {
       res.status(404).json({ message: 'المستخدم غير موجود' });
+    }
+    return res.status(500).send();
+  }
+});
+
+router.route('/users/balance').get(async (req: Request, res: Response) => {
+  if (!req.cookies.user_token) {
+    return res.status(401).send();
+  }
+
+  try {
+    const payload = auth.verifyToken(req.cookies.user_token);
+    if (!payload.id) {
+      return res.status(500).json({ message: 'ID not found in token' });
+    }
+
+    const balance: number = await db.getBalance(payload.id);
+
+    return res.status(200).json({ balance: balance });
+  } catch (err: any) {
+    console.log(err);
+    if (err instanceof db.RowNotFoundError) {
+      res.status(404).json({ message: err.message });
     }
     return res.status(500).send();
   }

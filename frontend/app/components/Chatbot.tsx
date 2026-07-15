@@ -225,9 +225,9 @@ function Chatbot() {
         }}
         className={`
           fixed md:left-10 left-2 md:w-96 w-[90vw] h-[70vh] max-h-[600px]
-          bg-[#1C1C18] border-[#3b3b34]/50 shadow-2xl shadow-[#e6d3a3]/20 flex flex-col dir="rtl"
+          bg-card border border-border shadow-2xl shadow-primary/10 flex flex-col dir="rtl"
           transition-all duration-300 ease-in-out origin-bottom-right
-          border rounded-t-3xl rounded-br-3xl overflow-hidden z-50
+          rounded-t-3xl rounded-br-3xl overflow-hidden z-50
           ${
             visible
               ? 'opacity-100 scale-100 translate-y-0'
@@ -235,13 +235,13 @@ function Chatbot() {
           }
         `}
       >
-        <div className="flex justify-between items-center bg-[#3b3b34] p-4 rounded-t-3xl shadow-sm shadow-[#e6d3a3]/20">
+        <div className="flex justify-between items-center bg-muted p-4 rounded-t-3xl shadow-sm shadow-primary/10">
           <div className="flex items-center gap-2">
-            <Bot className="text-white w-5 h-5" />
-            <h2 className="text-lg text-white font-bold">مساعد الدردشة</h2>
+            <Bot className="text-foreground w-5 h-5" />
+            <h2 className="text-lg text-foreground font-bold">مساعد الدردشة</h2>
           </div>
           <button
-            className="text-white hover:bg-[#525248] p-2 rounded-full transition-colors"
+            className="text-foreground hover:bg-secondary p-2 rounded-full transition-colors"
             onClick={() => setVisible(false)}
             aria-label="إغلاق الدردشة"
           >
@@ -249,16 +249,16 @@ function Chatbot() {
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-4 py-4 bg-[#1C1C18]">
+        <div className="flex-1 overflow-y-auto px-4 py-4 bg-card">
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center px-4">
-              <Bot className="w-16 h-16 text-[#e6d3a3]/50 mb-4" />
-              <p className="text-[#e6d3a3]/70 text-sm mb-4">
+              <Bot className="w-16 h-16 text-primary/50 mb-4" />
+              <p className="text-muted-foreground text-sm mb-4">
                 لا توجد رسائل بعد. ابدأ المحادثة!
               </p>
               <button
                 onClick={clearChat}
-                className="text-xs text-[#e6d3a3]/70 hover:text-[#e6d3a3] transition-colors"
+                className="text-xs text-muted-foreground hover:text-foreground transition-colors"
               >
                 مسح السجل
               </button>
@@ -275,7 +275,7 @@ function Chatbot() {
                 />
               ))}
               {botTyping && (
-                <div className="mb-2 px-4 py-2 rounded-t-2xl rounded-bl-2xl w-fit ml-auto max-w-[80%] bg-[#2a2a25] text-[#e6d3a3]">
+                <div className="mb-2 px-4 py-2 rounded-t-2xl rounded-bl-2xl w-fit ml-auto max-w-[80%] bg-secondary text-foreground">
                   <div className="flex items-center gap-1">
                     <span className="animate-bounce">.</span>
                     <span
@@ -298,16 +298,16 @@ function Chatbot() {
           )}
         </div>
 
-        <div className="p-4 bg-[#1C1C18] border-t border-[#3b3b34]/50 rounded-bl-3xl">
+        <div className="p-4 bg-card border-t border-border rounded-bl-3xl">
           {selectedFile && (
-            <div className="mb-2 flex items-center gap-2 p-2 rounded-lg bg-[#2a2a25]">
-              <Paperclip className="w-4 h-4 text-[#e6d3a3]/70" />
-              <span className="text-sm flex-1 truncate text-[#e6d3a3]">
+            <div className="mb-2 flex items-center gap-2 p-2 rounded-lg bg-secondary">
+              <Paperclip className="w-4 h-4 text-muted-foreground" />
+              <span className="text-sm flex-1 truncate text-foreground">
                 {selectedFile.name}
               </span>
               <button
                 onClick={() => setSelectedFile(null)}
-                className="text-[#e6d3a3]/70 hover:text-[#e6d3a3]"
+                className="text-muted-foreground hover:text-foreground"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -318,7 +318,7 @@ function Chatbot() {
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="text-[#e6d3a3]/70 hover:text-[#e6d3a3] hover:bg-[#2a2a25] p-2  rounded-full transition-colors"
+              className="text-muted-foreground hover:text-foreground hover:bg-secondary p-2 rounded-full transition-colors"
               aria-label="إرفاق ملف"
             >
               <Paperclip className="w-5 h-5" />
@@ -341,7 +341,7 @@ function Chatbot() {
                   sendMessage();
                 }
               }}
-              className="flex-1 border rounded-full px-4 py-3 pr-12 focus:outline-none focus:ring-2 focus:ring-[#e6d3a3]/50 focus:border-transparent bg-[#2a2a25] border-[#3b3b34]/50 text-[#e6d3a3] placeholder-[#e6d3a3]/70"
+              className="flex-1 border rounded-full px-4 py-3 pr-12 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent bg-secondary border-border text-foreground placeholder-muted-foreground"
               placeholder="اكتب رسالتك..."
               style={{ fontSize: '16px' }}
               disabled={isLoading}
@@ -352,7 +352,7 @@ function Chatbot() {
               type="button"
               onClick={() => sendMessage()}
               disabled={isLoading || (!input.trim() && !selectedFile)}
-              className=" text-[#e6d3a3] disabled:text-[#e6d3a3]/50 hover:text-[#e6d3a3] transition-colors p-2 rounded-full hover:bg-[#525248] disabled:hover:bg-transparent"
+              className=" text-foreground disabled:text-muted-foreground hover:text-foreground transition-colors p-2 rounded-full hover:bg-secondary disabled:hover:bg-transparent"
               aria-label="إرسال الرسالة"
             >
               <SendHorizontal className="w-5 h-5" />
@@ -363,7 +363,7 @@ function Chatbot() {
             <div className="mt-2 text-center">
               <button
                 onClick={clearChat}
-                className="text-xs text-[#e6d3a3]/70 hover:text-[#e6d3a3] transition-colors"
+                className="text-xs text-muted-foreground hover:text-foreground transition-colors"
               >
                 مسح سجل المحادثة
               </button>
@@ -377,15 +377,15 @@ function Chatbot() {
         className={`
       
            z-100 fixed bottom-4 left-4 rounded-full w-16 h-16
-          bg-[#3b3b34] hover:bg-[#525248] 
-          flex items-center justify-center shadow-lg cursor-pointer shadow-[#e6d3a3]/20
+          bg-primary hover:bg-primary/90 
+          flex items-center justify-center shadow-lg cursor-pointer shadow-primary/10
           transition-all duration-300
           ${visible ? 'scale-0 opacity-0 pointer-events-none' : 'scale-100 opacity-100'}
         `}
         aria-label="فتح الدردشة"
       >
-        <Bot className="text-white w-7 h-7" />
-        <span className="absolute bg-[#e6d3a3] w-4 h-4 top-0 right-0 border-2 border-white rounded-full animate-pulse" />
+        <Bot className="text-primary-foreground w-7 h-7" />
+        <span className="absolute bg-primary w-4 h-4 top-0 right-0 border-2 border-background rounded-full animate-pulse" />
       </button>
     </>
   );
@@ -411,10 +411,10 @@ function MessageBubble({
           px-4 py-2 whitespace-pre-wrap break-words rounded-2xl
           ${
             isUser
-              ? 'bg-[#525248] text-white rounded-r-2xl'
-              : 'bg-[#2a2a25] text-[#e6d3a3] rounded-l-2xl'
+              ? 'bg-primary text-primary-foreground rounded-r-2xl'
+              : 'bg-secondary text-foreground rounded-l-2xl'
           }
-          ${message.error ? 'border-2 border-[#e6d3a3]/50' : ''}
+          ${message.error ? 'border-2 border-destructive/50' : ''}
         `}
       >
         <div
@@ -422,12 +422,12 @@ function MessageBubble({
         />
 
         {message.file && (
-          <div className="mt-2 pt-2 border-t border-[#e6d3a3]/20">
+          <div className="mt-2 pt-2 border-t border-primary/20">
             <a
               href={message.file.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 text-sm hover:underline text-[#e6d3a3]/80"
+              className="flex items-center gap-2 text-sm hover:underline text-primary/80"
             >
               <Paperclip className="w-3 h-3" />
               {message.file.name}
@@ -436,7 +436,7 @@ function MessageBubble({
         )}
       </div>
 
-      <div className="text-xs mt-1 text-[#e6d3a3]/70">
+      <div className="text-xs mt-1 text-muted-foreground">
         {formatTimestamp(message.timestamp)}
       </div>
 
@@ -446,7 +446,7 @@ function MessageBubble({
         {message.error && (
           <button
             onClick={() => onRetry(message.id)}
-            className="text-xs text-[#e6d3a3]/70 hover:text-[#e6d3a3] flex items-center gap-1"
+            className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
           >
             <RotateCcw className="w-3 h-3" />
             إعادة المحاولة
@@ -457,9 +457,9 @@ function MessageBubble({
           <div className="flex gap-1">
             <button
               onClick={() => onReaction(message.id, 'thumbs_up')}
-              className={`p-1 rounded hover:bg-[#525248] transition-colors ${
+              className={`p-1 rounded hover:bg-secondary transition-colors ${
                 message.reaction === 'thumbs_up'
-                  ? 'bg-[#525248] text-[#e6d3a3]'
+                  ? 'bg-secondary text-foreground'
                   : ''
               }`}
               aria-label="إعجاب"
@@ -468,9 +468,9 @@ function MessageBubble({
             </button>
             <button
               onClick={() => onReaction(message.id, 'thumbs_down')}
-              className={`p-1 rounded hover:bg-[#525248] transition-colors ${
+              className={`p-1 rounded hover:bg-secondary transition-colors ${
                 message.reaction === 'thumbs_down'
-                  ? 'bg-[#525248] text-[#e6d3a3]'
+                  ? 'bg-secondary text-foreground'
                   : ''
               }`}
               aria-label="عدم إعجاب"
@@ -522,12 +522,12 @@ function formatMessage(text: string): string {
 
   formatted = formatted.replace(
     /`(.+?)`/g,
-    "<code class='bg-[#2a2a25] px-1 rounded text-[#e6d3a3]'>$1</code>",
+    "<code class='bg-secondary px-1 rounded text-foreground'>$1</code>",
   );
 
   formatted = formatted.replace(
     /\[(.+?)\]\((.+?)\)/g,
-    "<a href='$2' target='_blank' rel='noopener noreferrer' class='underline text-[#e6d3a3]'>$1</a>",
+    "<a href='$2' target='_blank' rel='noopener noreferrer' class='underline text-primary'>$1</a>",
   );
 
   formatted = formatted.replace(/\n/g, '<br />');

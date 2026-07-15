@@ -131,6 +131,13 @@ export const lectureVideoCompletionsRelations = relations(
 
   }),
 
+export const walletsRelations = relations(wallets, ({ one }) => ({
+  user: one(users, {
+    fields: [wallets.studentId],
+    references: [users.id],
+  }),
+}));
+
 export const answerSubmissionsRelations = relations(
   answerSubmissions,
   ({ one }) => ({

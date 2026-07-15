@@ -15,7 +15,7 @@ export default function Page() {
     ? params.sid[0]
     : params.sid;
 
-  if (!sid || !lid) return <h1 className='text-white'>حدث خطأ ما</h1>;
+  if (!sid || !lid) return <h1 className='text-foreground'>حدث خطأ ما</h1>;
 
   const {
     data: videoData,
@@ -51,7 +51,7 @@ export default function Page() {
 
   return (
     <section className="min-h-screen bg-background text-foreground">
-      <div className="max-w-7xl mx-auto p-4 lg:p-8 mt-24">
+      <div className="max-w-7xl mx-auto p-4 lg:p-8 ">
         {/* Header */}
         <div className="mb-8 flex flex-col gap-3">
           <div className="flex items-center gap-2 text-primary">

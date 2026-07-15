@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import { drizzle } from 'drizzle-orm/node-postgres';
-import { eq, and, inArray } from 'drizzle-orm';
+import { eq, and, inArray, sql } from 'drizzle-orm';
 
 import * as schema from '../drizzle/schema.ts';
 import * as schemaRelations from '../drizzle/relations.ts';
@@ -266,6 +266,20 @@ export async function isUserEnrolled(userId: number, courseId: number) {
 }
 
 export async function addCourseEnrollment(enrollment: InsertCourseEnrollment) {
+  const res = await db
+    .select()
+    .from(schema.courseEnrollments)
+    .where(
+      and(
+        eq(schema.courseEnrollments.studentId, enrollment.studentId),
+        eq(schema.courseEnrollments.courseId, enrollment.courseId),
+      ),
+    );
+
+  if (res.length) {
+    throw new NonUniqueDataError(res.length);
+  }
+
   await db.insert(schema.courseEnrollments).values(enrollment);
 }
 
