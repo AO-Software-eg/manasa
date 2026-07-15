@@ -10,6 +10,7 @@ import {
   users,
   courses,
   lectureVideoCompletions,
+  wallets,
   answerSubmissions,
 } from './schema.ts';
 
@@ -129,7 +130,6 @@ export const lectureVideoCompletionsRelations = relations(
   }),
 );
 
-  }),
 
 export const walletsRelations = relations(wallets, ({ one }) => ({
   user: one(users, {

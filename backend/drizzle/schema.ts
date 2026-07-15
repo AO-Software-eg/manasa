@@ -196,7 +196,6 @@ export const courseEnrollments = pgTable("course_enrollments", {
 	primaryKey({ columns: [table.studentId, table.courseId, table.id], name: "course_enrollments_pkey"}),
 	unique("course_enrollments_id_key").on(table.id),
 ]);
-]);
 
 export const wallets = pgTable("wallets", {
 	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
