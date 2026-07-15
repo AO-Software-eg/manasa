@@ -112,7 +112,14 @@ export const examSubmissions = pgTable("exam_submissions", {
 	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 	grade: integer().notNull(),
 	questionCount: integer("question_count").notNull(),
+	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
+	enrollmentId: bigint("enrollment_id", { mode: "number" }),
 }, (table) => [
+	foreignKey({
+			columns: [table.enrollmentId],
+			foreignColumns: [courseEnrollments.id],
+			name: "exam_submissions_enrollment_id_fkey"
+		}),
 	foreignKey({
 			columns: [table.examId],
 			foreignColumns: [exams.id],
@@ -146,7 +153,14 @@ export const lectureVideoCompletions = pgTable("lecture_video_completions", {
 	studentId: bigint("student_id", { mode: "number" }).notNull(),
 	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
 	videoId: bigint("video_id", { mode: "number" }).notNull(),
+	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
+	enrollmentId: bigint("enrollment_id", { mode: "number" }),
 }, (table) => [
+	foreignKey({
+			columns: [table.enrollmentId],
+			foreignColumns: [courseEnrollments.id],
+			name: "lecture_video_completions_enrollment_id_fkey"
+		}),
 	foreignKey({
 			columns: [table.studentId],
 			foreignColumns: [users.id],
@@ -166,6 +180,8 @@ export const courseEnrollments = pgTable("course_enrollments", {
 	studentId: bigint("student_id", { mode: "number" }).notNull(),
 	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
 	courseId: bigint("course_id", { mode: "number" }).notNull(),
+	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
+	id: bigint({ mode: "number" }).generatedByDefaultAsIdentity({ name: "course_enrollments_id_seq", startWith: 1, increment: 1, minValue: 1, maxValue: 9223372036854775807, cache: 1 }),
 }, (table) => [
 	foreignKey({
 			columns: [table.courseId],
@@ -177,7 +193,9 @@ export const courseEnrollments = pgTable("course_enrollments", {
 			foreignColumns: [users.id],
 			name: "course_enrollments_student_id_fkey"
 		}).onUpdate("cascade").onDelete("cascade"),
-	primaryKey({ columns: [table.studentId, table.courseId], name: "course_enrollments_pkey"}),
+	primaryKey({ columns: [table.studentId, table.courseId, table.id], name: "course_enrollments_pkey"}),
+	unique("course_enrollments_id_key").on(table.id),
+]);
 ]);
 
 export const wallets = pgTable("wallets", {

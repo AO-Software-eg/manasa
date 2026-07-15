@@ -547,40 +547,40 @@ export async function createPayment(): Promise<SelectPaymentTransaction> {
   return payment;
 }
 
-export async function addToWalletBalance(studentId: number, amount: number) {
-  if (!isUserFoundById(studentId)) {
-    throw new RowNotFoundError(`User with id ${studentId} does not exist`);
+export async function getCourseEnrollment(
+  studentId: number,
+  lectureId: number,
+): Promise<SelectCourseEnrollment> {
+  const lectures = await db
+    .select()
+    .from(schema.lectures)
+    .where(eq(schema.lectures.id, lectureId));
+
+  if (lectures.length === 0) {
+    throw new RowNotFoundError(
+      `No lecture with id ${lectureId} has been found`,
+    );
   }
 
-  await db
-    .insert(schema.wallets)
-    .values({
-      studentId,
-      balance: amount,
-    })
-    .onConflictDoUpdate({
-      target: schema.wallets.studentId,
-      set: {
-        balance: sql`${schema.wallets.balance} + ${amount}`,
-      },
-    });
-}
-
-export async function getBalance(studentId: number): Promise<number> {
-  if (!isUserFoundById(studentId)) {
-    throw new RowNotFoundError(`User with id ${studentId} does not exist`);
-  }
+  const courseId = lectures[0].courseId;
 
   const res = await db
     .select()
-    .from(schema.wallets)
-    .where(eq(schema.wallets.studentId, studentId));
+    .from(schema.courseEnrollments)
+    .where(
+      and(
+        eq(schema.courseEnrollments.studentId, studentId),
+        eq(schema.courseEnrollments.courseId, courseId),
+      ),
+    );
 
   if (res.length === 0) {
-    throw new RowNotFoundError(`User with id ${studentId} has no wallet`);
+    throw new RowNotFoundError(
+      `No enrollment for student ${studentId} in course ${courseId} has been found`,
+    );
   }
 
-  return res[0].balance;
+  return res[0];
 }
 
 export default db;
