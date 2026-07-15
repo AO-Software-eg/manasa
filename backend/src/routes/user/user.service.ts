@@ -1,14 +1,13 @@
 import * as db from '../../database.ts';
-import * as validation from '../../validation.ts';
+import * as validation from './user.validation.ts';
 import * as auth from '../../auth.ts';
 
-export async function getMe(userToken: string) {
-  const payload = auth.verifyToken(userToken);
-  if (!payload.id) {
+export async function getMe(userPayload: any) {
+  if (!userPayload.id) {
     throw new Error("Malformed token: payload missing 'id' field");
   }
 
-  const user: db.SelectUser = await db.getUserById(payload.id);
+  const user: db.SelectUser = await db.getUserById(userPayload.id);
   if (user.password) {
     user.password = '';
   } else {
@@ -18,11 +17,8 @@ export async function getMe(userToken: string) {
   return user;
 }
 
-export async function getBalance(userToken: string) {
-  const payload = auth.verifyToken(userToken);
-  if (!payload.id) {
-    throw new Error("Malformed token: payload missing 'id' field");
-  }
-
-  return await db.getBalance(payload.id);
+export async function getBalance(userPayload: any) {
+  return await db.getBalance(userPayload.id);
 }
+
+export async function enrollCourse(userPayload: any) {}

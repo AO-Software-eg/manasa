@@ -6,6 +6,7 @@ import express, {
 
 import jwt from 'jsonwebtoken';
 import * as authService from './auth/auth.service.ts';
+import * as userController from './user/user.controller.ts';
 
 import { RowNotFoundError } from './../database.ts';
 import { ZodError } from 'zod';
@@ -38,6 +39,10 @@ export function errorHandler(
   }
 
   if (err instanceof authService.InvalidCredentialsError) {
+    return res.status(401).send();
+  }
+
+  if (err instanceof userController.UserTokenNotFoundError) {
     return res.status(401).send();
   }
 
