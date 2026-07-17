@@ -23,7 +23,12 @@ export async function enrollCourse(
   userPayload: any,
   data: validation.enrollData,
 ) {
-  await db.addCourseEnrollment(data);
+  const enrollment: db.InsertCourseEnrollment = {
+    studentId: userPayload.id,
+    courseId: data.courseId,
+  };
+
+  await db.addCourseEnrollment(enrollment);
 }
 
 export async function getEnrollments(userPayload: any) {
