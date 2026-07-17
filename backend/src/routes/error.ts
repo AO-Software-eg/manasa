@@ -13,6 +13,18 @@ import { ZodError } from 'zod';
 
 const { JsonWebTokenError } = jwt;
 
+export class UserTokenNotFoundError extends Error {
+  constructor() {
+    super('User token not found');
+  }
+}
+
+export class UserUnauthorizedError extends Error {
+  constructor() {
+    super('User is not authorized to access this resource');
+  }
+}
+
 export function errorHandler(
   err: Error,
   req: Request,
@@ -22,6 +34,11 @@ export function errorHandler(
   console.log(err);
 
   res.status(500);
+
+  if (err instanceof UserUnauthorizedError) {
+    res.status(403);
+  }
+
   if (err instanceof RowNotFoundError) {
     res.status(404);
   }
@@ -42,7 +59,7 @@ export function errorHandler(
     return res.status(401).send();
   }
 
-  if (err instanceof userController.UserTokenNotFoundError) {
+  if (err instanceof UserTokenNotFoundError) {
     return res.status(401).send();
   }
 

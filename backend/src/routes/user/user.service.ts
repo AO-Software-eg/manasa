@@ -1,6 +1,5 @@
 import * as db from '../../database.ts';
 import * as validation from './user.validation.ts';
-import * as auth from '../../auth.ts';
 
 import * as progress from '../../progress.ts';
 

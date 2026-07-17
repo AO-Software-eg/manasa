@@ -1,48 +1,9 @@
 import { type Request, type Response } from 'express';
 
-import * as auth from '../../auth.ts';
 import * as service from './user.service.ts';
 import * as validation from './user.validation.ts';
 
-import jwt from 'jsonwebtoken';
-
-import { RowNotFoundError } from './../../database.ts';
-
-const { JsonWebTokenError } = jwt;
-
-export class UserTokenNotFoundError extends Error {
-  constructor() {
-    super('User token not found');
-  }
-}
-
-function getUserPayload(req: Request) {
-  if (!req.cookies.user_token) {
-    throw new UserTokenNotFoundError();
-  }
-
-  const userPayload = auth.verifyToken(req.cookies.user_token);
-
-  if (!userPayload.id) {
-    throw new Error("Malformed token: payload missing 'id' field");
-  }
-  if (!userPayload.email) {
-    throw new Error("Malformed token: payload missing 'email' field");
-  }
-
-  return userPayload;
-}
-
-function isNumberParameter(param: string | string[]): param is string {
-  if (typeof param !== 'string') {
-    return false;
-  }
-  if (/^\d+$/.test(param) === false) {
-    return false;
-  }
-
-  return true;
-}
+import { isNumberParameter, getUserPayload } from '../util.ts';
 
 export async function getMe(req: Request, res: Response) {
   const me = await service.getMe(getUserPayload(req));
