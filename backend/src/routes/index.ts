@@ -1,6 +1,6 @@
 import express from 'express';
 import authRouter from './auth/auth.routes.ts';
-import coursesRouter from './courses/routes.ts';
+import coursesRouter from './course/course.routes.ts';
 import userRouter from './user/user.routes.ts';
 import videoRouter from './video/video.routes.ts';
 import examsRouter from './exams/routes.ts';
