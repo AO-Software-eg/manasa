@@ -5,8 +5,6 @@ import express, {
 } from 'express';
 
 import jwt from 'jsonwebtoken';
-import * as authService from './auth/auth.service.ts';
-import * as userController from './user/user.controller.ts';
 
 import { RowNotFoundError } from './../database.ts';
 import { ZodError } from 'zod';
@@ -22,6 +20,18 @@ export class UserTokenNotFoundError extends Error {
 export class UserUnauthorizedError extends Error {
   constructor() {
     super('User is not authorized to access this resource');
+  }
+}
+
+export class UserAlreadyExistsError extends Error {
+  constructor() {
+    super('User already exists');
+  }
+}
+
+export class InvalidCredentialsError extends Error {
+  constructor() {
+    super('Invalid Credentials');
   }
 }
 
@@ -51,11 +61,11 @@ export function errorHandler(
     res.status(400);
   }
 
-  if (err instanceof authService.UserAlreadyExistsError) {
+  if (err instanceof UserAlreadyExistsError) {
     res.status(409);
   }
 
-  if (err instanceof authService.InvalidCredentialsError) {
+  if (err instanceof InvalidCredentialsError) {
     return res.status(401).send();
   }
 

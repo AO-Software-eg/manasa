@@ -2,27 +2,16 @@ import * as db from '../../database.ts';
 import * as validation from './auth.validation.ts';
 import * as auth from '../../auth.ts';
 import * as hash from '../../hash.ts';
+import * as err from '../error.ts';
 
 import z from 'zod';
 
 type SignupData = z.infer<typeof validation.signupSchema>;
 type LoginData = z.infer<typeof validation.loginSchema>;
 
-export class UserAlreadyExistsError extends Error {
-  constructor() {
-    super('User already exists');
-  }
-}
-
-export class InvalidCredentialsError extends Error {
-  constructor() {
-    super('Invalid Credentials');
-  }
-}
-
 export async function signup(data: SignupData) {
   if (await db.isUserFound(data.email)) {
-    throw new UserAlreadyExistsError();
+    throw new err.UserAlreadyExistsError();
   }
 
   const passwordHash = await hash.hashString(data.password);
@@ -45,7 +34,7 @@ export async function login(data: LoginData): Promise<string> {
   const user: db.SelectUser = await db.getUserByEmail(data.email);
 
   if ((await hash.verifyHash(user.password, data.password)) == false) {
-    throw new InvalidCredentialsError();
+    throw new err.InvalidCredentialsError();
   }
 
   const token = auth.signToken({
