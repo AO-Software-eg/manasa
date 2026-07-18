@@ -6,7 +6,7 @@ import express, {
 
 import jwt from 'jsonwebtoken';
 
-import { RowNotFoundError } from './../database.ts';
+import { NonUniqueDataError, RowNotFoundError } from './../database.ts';
 import { ZodError } from 'zod';
 
 const { JsonWebTokenError } = jwt;
@@ -35,6 +35,18 @@ export class InvalidCredentialsError extends Error {
   }
 }
 
+export class ItemAlreadyOwnedError extends Error {
+  constructor() {
+    super('Item already owned');
+  }
+}
+
+export class NotPurchasableYetError extends Error {
+  constructor() {
+    super('The item type is valid, but purchasing it is not yet supported');
+  }
+}
+
 export function errorHandler(
   err: Error,
   req: Request,
@@ -44,6 +56,14 @@ export function errorHandler(
   console.log(err);
 
   res.status(500);
+
+  if (err instanceof ItemAlreadyOwnedError) {
+    res.status(409);
+  }
+
+  if (err instanceof NotPurchasableYetError) {
+    res.status(501);
+  }
 
   if (err instanceof UserUnauthorizedError) {
     res.status(403);
@@ -66,12 +86,16 @@ export function errorHandler(
   }
 
   if (err instanceof InvalidCredentialsError) {
-    return res.status(401).send();
+    res.status(401);
   }
 
   if (err instanceof UserTokenNotFoundError) {
-    return res.status(401).send();
+    res.status(401);
   }
 
-  res.send();
+  if (err instanceof NonUniqueDataError) {
+    res.status(409);
+  }
+
+  res.json(err.message);
 }

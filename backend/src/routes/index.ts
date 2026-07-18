@@ -5,7 +5,7 @@ import userRouter from './user/user.routes.ts';
 import videoRouter from './video/video.routes.ts';
 import examsRouter from './exams/routes.ts';
 import lecturesRouter from './lectures/routes.ts';
-import paymentRouter from './payment/routes.ts';
+import paymentRouter from './payment/payment.routes.ts';
 
 const router = express.Router();
 

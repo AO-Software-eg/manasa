@@ -72,7 +72,7 @@ router
           console.log('deposit');
           await db.addToWalletBalance(user.id, buyData.amount);
         } else {
-          console.log('No schemasss');
+          console.log('No schemas');
           return res.status(400).json({
             error: 'Bad Request',
             message: 'Invalid request data',
