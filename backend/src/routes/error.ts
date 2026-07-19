@@ -78,7 +78,7 @@ export function errorHandler(
   }
 
   if (err instanceof ZodError) {
-    res.status(400);
+    res.status(422);
   }
 
   if (err instanceof UserAlreadyExistsError) {
