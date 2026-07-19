@@ -4,7 +4,7 @@ import coursesRouter from './course/course.routes.ts';
 import userRouter from './user/user.routes.ts';
 import videoRouter from './video/video.routes.ts';
 import examsRouter from './exams/routes.ts';
-import lecturesRouter from './lectures/routes.ts';
+import lecturesRouter from './lecture/lecture.routes.ts';
 import paymentRouter from './payment/payment.routes.ts';
 
 const router = express.Router();
@@ -12,7 +12,7 @@ const router = express.Router();
 router.use('/payment', paymentRouter);
 router.use('/course', coursesRouter);
 router.use('/video', videoRouter);
-router.use('/lectures', lecturesRouter);
+router.use('/lecture', lecturesRouter);
 router.use('/exams', examsRouter);
 router.use('/user', userRouter);
 router.use('/auth', authRouter);
