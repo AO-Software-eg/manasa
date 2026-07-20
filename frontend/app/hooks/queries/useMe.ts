@@ -8,7 +8,7 @@ export function useMe() {
     staleTime: 1000 * 60 * 10,
     queryFn: async () => {
       try {
-        const res = await api.get('/me');
+        const res = await api.get('/user/me');
         console.log(res.data)
         return res.data ?? null;
 

@@ -6,7 +6,7 @@ export function useCourses() {
   return useQuery({
     queryKey: ['courses'],
     queryFn: async () => {
-      const res = await api.get(`/courses`);
+      const res = await api.get(`/course`);
       if (!res.data.data) throw new Error('جدث خطأ اثناء تحميل الكورسات');
       return res.data.data;
     },
@@ -27,8 +27,8 @@ export function useCourseById(id: string) {
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     queryFn: async () => {
-      const res = await api.get(`/courses/${id}`);
-      if (!id) throw new Error('لم يتم العثور على الكورس');
+      const res = await api.get(`/course/${id}`);
+      if (!res.data.data) throw new Error('لم يتم العثور على الكورس');
       return res.data.data;
     },
   });

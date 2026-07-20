@@ -11,7 +11,7 @@ export const useExams = (examId: number) => {
     queryKey: ['exams', examId],
     enabled: !isNaN(examId),
     queryFn: async () => {
-      const { data } = await api.get(`/exams/${examId}`);
+      const { data } = await api.get(`/exam/${examId}`);
       const questions = Array.isArray(data) ? data : data.questions ?? [];
       return {
         questions: questions.map((question: ExamQuestion) => ({
@@ -35,7 +35,6 @@ export const useSubmitExam = () => {
   return useMutation({
     mutationFn: async ({
       examId,
-      studentId,
       answers,
     }: {
       examId: number;
@@ -46,9 +45,8 @@ export const useSubmitExam = () => {
       }[];
     }) => {
       try {
-        const response = await api.post('/exams/submit', {
+        const response = await api.post('/exam/submit', {
           examId,
-          studentId,
           answers,
         });
         return response.data;
@@ -74,12 +72,12 @@ export const useSubmitExam = () => {
   });
 };
 
-export const useGetExamSubmissions = (userId: number) => {
+export const useGetExamSubmissions = () => {
   return useQuery({
-    queryKey: ["userId", userId],
-    enabled: !isNaN(userId),
+    queryKey: ['examSubmissions'],
+    enabled: true,
     queryFn: async () => {
-      const res = await api.get(`/users/${userId}/grades`);
+      const res = await api.get(`/user/grades`);
       if (!res.data) throw new Error('جدث خطأ اثناء تحميل الامتحانات');
       return res.data
     },
@@ -94,20 +92,18 @@ type UseGetOnSubmitOptions = {
 
 export const useGetOnSubmit = (
   examId: number,
-  userId?: number,
   options?: UseGetOnSubmitOptions
 ) => {
   return useQuery<ExamSubmissionResponse>({
-    queryKey: ['exam', examId, userId],
+    queryKey: ['exam', examId],
 
     enabled:
       !isNaN(examId) &&
-      !!userId &&
       (options?.enabled ?? true),
 
     queryFn: async () => {
       const res = await api.get(
-        `/users/${userId}/grades/${examId}`
+        `/user/grades/${examId}`
       );
 
       if (!res.data) {

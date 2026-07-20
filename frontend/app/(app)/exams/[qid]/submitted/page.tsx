@@ -21,11 +21,10 @@ import { Button } from '@/components/ui/button';
 import { Submissions } from '@/types';
 
 function Page() {
-  const { data: user } = useMe();
   const { qid, id } = useParams();
   const examId = Number(qid);
 
-  const { data, isLoading, isError } = useGetOnSubmit(examId, user?.id ?? '');
+  const { data, isLoading, isError } = useGetOnSubmit(examId);
 
   const queryClient = useQueryClient();
 
