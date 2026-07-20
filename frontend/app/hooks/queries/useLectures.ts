@@ -31,7 +31,7 @@ export function useVideo(
         `/lecture/${lectureId}/videos`
       );
 
-      const video = res.data.data.find(
+      const video = res.data.find(
         (v: lectureVideoSchema) => Number(v.id) === Number(videoRecordId)
       );
 
@@ -39,7 +39,7 @@ export function useVideo(
         throw new Error('لم يتم العثور على الفيديو');
       }
 
-      const vidRes = await api.get(`/videos/${video.videoId}`);
+      const vidRes = await api.get(`/video/${video.videoId}`);
 
       return {
         otp: vidRes.data.otp,
