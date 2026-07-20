@@ -45,6 +45,11 @@ export default function ResetPasswordPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    console.log('handleSubmit called');
+    console.log('password:', password);
+    console.log('confirmPassword:', confirmPassword);
+    console.log('token:', token);
+
     if (password !== confirmPassword) {
       setError('كلمات المرور غير متطابقة');
       return;
@@ -60,13 +65,14 @@ export default function ResetPasswordPage() {
     setLoading(true);
 
     try {
-      await api.post('/reset-password', {
+      const response = await api.post('/reset-password', {
         resetToken: token,
         newPassword: password,
       });
+      console.log('Reset password response:', response);
       setSuccess(true);
     } catch (err) {
-      console.error(err);
+      console.error('Reset password error:', err);
       setError('حدث خطأ أثناء إعادة تعيين كلمة المرور');
     } finally {
       setLoading(false);

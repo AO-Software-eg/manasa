@@ -5,7 +5,7 @@ export const MIN_NAME_LENGTH = 2;
 export const EGYPT_MOBILE_REGEX = /^\+201[0125]\d{8}$/;
 
 export const userSchema = z.object({
-  id: z.string(),
+  id: z.number(),
   email: z.string(),
   name: z.string(),
   studentPhone: z.string(),

@@ -70,6 +70,15 @@ export async function isStudentPhoneFound(phone: string): Promise<boolean> {
   return res.rowCount != 0;
 }
 
+export async function isPhoneRegistered(phone: string): Promise<boolean> {
+  const normalizedPhone = normalizeEgyptPhone(phone);
+  const query = 'SELECT 1 FROM users WHERE student_phone = $1 OR parent_phone = $1';
+  const values = [normalizedPhone];
+
+  const res = await db.query(query, values);
+  return res.rowCount != 0;
+}
+
 export async function getUserByEmail(email: string): Promise<User> {
   const query = 'SELECT * FROM users WHERE email = $1';
   const values = [email];
@@ -87,7 +96,7 @@ export async function getUserByEmail(email: string): Promise<User> {
   const row = res.rows[0];
 
   const user: User = {
-    id: row.id,
+    id: Number(row.id),
     email: row.email,
     passwordHash: row.password,
     specialization: row.specialization,
@@ -144,7 +153,7 @@ export async function getUserByPhone(phone: string): Promise<User> {
   const row = res.rows[0];
 
   const user: User = {
-    id: row.id,
+    id: Number(row.id),
     email: row.email,
     passwordHash: row.password,
     specialization: row.specialization,
@@ -168,10 +177,12 @@ export async function getUserByIdentifier(identifier: string): Promise<User> {
   }
 }
 
-export async function updateUserPassword(userId: string, newPasswordHash: string) {
+export async function updateUserPassword(userId: number, newPasswordHash: string) {
   const query = 'UPDATE users SET password = $1 WHERE id = $2';
   const values = [newPasswordHash, userId];
-  await db.query(query, values);
+  console.log('Updating password for userId:', userId, 'with hash:', newPasswordHash);
+  const result = await db.query(query, values);
+  console.log('Update result row count:', result.rowCount);
 }
 
 export async function insertUser(user: User) {
