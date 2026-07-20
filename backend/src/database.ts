@@ -61,6 +61,14 @@ export async function isUserFound(email: string): Promise<boolean> {
   return res.rowCount != 0;
 }
 
+export async function isStudentPhoneFound(phone: string): Promise<boolean> {
+  const query = 'SELECT 1 FROM users WHERE student_phone = $1';
+  const values = [phone];
+
+  const res = await db.query(query, values);
+  return res.rowCount != 0;
+}
+
 export async function getUserByEmail(email: string): Promise<User> {
   const query = 'SELECT * FROM users WHERE email = $1';
   const values = [email];
@@ -90,6 +98,49 @@ export async function getUserByEmail(email: string): Promise<User> {
   };
 
   return user;
+}
+
+export async function getUserByPhone(phone: string): Promise<User> {
+  // First try to find a user with this phone as student_phone
+  let query = 'SELECT * FROM users WHERE student_phone = $1';
+  let values = [phone];
+  let res = await db.query(query, values);
+
+  // If no user found, try parent_phone
+  if (res.rowCount === 0) {
+    query = 'SELECT * FROM users WHERE parent_phone = $1';
+    res = await db.query(query, values);
+  }
+
+  // If still no user found, throw RowNotFoundError
+  if (res.rowCount === 0) {
+    throw new RowNotFoundError(
+      `المستخدم ذو رقم الهاتف ${phone} غير موجود`,
+    );
+  }
+
+  // Return first user found
+  const row = res.rows[0];
+
+  const user: User = {
+    id: row.id,
+    email: row.email,
+    passwordHash: row.password,
+    specialization: row.specialization,
+    governorate: row.governorate,
+    parentPhone: row.parent_phone,
+    studentPhone: row.student_phone,
+    year: row.year,
+    name: row.name,
+  };
+
+  return user;
+}
+
+export async function updateUserPassword(userId: string, newPasswordHash: string) {
+  const query = 'UPDATE users SET password = $1 WHERE id = $2';
+  const values = [newPasswordHash, userId];
+  await db.query(query, values);
 }
 
 export async function insertUser(user: User) {

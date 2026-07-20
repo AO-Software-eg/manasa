@@ -16,6 +16,19 @@ export const userSchema = z.object({
   passwordHash: z.string(),
 });
 
+// reset password 
+
+export const resetPasswordSchema = z
+  .object({
+    phone: z.string(),
+    password: z.string().min(8),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    path: ["confirmPassword"],
+    message: "Passwords do not match",
+  });
+
 // Courses table in db
 export const courseSchema = z.object({
   id: z.string(),

@@ -5,6 +5,9 @@ import cookieParser from 'cookie-parser';
 import apiRouter from './routes/index.ts';
 
 const app = express();
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 app.use(cookieParser());
 
 if (!process.env.FRONTEND_LOCAL_URL) {

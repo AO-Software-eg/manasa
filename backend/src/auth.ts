@@ -6,8 +6,8 @@ if (!process.env.TOKEN_SECRET_KEY) {
 
 const TOKEN_SECRET_KEY: string = process.env.TOKEN_SECRET_KEY;
 
-export function signToken(payload: object) {
-  const token = jwt.sign(payload, TOKEN_SECRET_KEY);
+export function signToken(payload: object, expiresIn?: string | number) {
+  const token = jwt.sign(payload, TOKEN_SECRET_KEY, expiresIn ? { expiresIn: expiresIn as jwt.SignOptions['expiresIn'] } : undefined);
   return token;
 }
 

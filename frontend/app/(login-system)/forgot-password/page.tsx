@@ -10,6 +10,8 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from '@/components/ui/input-otp';
+import { solvePow, getTurnstileToken } from "@akedly/shield";
+import { api } from "@/app/hooks/api";
 import dynamic from 'next/dynamic';
 
 const Lottie = dynamic(() => import('lottie-react'), { ssr: false });
@@ -23,7 +25,7 @@ const phoneSchema = z.object({
 });
 
 const codeSchema = z.object({
-  code: z.string().length(4, 'يجب أن يكون الرمز 4 أرقام'),
+  code: z.string().length(6, 'يجب أن يكون الرمز 6 أرقام'),
 });
 
 /* ---------------- Stepper ---------------- */
@@ -31,7 +33,6 @@ const codeSchema = z.object({
 const { useStepper, steps } = defineStepper(
   { id: 'enter-number', title: 'أدخل الرقم' },
   { id: 'enter-code', title: 'أدخل الرمز' },
-  { id: 'done', title: 'تم' },
 );
 
 type StepperType = ReturnType<typeof useStepper>;
@@ -46,10 +47,32 @@ const btnPrimaryCls = `bg-[${GOLD}] text-[${BG}] font-bold py-2 px-5 rounded-lg 
 
 const btnSecondCls = `border-2 border-[${GOLD}] text-[${GOLD}] font-bold py-2 px-5 rounded-lg hover:bg-[#2a2a25] transition duration-200`;
 
+
+function normalizeEgyptPhone(phone: string) {
+  phone = phone.replace(/\s+/g, "");
+
+  if (phone.startsWith("+20")) {
+    return phone;
+  }
+
+  if (phone.startsWith("0")) {
+    return `+20${phone.slice(1)}`;
+  }
+
+  if (phone.startsWith("20")) {
+    return `+${phone}`;
+  }
+
+  return phone;
+}
+
 /* ---------------- Page ---------------- */
 
 export default function Page() {
   const stepper = useStepper();
+  const [phone, setPhone] = useState("");
+  const [transactionReqID, setTransactionReqID] = useState("");
+  const router = useRouter();
 
   return (
     <div
@@ -107,9 +130,8 @@ export default function Page() {
           </h2>
 
           {stepper.flow.switch({
-            'enter-number': () => <EnterNumber stepper={stepper} />,
-            'enter-code': () => <EnterCode stepper={stepper} />,
-            done: () => <Done stepper={stepper} />,
+            'enter-number': () => <EnterNumber stepper={stepper} phone={phone} transactionReqID={transactionReqID} setPhone={setPhone} setTransactionReqID={setTransactionReqID} />,
+            'enter-code': () => <EnterCode stepper={stepper} phone={phone} transactionReqID={transactionReqID} router={router} />,
           })}
         </div>
       </div>
@@ -119,18 +141,59 @@ export default function Page() {
 
 /* ---------------- Steps ---------------- */
 
-function EnterNumber({ stepper }: { stepper: StepperType }) {
-  const [phone, setPhone] = useState('');
+function EnterNumber({ stepper, phone, transactionReqID, setPhone, setTransactionReqID }: { stepper: StepperType; phone: string; transactionReqID: string; setPhone: (phone: string) => void; setTransactionReqID: (transactionReqID: string) => void }) {
   const [error, setError] = useState<string>('');
 
-  const handleNext = () => {
-    const result = phoneSchema.safeParse({ phone });
+  const handleNext = async () => {
+    const result = phoneSchema.safeParse({ phone: normalizeEgyptPhone(phone) });
+
     if (!result.success) {
       setError(result.error.issues[0].message);
       return;
     }
-    setError('');
-    stepper.navigation.next();
+
+    setError("");
+
+    try {
+      // 1. Get challenge
+      const challengeRes = await api.get("/auth/akedly/challenge");
+
+      const data = challengeRes.data.data;
+
+      // 2. Solve Proof of Work
+      const { nonce } = await solvePow(
+        data.challenge,
+        data.difficulty
+      );
+
+      // 3. Get Turnstile token if required
+      let turnstileToken;
+
+      if (data.turnstile?.required) {
+        turnstileToken = await getTurnstileToken(
+          data.turnstile.siteKey
+        );
+      }
+
+      // 4. Send OTP
+      const sendRes = await api.post("/auth/akedly/send", {
+        phoneNumber: normalizeEgyptPhone(phone),
+        powSolution: {
+          challengeToken: data.challengeToken,
+          nonce,
+        },
+        turnstileToken,
+      });
+
+      setTransactionReqID(
+        sendRes.data.data.transactionReqID
+      );
+
+      stepper.navigation.next();
+    } catch (err) {
+      console.error(err);
+      setError("تعذر إرسال رمز التحقق");
+    }
   };
 
   return (
@@ -154,18 +217,33 @@ function EnterNumber({ stepper }: { stepper: StepperType }) {
   );
 }
 
-function EnterCode({ stepper }: { stepper: StepperType }) {
+function EnterCode({ stepper, phone, transactionReqID, router }: { stepper: StepperType; phone: string; transactionReqID: string; router: ReturnType<typeof useRouter> }) {
   const [code, setCode] = useState('');
   const [error, setError] = useState<string>('');
 
-  const handleNext = () => {
+  const handleNext = async () => {
     const result = codeSchema.safeParse({ code });
     if (!result.success) {
       setError(result.error.issues[0].message);
       return;
     }
     setError('');
-    stepper.navigation.next();
+    try {
+      await api.post("/auth/akedly/verify", {
+        transactionReqID,
+        otp: code,
+      });
+
+      // Get reset token
+      const tokenRes = await api.post("/reset-password/token", {
+        phone: normalizeEgyptPhone(phone),
+      });
+
+      // Navigate to reset password page with token
+      router.push(`/reset-password?token=${encodeURIComponent(tokenRes.data.resetToken)}`);
+    } catch {
+      setError("رمز التحقق غير صحيح");
+    }
   };
 
   return (
@@ -185,6 +263,8 @@ function EnterCode({ stepper }: { stepper: StepperType }) {
             }}
           >
             <InputOTPGroup className="gap-2">
+              <InputOTPSlot index={5} />
+              <InputOTPSlot index={4} />
               <InputOTPSlot index={3} />
               <InputOTPSlot index={2} />
               <InputOTPSlot index={1} />
@@ -207,30 +287,6 @@ function EnterCode({ stepper }: { stepper: StepperType }) {
         className={`${btnSecondCls} w-full`}
       >
         رجوع
-      </button>
-    </div>
-  );
-}
-
-function Done({ stepper }: { stepper: StepperType }) {
-  const router = useRouter();
-  return (
-    <div className="flex flex-col gap-4 items-center text-center py-2 ">
-      <div className="flex items-center gap-2 w-48 h-48">
-        <Lottie
-          animationData={require('../../../public/successAnim.json')}
-          loop
-          autoplay
-        />
-      </div>
-
-      <p className={`text-[${GOLD}] text-lg font-bold`}> تم التحقق بنجاح!</p>
-
-      <button
-        onClick={() => router.push('/')}
-        className={`${btnPrimaryCls} w-full`}
-      >
-        العودة للصفحة الرئيسية
       </button>
     </div>
   );

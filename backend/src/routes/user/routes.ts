@@ -27,6 +27,13 @@ router
         });
       }
 
+      const studentPhoneExists: boolean = await db.isStudentPhoneFound(data.studentPhone);
+      if (studentPhoneExists) {
+        return res.status(400).json({
+          message: 'رقم الهاتف الطالب مستخدم بالفعل',
+        });
+      }
+
       const passwordHash = await hashPassword(data.password);
       const user: db.User = {
         id: '', // Doesn't matter, database creates the id
@@ -141,6 +148,60 @@ router.route('/me').get(async (req: Request, res: Response) => {
       res.status(404).json({ message: 'المستخدم غير موجود' });
     }
     return res.status(500).send();
+  }
+});
+
+router.route('/reset-password/token').post(bodyParser.json(), async (req: Request, res: Response) => {
+  if (!req.is('application/json')) {
+    return res.status(415).send();
+  }
+
+  try {
+    const { phone } = req.body;
+    const user = await db.getUserByPhone(phone);
+    
+    const resetToken = auth.signToken(
+      {
+        id: user.id,
+        purpose: "reset-password",
+      },
+      "10m"
+    );
+
+    return res.status(200).json({ resetToken });
+  } catch (err: any) {
+    if (err instanceof db.RowNotFoundError) {
+      return res.status(404).json({ message: 'المستخدم غير موجود' });
+    }
+    console.log(err);
+    return res.status(500).json({
+      message: err instanceof Error ? err.message : 'حدث خطأ ما !',
+    });
+  }
+});
+
+router.route('/reset-password').post(bodyParser.json(), async (req: Request, res: Response) => {
+  if (!req.is('application/json')) {
+    return res.status(415).send();
+  }
+
+  try {
+    const { resetToken, newPassword } = req.body;
+    const payload = auth.verifyToken(resetToken);
+    
+    if (payload.purpose !== "reset-password") {
+      return res.status(400).json({ message: 'Invalid token purpose' });
+    }
+
+    const newPasswordHash = await hashPassword(newPassword);
+    await db.updateUserPassword(payload.id as string, newPasswordHash);
+
+    return res.status(200).send();
+  } catch (err: any) {
+    console.log(err);
+    return res.status(500).json({
+      message: err instanceof Error ? err.message : 'حدث خطأ ما !',
+    });
   }
 });
 
