@@ -62,8 +62,9 @@ export async function isUserFound(email: string): Promise<boolean> {
 }
 
 export async function isStudentPhoneFound(phone: string): Promise<boolean> {
+  const normalizedPhone = normalizeEgyptPhone(phone);
   const query = 'SELECT 1 FROM users WHERE student_phone = $1';
-  const values = [phone];
+  const values = [normalizedPhone];
 
   const res = await db.query(query, values);
   return res.rowCount != 0;
@@ -100,10 +101,30 @@ export async function getUserByEmail(email: string): Promise<User> {
   return user;
 }
 
+function normalizeEgyptPhone(phone: string): string {
+  phone = phone.replace(/\s+/g, "");
+
+  if (phone.startsWith("+20")) {
+    return phone;
+  }
+
+  if (phone.startsWith("0")) {
+    return `+20${phone.slice(1)}`;
+  }
+
+  if (phone.startsWith("20")) {
+    return `+${phone}`;
+  }
+
+  return phone;
+}
+
 export async function getUserByPhone(phone: string): Promise<User> {
+  const normalizedPhone = normalizeEgyptPhone(phone);
+  
   // First try to find a user with this phone as student_phone
   let query = 'SELECT * FROM users WHERE student_phone = $1';
-  let values = [phone];
+  let values = [normalizedPhone];
   let res = await db.query(query, values);
 
   // If no user found, try parent_phone
@@ -135,6 +156,16 @@ export async function getUserByPhone(phone: string): Promise<User> {
   };
 
   return user;
+}
+
+export async function getUserByIdentifier(identifier: string): Promise<User> {
+  // First try to find user by email
+  try {
+    return await getUserByEmail(identifier);
+  } catch (err) {
+    // If not found by email, try by student phone
+    return await getUserByPhone(identifier);
+  }
 }
 
 export async function updateUserPassword(userId: string, newPasswordHash: string) {

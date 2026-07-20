@@ -25,7 +25,7 @@ function page() {
     e.preventDefault();
     const data = new FormData(e.target as HTMLFormElement);
     const payload = {
-      email: data.get('email') as string,
+      identifier: data.get('identifier') as string,
       password: data.get('password') as string,
     };
 
@@ -52,14 +52,15 @@ function page() {
         </h1>
         <form onSubmit={onsubmit} className={`w-full ${cairo.className}`}>
           <div className="mb-4">
-            <label htmlFor="email" className="block text-[#e6d3a3] mb-2">
-              البريد الإلكتروني
+            <label htmlFor="identifier" className="block text-[#e6d3a3] mb-2">
+              البريد الإلكتروني أو رقم الهاتف
             </label>
             <input
-              type="email"
-              id="email"
-              name="email"
+              type="text"
+              id="identifier"
+              name="identifier"
               className="bg-[#1C1C18] rounded-lg  w-full outline-none  text-[#e6d3a3] placeholder:text-[#e6d3a3] border-2 border-[#e6d3a3]  p-2 placeholder:opacity-70"
+              placeholder="أدخل بريدك الإلكتروني أو رقم هاتفك"
             />
           </div>
           <div className="mb-4">

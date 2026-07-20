@@ -72,12 +72,7 @@ router
       const data = req.body;
       validation.loginSchema.parse(data);
 
-      const user: db.User | null = await db.getUserByEmail(data.email);
-      if (!user) {
-        return res.status(404).json({
-          message: 'المستخدم غير موجود',
-        });
-      }
+      const user: db.User = await db.getUserByIdentifier(data.identifier);
 
       if ((await verifyPassword(user.passwordHash, data.password)) == false) {
         return res.status(400).json({
@@ -101,6 +96,10 @@ router
       if (err instanceof ZodError) {
         return res.status(400).json({
           message: 'بيانات غير صحيحه',
+        });
+      } else if (err instanceof db.RowNotFoundError) {
+        return res.status(404).json({
+          message: 'المستخدم غير موجود',
         });
       } else {
         console.log(err);
@@ -158,6 +157,7 @@ router.route('/reset-password/token').post(bodyParser.json(), async (req: Reques
 
   try {
     const { phone } = req.body;
+    // getUserByPhone already normalizes the phone, so we're good
     const user = await db.getUserByPhone(phone);
     
     const resetToken = auth.signToken(

@@ -57,7 +57,7 @@ export const lectureVideoSchema = z.object({
 });
 
 export const loginSchema = z.object({
-  email: z.email(),
+  identifier: z.string(), // Can be email or phone
   password: z.string().min(MIN_PASSWORD_LENGTH),
 });
 
