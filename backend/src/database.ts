@@ -94,6 +94,27 @@ export async function isUserFound(email: string): Promise<boolean> {
   return res.length != 0;
 }
 
+export async function isStudentPhoneFound(phone: string): Promise<boolean> {
+  const normalizedPhone = normalizeEgyptPhone(phone);
+  const query = 'SELECT 1 FROM users WHERE student_phone = $1';
+  const values = [normalizedPhone];
+
+  const res = await db.query(query, values);
+  return res.rowCount != 0;
+}
+
+export async function isPhoneRegistered(phone: string): Promise<boolean> {
+  const normalizedPhone = normalizeEgyptPhone(phone);
+  const query = 'SELECT 1 FROM users WHERE student_phone = $1 OR parent_phone = $1';
+  const values = [normalizedPhone];
+
+  const res = await db.query(query, values);
+  return res.rowCount != 0;
+}
+
+export async function getUserByEmail(email: string): Promise<User> {
+  const query = 'SELECT * FROM users WHERE email = $1';
+  const values = [email];
 export async function getUserByEmail(email: string): Promise<SelectUser> {
   const res = await db
     .select()
@@ -118,6 +139,74 @@ export async function getUserById(id: number): Promise<SelectUser> {
     .from(schema.users)
     .where(eq(schema.users.id, id));
 
+  const user: User = {
+    id: Number(row.id),
+    email: row.email,
+    passwordHash: row.password,
+    specialization: row.specialization,
+    governorate: row.governorate,
+    parentPhone: row.parent_phone,
+    studentPhone: row.student_phone,
+    year: row.year,
+    name: row.name,
+  };
+
+  return user;
+}
+
+function normalizeEgyptPhone(phone: string): string {
+  phone = phone.replace(/\s+/g, "");
+
+  if (phone.startsWith("+20")) {
+    return phone;
+  }
+
+  if (phone.startsWith("0")) {
+    return `+20${phone.slice(1)}`;
+  }
+
+  if (phone.startsWith("20")) {
+    return `+${phone}`;
+  }
+
+  return phone;
+}
+
+export async function getUserByPhone(phone: string): Promise<User> {
+  const normalizedPhone = normalizeEgyptPhone(phone);
+  
+  // First try to find a user with this phone as student_phone
+  let query = 'SELECT * FROM users WHERE student_phone = $1';
+  let values = [normalizedPhone];
+  let res = await db.query(query, values);
+
+  // If no user found, try parent_phone
+  if (res.rowCount === 0) {
+    query = 'SELECT * FROM users WHERE parent_phone = $1';
+    res = await db.query(query, values);
+  }
+
+  // If still no user found, throw RowNotFoundError
+  if (res.rowCount === 0) {
+    throw new RowNotFoundError(
+      `المستخدم ذو رقم الهاتف ${phone} غير موجود`,
+    );
+  }
+
+  // Return first user found
+  const row = res.rows[0];
+
+  const user: User = {
+    id: Number(row.id),
+    email: row.email,
+    passwordHash: row.password,
+    specialization: row.specialization,
+    governorate: row.governorate,
+    parentPhone: row.parent_phone,
+    studentPhone: row.student_phone,
+    year: row.year,
+    name: row.name,
+  };
   if (res.length == 0) {
     throw new RowNotFoundError(`المستخدم ذو المعرف ${id} غير موجود`);
   }
@@ -142,6 +231,37 @@ export async function getCourseById(id: number): Promise<SelectCourse> {
   return res[0];
 }
 
+export async function getUserByIdentifier(identifier: string): Promise<User> {
+  // First try to find user by email
+  try {
+    return await getUserByEmail(identifier);
+  } catch (err) {
+    // If not found by email, try by student phone
+    return await getUserByPhone(identifier);
+  }
+}
+
+export async function updateUserPassword(userId: number, newPasswordHash: string) {
+  const query = 'UPDATE users SET password = $1 WHERE id = $2';
+  const values = [newPasswordHash, userId];
+  console.log('Updating password for userId:', userId, 'with hash:', newPasswordHash);
+  const result = await db.query(query, values);
+  console.log('Update result row count:', result.rowCount);
+}
+
+export async function insertUser(user: User) {
+  const query = `INSERT INTO users(name, email, password, student_phone, parent_phone, specialization, year, governorate)
+                 VALUES($1, $2, $3, $4, $5, $6, $7, $8)`;
+  const values = [
+    user.name,
+    user.email,
+    user.passwordHash,
+    user.studentPhone,
+    user.parentPhone,
+    user.specialization,
+    user.year,
+    user.governorate,
+  ];
 export async function getAllCourses(): Promise<SelectCourse[]> {
   const res = await db.select().from(schema.courses);
 
