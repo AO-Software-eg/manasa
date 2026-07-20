@@ -82,9 +82,9 @@ export const signupSchema = z
       .string()
       .trim()
       .regex(EGYPT_MOBILE_REGEX, 'Invalid egyptian mobile phone number.'),
-    specialization: z.string().optional(),
+    specialization: z.string().optional().nullable(),
     governorate: z.string('Governorate must be picked.'),
-    YearCombo: z.string('School Year must be picked.'),
+    year: z.string('School Year must be picked.'),
     password: z.string().min(MIN_PASSWORD_LENGTH, 'Password is too short.'),
     confirmPassword: z
       .string()

@@ -1,10 +1,9 @@
 import 'dotenv/config';
 import { drizzle } from 'drizzle-orm/node-postgres';
-import { eq, and, inArray, sql } from 'drizzle-orm';
+import { eq, and, or, sql } from 'drizzle-orm';
 
 import * as schema from '../drizzle/schema.ts';
 import * as schemaRelations from '../drizzle/relations.ts';
-import { PgBigInt53 } from 'drizzle-orm/pg-core';
 
 export class DataIntegrityError extends Error {
   constructor(message: string) {
@@ -85,75 +84,6 @@ export type RelationExamQuestions = Awaited<
 
 export type RelationUserLectures = Awaited<ReturnType<typeof getUserLectures>>;
 
-export async function isUserFound(email: string): Promise<boolean> {
-  const res = await db
-    .select()
-    .from(schema.users)
-    .where(eq(schema.users.email, email));
-
-  return res.length != 0;
-}
-
-export async function isStudentPhoneFound(phone: string): Promise<boolean> {
-  const normalizedPhone = normalizeEgyptPhone(phone);
-  const query = 'SELECT 1 FROM users WHERE student_phone = $1';
-  const values = [normalizedPhone];
-
-  const res = await db.query(query, values);
-  return res.rowCount != 0;
-}
-
-export async function isPhoneRegistered(phone: string): Promise<boolean> {
-  const normalizedPhone = normalizeEgyptPhone(phone);
-  const query = 'SELECT 1 FROM users WHERE student_phone = $1 OR parent_phone = $1';
-  const values = [normalizedPhone];
-
-  const res = await db.query(query, values);
-  return res.rowCount != 0;
-}
-
-export async function getUserByEmail(email: string): Promise<User> {
-  const query = 'SELECT * FROM users WHERE email = $1';
-  const values = [email];
-export async function getUserByEmail(email: string): Promise<SelectUser> {
-  const res = await db
-    .select()
-    .from(schema.users)
-    .where(eq(schema.users.email, email))
-    .limit(2); // We test for uniqueness only
-
-  if (res.length == 0) {
-    throw new RowNotFoundError(
-      `المستخدم ذو البريد الإلكتروني ${email} غير موجود`,
-    );
-  } else if (res.length > 1) {
-    throw new NonUniqueDataError(res.length);
-  }
-
-  return res[0];
-}
-
-export async function getUserById(id: number): Promise<SelectUser> {
-  const res = await db
-    .select()
-    .from(schema.users)
-    .where(eq(schema.users.id, id));
-
-  const user: User = {
-    id: Number(row.id),
-    email: row.email,
-    passwordHash: row.password,
-    specialization: row.specialization,
-    governorate: row.governorate,
-    parentPhone: row.parent_phone,
-    studentPhone: row.student_phone,
-    year: row.year,
-    name: row.name,
-  };
-
-  return user;
-}
-
 function normalizeEgyptPhone(phone: string): string {
   phone = phone.replace(/\s+/g, "");
 
@@ -172,41 +102,64 @@ function normalizeEgyptPhone(phone: string): string {
   return phone;
 }
 
-export async function getUserByPhone(phone: string): Promise<User> {
+export async function isUserFound(email: string): Promise<boolean> {
+  const res = await db
+    .select()
+    .from(schema.users)
+    .where(eq(schema.users.email, email));
+
+  return res.length != 0;
+}
+
+export async function isStudentPhoneFound(phone: string): Promise<boolean> {
   const normalizedPhone = normalizeEgyptPhone(phone);
-  
-  // First try to find a user with this phone as student_phone
-  let query = 'SELECT * FROM users WHERE student_phone = $1';
-  let values = [normalizedPhone];
-  let res = await db.query(query, values);
+  const res = await db
+    .select()
+    .from(schema.users)
+    .where(eq(schema.users.studentPhone, normalizedPhone));
 
-  // If no user found, try parent_phone
-  if (res.rowCount === 0) {
-    query = 'SELECT * FROM users WHERE parent_phone = $1';
-    res = await db.query(query, values);
-  }
+  return res.length != 0;
+}
 
-  // If still no user found, throw RowNotFoundError
-  if (res.rowCount === 0) {
-    throw new RowNotFoundError(
-      `المستخدم ذو رقم الهاتف ${phone} غير موجود`,
+export async function isPhoneRegistered(phone: string): Promise<boolean> {
+  const normalizedPhone = normalizeEgyptPhone(phone);
+  const res = await db
+    .select()
+    .from(schema.users)
+    .where(
+      or(
+        eq(schema.users.studentPhone, normalizedPhone),
+        eq(schema.users.parentPhone, normalizedPhone)
+      )
     );
+
+  return res.length != 0;
+}
+
+export async function getUserByEmail(email: string): Promise<SelectUser> {
+  const res = await db
+    .select()
+    .from(schema.users)
+    .where(eq(schema.users.email, email))
+    .limit(2);
+
+  if (res.length == 0) {
+    throw new RowNotFoundError(
+      `المستخدم ذو البريد الإلكتروني ${email} غير موجود`,
+    );
+  } else if (res.length > 1) {
+    throw new NonUniqueDataError(res.length);
   }
 
-  // Return first user found
-  const row = res.rows[0];
+  return res[0];
+}
 
-  const user: User = {
-    id: Number(row.id),
-    email: row.email,
-    passwordHash: row.password,
-    specialization: row.specialization,
-    governorate: row.governorate,
-    parentPhone: row.parent_phone,
-    studentPhone: row.student_phone,
-    year: row.year,
-    name: row.name,
-  };
+export async function getUserById(id: number): Promise<SelectUser> {
+  const res = await db
+    .select()
+    .from(schema.users)
+    .where(eq(schema.users.id, id));
+
   if (res.length == 0) {
     throw new RowNotFoundError(`المستخدم ذو المعرف ${id} غير موجود`);
   }
@@ -214,8 +167,52 @@ export async function getUserByPhone(phone: string): Promise<User> {
   return res[0];
 }
 
+export async function getUserByPhone(phone: string): Promise<SelectUser> {
+  const normalizedPhone = normalizeEgyptPhone(phone);
+  
+  // First try to find a user with this phone as student_phone
+  let res = await db
+    .select()
+    .from(schema.users)
+    .where(eq(schema.users.studentPhone, normalizedPhone));
+
+  // If no user found, try parent_phone
+  if (res.length === 0) {
+    res = await db
+      .select()
+      .from(schema.users)
+      .where(eq(schema.users.parentPhone, normalizedPhone));
+  }
+
+  // If still no user found, throw RowNotFoundError
+  if (res.length === 0) {
+    throw new RowNotFoundError(
+      `المستخدم ذو رقم الهاتف ${phone} غير موجود`,
+    );
+  }
+
+  return res[0];
+}
+
+export async function getUserByIdentifier(identifier: string): Promise<SelectUser> {
+  // First try to find user by email
+  try {
+    return await getUserByEmail(identifier);
+  } catch (err) {
+    // If not found by email, try by phone
+    return await getUserByPhone(identifier);
+  }
+}
+
 export async function insertUser(user: InsertUser) {
   await db.insert(schema.users).values(user);
+}
+
+export async function updateUserPassword(userId: number, newPasswordHash: string) {
+  await db
+    .update(schema.users)
+    .set({ password: newPasswordHash })
+    .where(eq(schema.users.id, userId));
 }
 
 export async function getCourseById(id: number): Promise<SelectCourse> {
@@ -231,37 +228,6 @@ export async function getCourseById(id: number): Promise<SelectCourse> {
   return res[0];
 }
 
-export async function getUserByIdentifier(identifier: string): Promise<User> {
-  // First try to find user by email
-  try {
-    return await getUserByEmail(identifier);
-  } catch (err) {
-    // If not found by email, try by student phone
-    return await getUserByPhone(identifier);
-  }
-}
-
-export async function updateUserPassword(userId: number, newPasswordHash: string) {
-  const query = 'UPDATE users SET password = $1 WHERE id = $2';
-  const values = [newPasswordHash, userId];
-  console.log('Updating password for userId:', userId, 'with hash:', newPasswordHash);
-  const result = await db.query(query, values);
-  console.log('Update result row count:', result.rowCount);
-}
-
-export async function insertUser(user: User) {
-  const query = `INSERT INTO users(name, email, password, student_phone, parent_phone, specialization, year, governorate)
-                 VALUES($1, $2, $3, $4, $5, $6, $7, $8)`;
-  const values = [
-    user.name,
-    user.email,
-    user.passwordHash,
-    user.studentPhone,
-    user.parentPhone,
-    user.specialization,
-    user.year,
-    user.governorate,
-  ];
 export async function getAllCourses(): Promise<SelectCourse[]> {
   const res = await db.select().from(schema.courses);
 

@@ -3,9 +3,9 @@ import * as db from '../../database.ts';
 import * as validation from '../../validation.ts';
 import * as auth from '../../auth.ts';
 import cookieParser from 'cookie-parser';
-import z, { date, ZodError } from 'zod';
+import z, { ZodError } from 'zod';
 import bodyParser from 'body-parser';
-import { hashString, verifyHash } from '../../hash.ts';
+import { hashString as hashPassword, verifyHash } from '../../hash.ts';
 
 import * as progress from '../../progress.ts';
 
@@ -204,15 +204,14 @@ router
       }
 
       const passwordHash = await hashPassword(data.password);
-      const user: db.User = {
-        id: 0,  // Doesn't matter, database creates the id
+      const user: db.InsertUser = {
         email: data.email,
         name: data.name,
         studentPhone: data.studentPhone,
         parentPhone: data.parentPhone,
         specialization: data.specialization,
         governorate: data.governorate,
-        year: data.YearCombo,
+        year: data.year,
         password: passwordHash,
       };
 
@@ -241,7 +240,7 @@ router
       const data = req.body;
       validation.loginSchema.parse(data);
 
-      const user: db.User = await db.getUserByIdentifier(data.identifier);
+      const user: db.SelectUser = await db.getUserByIdentifier(data.identifier);
 
       if ((await verifyHash(user.password, data.password)) == false) {
         return res.status(400).json({
@@ -261,6 +260,8 @@ router
         secure: true,
         expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
       });
+
+      return res.status(200).send();
     } catch (err) {
       if (err instanceof ZodError) {
         return res.status(400).json({
@@ -277,8 +278,6 @@ router
         });
       }
     }
-
-    return res.status(200).send();
   });
 
 router.route('/logout').post(async (req: Request, res: Response) => {
@@ -306,13 +305,11 @@ router.route('/me').get(async (req: Request, res: Response) => {
     }
 
     const user: db.SelectUser = await db.getUserById(payload.id);
-    if (user.password) {
-      user.password = '';
-    } else {
-      throw new Error("Couldn't find password field to remove in SelectUser");
-    }
+    // We can't modify the SelectUser object directly, so we'll create a copy
+    const userCopy: Partial<db.SelectUser> = { ...user };
+    delete userCopy.password;
 
-    return res.status(200).json(user);
+    return res.status(200).json(userCopy);
   } catch (err: any) {
     console.log(err);
     if (err instanceof db.RowNotFoundError) {
@@ -369,18 +366,11 @@ router.route('/reset-password').post(bodyParser.json(), async (req: Request, res
     const payload = auth.verifyToken(resetToken);
     console.log('Decoded payload:', payload);
 
-    const user = await db.getUserByPhone(payload.phone);
-
-    const newPasswordHash = await hashPassword(newPassword);
-
-    await db.updateUserPassword(user.id, newPasswordHash);
-
     if (payload.purpose !== "reset-password") {
       return res.status(400).json({ message: 'Invalid token purpose' });
-
     }
 
-    
+    const newPasswordHash = await hashPassword(newPassword);
     console.log('New password hash:', newPasswordHash);
 
     await db.updateUserPassword(payload.id as number, newPasswordHash);
@@ -408,6 +398,9 @@ router.route('/check-phone').post(bodyParser.json(), async (req: Request, res: R
     return res.status(500).json({
       message: err instanceof Error ? err.message : 'حدث خطأ ما !',
     });
+  }
+});
+
 router.route('/users/balance').get(async (req: Request, res: Response) => {
   if (!req.cookies.user_token) {
     return res.status(401).send();
