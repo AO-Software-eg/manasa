@@ -196,8 +196,16 @@ router
         });
       }
 
-      const passwordHash = await hashString(data.password);
-      const user: db.InsertUser = {
+      const studentPhoneExists: boolean = await db.isStudentPhoneFound(data.studentPhone);
+      if (studentPhoneExists) {
+        return res.status(400).json({
+          message: 'رقم الهاتف الطالب مستخدم بالفعل',
+        });
+      }
+
+      const passwordHash = await hashPassword(data.password);
+      const user: db.User = {
+        id: 0,  // Doesn't matter, database creates the id
         email: data.email,
         name: data.name,
         studentPhone: data.studentPhone,
@@ -233,7 +241,7 @@ router
       const data = req.body;
       validation.loginSchema.parse(data);
 
-      const user: db.SelectUser = await db.getUserByEmail(data.email);
+      const user: db.User = await db.getUserByIdentifier(data.identifier);
 
       if ((await verifyHash(user.password, data.password)) == false) {
         return res.status(400).json({
@@ -314,6 +322,92 @@ router.route('/me').get(async (req: Request, res: Response) => {
   }
 });
 
+router.route('/reset-password/token').post(bodyParser.json(), async (req: Request, res: Response) => {
+  if (!req.is('application/json')) {
+    return res.status(415).send();
+  }
+
+  try {
+    const { phone } = req.body;
+    console.log('Reset token request for phone:', phone);
+    // getUserByPhone already normalizes the phone, so we're good
+    const user = await db.getUserByPhone(phone);
+    console.log('Found user:', user);
+
+    const resetToken = auth.signToken(
+      {
+        id: user.id,
+        purpose: "reset-password",
+      },
+      "10m"
+    );
+    console.log('Generated reset token:', resetToken);
+
+    return res.status(200).json({ resetToken });
+  } catch (err: any) {
+    console.log('Reset token error:', err);
+    if (err instanceof db.RowNotFoundError) {
+      return res.status(404).json({ message: 'المستخدم غير موجود' });
+    }
+    return res.status(500).json({
+      message: err instanceof Error ? err.message : 'حدث خطأ ما !',
+    });
+  }
+});
+
+router.route('/reset-password').post(bodyParser.json(), async (req: Request, res: Response) => {
+  if (!req.is('application/json')) {
+    return res.status(415).send();
+  }
+
+  try {
+    const { resetToken, newPassword } = req.body;
+    console.log('Received reset password request');
+    console.log('resetToken:', resetToken);
+    console.log('newPassword:', newPassword ? 'provided' : 'missing');
+
+    const payload = auth.verifyToken(resetToken);
+    console.log('Decoded payload:', payload);
+
+    const user = await db.getUserByPhone(payload.phone);
+
+    const newPasswordHash = await hashPassword(newPassword);
+
+    await db.updateUserPassword(user.id, newPasswordHash);
+
+    if (payload.purpose !== "reset-password") {
+      return res.status(400).json({ message: 'Invalid token purpose' });
+
+    }
+
+    
+    console.log('New password hash:', newPasswordHash);
+
+    await db.updateUserPassword(payload.id as number, newPasswordHash);
+
+    return res.status(200).send();
+  } catch (err: any) {
+    console.log('Reset password error:', err);
+    return res.status(500).json({
+      message: err instanceof Error ? err.message : 'حدث خطأ ما !',
+    });
+  }
+});
+
+router.route('/check-phone').post(bodyParser.json(), async (req: Request, res: Response) => {
+  if (!req.is('application/json')) {
+    return res.status(415).send();
+  }
+
+  try {
+    const { phone } = req.body;
+    const exists = await db.isPhoneRegistered(phone);
+    return res.status(200).json({ exists });
+  } catch (err: any) {
+    console.log(err);
+    return res.status(500).json({
+      message: err instanceof Error ? err.message : 'حدث خطأ ما !',
+    });
 router.route('/users/balance').get(async (req: Request, res: Response) => {
   if (!req.cookies.user_token) {
     return res.status(401).send();

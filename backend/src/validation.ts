@@ -4,6 +4,49 @@ export const MIN_PASSWORD_LENGTH = 6;
 export const MIN_NAME_LENGTH = 2;
 export const EGYPT_MOBILE_REGEX = /^\+201[0125]\d{8}$/;
 
+export const userSchema = z.object({
+  id: z.number(),
+  email: z.string(),
+  name: z.string(),
+  studentPhone: z.string(),
+  parentPhone: z.string(),
+  specialization: z.string().nullable(),
+  governorate: z.string(),
+  year: z.string(),
+  passwordHash: z.string(),
+});
+
+// reset password 
+
+export const resetPasswordSchema = z
+  .object({
+    phone: z.string(),
+    password: z.string().min(8),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    path: ["confirmPassword"],
+    message: "Passwords do not match",
+  });
+
+// Courses table in db
+export const courseSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  image_url: z.string(),
+  price: z.number(),
+  year: z.string(),
+  specialization: z.string().nullable(),
+  description: z.string().nullable(),
+  tags: z.string().nullable(),
+});
+
+// Lectures table in db
+export const lectureSchema = z.object({
+  id: z.string(),
+  course_id: z.string(),
+  title: z.string(),
+});
 export const examSubmissionSchema = z.object({
   studentId: z.number(),
   examId: z.number(),
@@ -23,7 +66,7 @@ export const enrollSchema = z.object({
 });
 
 export const loginSchema = z.object({
-  email: z.email(),
+  identifier: z.string(), // Can be email or phone
   password: z.string().min(MIN_PASSWORD_LENGTH),
 });
 
