@@ -8,10 +8,10 @@ type Props = {
 function YearBox({ year, link }: Props) {
   return (
     <Link href={`/years/${link}`}>
-      <div className="w-full sm:w-80 cursor-pointer shrink-0 h-48 md:h-56 bg-[#e6d3a3]/10 hover:bg-[#e6d3a3]/20 text-[#e6d3a3] rounded-2xl flex items-center justify-center text-center p-6 md:p-8 border border-[#e6d3a3]/20 hover:border-[#e6d3a3]/40 hover:shadow-2xl hover:shadow-[#e6d3a3]/30 transform hover:scale-105 hover:-translate-y-2 transition-all duration-300 overflow-hidden backdrop-blur-md">
-        <h1 className="text-2xl md:text-4xl lg:text-5xl font-bold mx-auto leading-tight">
+      <div className="w-full sm:w-80 cursor-pointer shrink-0 h-48 md:h-56 bg-card hover:bg-secondary/50 text-foreground hover:text-primary rounded-2xl flex items-center justify-center text-center p-6 md:p-8 border border-border hover:border-primary/40 hover:shadow-md transform hover:scale-102 hover:-translate-y-1.5 transition-all duration-300 overflow-hidden shadow-xs">
+        <h4 className="text-xl md:text-2xl lg:text-3xl font-bold mx-auto leading-tight transition-colors duration-300">
           {year}
-        </h1>
+        </h4>
       </div>
     </Link>
   );

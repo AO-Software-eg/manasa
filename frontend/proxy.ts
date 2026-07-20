@@ -29,19 +29,19 @@ export default async function proxy(request: NextRequest) {
 
   if (url.pathname == '/login' || url.pathname == '/signup') {
     if (loggedIn) {
-      url.pathname = '/user';
+      url.pathname = '/home';
       return NextResponse.redirect(url);
     }
-  } else if (url.pathname.startsWith('/user')) {
+  } else if (url.pathname.startsWith('/home')) {
     if (!loggedIn) {
       url.pathname = '/login';
-      return NextResponse.redirect(url);
+      return NextResponse.redirect(url); // instead of .rewrite(url) because it was making bugs while routing .
     }
   }
 
-  return NextResponse.rewrite(url);
+  return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/login', '/user/:path*', '/signup'],
+  matcher: ['/login', '/home/:path*', '/signup'],
 };

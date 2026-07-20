@@ -1,0 +1,89 @@
+// post and get  Exam operations
+export type ExamQuestionChoice = {
+  id: number;
+  choiceText: string;
+};
+
+export type ExamQuestion = {
+  id: number;
+  question: string;
+  questionChoices: ExamQuestionChoice[];
+};
+
+export type ExamSubmission = {
+  studentId: number;
+  examId: number;
+  answers: Array<{
+    questionId: number;
+    choiceId: number;
+  }>;
+};
+
+// get exam grades
+
+export type ExamSubmissionResponse = {
+  exam: Exam;
+
+  submissions: Submissions[];
+};
+
+
+export type Exam = {
+  createdAt: string;
+  id: number;
+  lectureId: number;
+  title: string;
+};
+
+export type Submissions = {
+  id: number;
+  studentId: number;
+  createdAt: string;
+  grade: number;
+  questionCount: number;
+  exam: {
+    id: number;
+    title: string;
+  };
+  answerSubmissions: AnswerGrade[];
+};
+export type AnswerGrade = {
+  studentId: number;
+  examSubmissionId: number;
+
+  question: {
+    id: number;
+    question: string;
+    correctChoices: [
+      {
+        id: number;
+        choiceText: string;
+      },
+    ];
+  };
+  questionChoice: {
+    id: number;
+    choiceText: string;
+    isCorrect: boolean;
+  };
+};
+
+
+
+export type ExamStatus = 'solved' | 'current' | 'locked';
+ 
+/**
+ * Determines an exam's status based on its position in the list
+ * relative to how many exams the user has already solved.
+ */
+export function getExamStatus(index: number, solvedExamCount: number): ExamStatus {
+  if (index < solvedExamCount) return 'solved';
+  if (index === solvedExamCount) return 'current';
+  return 'locked';
+}
+ 
+export const EXAM_STATUS_LABEL: Record<ExamStatus, string> = {
+  solved: 'تم الحل',
+  locked: 'مغلق',
+  current: 'اختبار',
+};

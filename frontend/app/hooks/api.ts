@@ -23,6 +23,19 @@ export async function getSessionData(): Promise<Object | null> {
   } catch (err: unknown) {
     console.log(err);
 
-    return null;
+    return null;    
   }
 }
+
+
+let requests = 0;
+
+api.interceptors.request.use((config) => {
+  requests++;
+
+  console.log(`#${requests}`, config.method, config.url);
+
+  console.trace(); // shows exactly what triggered it
+
+  return config;
+});

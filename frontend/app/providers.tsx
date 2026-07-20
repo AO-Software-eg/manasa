@@ -2,7 +2,7 @@
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState } from 'react';
-import { AuthProvider } from '@/context/AuthContext';
+import { ThemeProvider } from 'next-themes';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 export default function Providers({ children }: { children: React.ReactNode }) {
@@ -20,10 +20,10 @@ export default function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
         {children}
         <ReactQueryDevtools initialIsOpen={false} />
-      </AuthProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }

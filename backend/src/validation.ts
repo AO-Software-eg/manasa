@@ -47,13 +47,22 @@ export const lectureSchema = z.object({
   course_id: z.string(),
   title: z.string(),
 });
+export const examSubmissionSchema = z.object({
+  studentId: z.number(),
+  examId: z.number(),
+  answers: z.array(
+    z.object({
+      questionId: z.number(),
+      choiceId: z.number(),
+    }),
+  ),
+});
 
-// Lecture videos table in db
-export const lectureVideoSchema = z.object({
-  id: z.string(),
-  lecture_id: z.string(),
-  title: z.string(),
-  video_id: z.string(),
+export type examSubmissionData = z.infer<typeof examSubmissionSchema>;
+
+export const enrollSchema = z.object({
+  courseId: z.number(),
+  studentId: z.number(),
 });
 
 export const loginSchema = z.object({
@@ -87,3 +96,23 @@ export const signupSchema = z
   .refine((data) => data.studentPhone !== data.parentPhone, {
     error: 'Student and parent phone numbers must differ.',
   });
+
+export const buyItemSchema = z.object({
+  type: z.enum(['item']),
+  itemId: z.number(),
+  itemType: z.enum(['course']),
+  phoneNumber: z
+    .string()
+    .regex(EGYPT_MOBILE_REGEX, 'Invalid egyptian mobile phone number'),
+});
+
+export const walletDepositSchema = z.object({
+  type: z.enum(['wallet-deposit']),
+  amount: z.number(),
+  phoneNumber: z
+    .string()
+    .regex(EGYPT_MOBILE_REGEX, 'Invalid egyptian mobile phone number'),
+});
+
+export type buyItemData = z.infer<typeof buyItemSchema>;
+export type walletDepositData = z.infer<typeof walletDepositSchema>;

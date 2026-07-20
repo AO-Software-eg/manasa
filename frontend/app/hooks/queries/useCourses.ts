@@ -1,4 +1,5 @@
 import { api } from '@/app/hooks/api';
+import { courses } from '@/types';
 import { useQuery } from '@tanstack/react-query';
 
 export function useCourses() {
@@ -9,14 +10,22 @@ export function useCourses() {
       if (!res.data.data) throw new Error('جدث خطأ اثناء تحميل الكورسات');
       return res.data.data;
     },
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    staleTime: 10 * 60 * 1000,
   });
 }
 
+
+
+
 export function useCourseById(id: string) {
-  return useQuery({
+  return useQuery<courses>({
     queryKey: ['course', id],
     enabled: !!id,
-    staleTime: 0,
+    staleTime: 1000 * 60 * 5,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
     queryFn: async () => {
       const res = await api.get(`/courses/${id}`);
       if (!id) throw new Error('لم يتم العثور على الكورس');

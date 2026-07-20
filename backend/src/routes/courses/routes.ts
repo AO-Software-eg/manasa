@@ -1,11 +1,12 @@
 import express, { type Request, type Response } from 'express';
 import * as db from '../../database.ts';
+import * as auth from '../../auth.ts';
 
 const router = express.Router();
 
 router.route('/').get(async (req: Request, res: Response) => {
   try {
-    const courses: db.Course[] = await db.getAllCourses();
+    const courses: db.SelectCourse[] = await db.getAllCourses();
     return res
       .status(200)
       .json({ message: 'Courses retrieval successful', data: courses });
@@ -25,7 +26,7 @@ router.route('/:courseId').get(async (req: Request, res: Response) => {
     if (/^\d+$/.test(courseId) === false) {
       return res.status(401).json({ message: 'Invalid course ID paramater' });
     }
-    const course: db.Course = await db.getCourseById(Number(courseId));
+    const course: db.SelectCourse = await db.getCourseById(Number(courseId));
 
     return res.status(200).json({ message: 'Found course', data: course });
   } catch (err: any) {
@@ -49,7 +50,37 @@ router.route('/:courseId/lectures').get(async (req: Request, res: Response) => {
       return res.status(401).json({ message: 'Invalid course ID paramater' });
     }
 
-    const lectures: db.Lecture[] = await db.getCourseLectures(Number(courseId));
+    const payload = auth.verifyToken(req.cookies.user_token);
+
+    const userId = payload.id;
+
+    if (!(await db.isUserFoundById(userId))) {
+      return res.status(403).json({
+        message: `Unauthorized, user with id ${userId} does not exist, Invalid user token?`,
+      });
+    }
+
+    console.log({
+      userId,
+      courseId: Number(courseId),
+    });
+
+    console.log(payload);
+    console.log(req.cookies.user_token);
+
+    const enrolled = await db.isUserEnrolled(userId, Number(courseId));
+
+    console.log({ enrolled });
+
+    if (!enrolled) {
+      return res.status(403).json({
+        message: 'Unauthorized, user does not have access to this course',
+      });
+    }
+
+    const lectures: db.SelectLecture[] = await db.getCourseLectures(
+      Number(courseId),
+    );
 
     return res
       .status(200)

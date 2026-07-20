@@ -1,8 +1,10 @@
 import 'dotenv/config';
-import { Pool } from 'pg';
-import z from 'zod';
+import { drizzle } from 'drizzle-orm/node-postgres';
+import { eq, and, inArray, sql } from 'drizzle-orm';
 
-import * as validation from './validation.ts';
+import * as schema from '../drizzle/schema.ts';
+import * as schemaRelations from '../drizzle/relations.ts';
+import { PgBigInt53 } from 'drizzle-orm/pg-core';
 
 export class DataIntegrityError extends Error {
   constructor(message: string) {
@@ -26,39 +28,70 @@ export class RowNotFoundError extends Error {
   }
 }
 
-const db = new Pool({
-  user: process.env.DB_USER,
-  host: process.env.DB_HOST,
-  database: process.env.DB_NAME,
-  password: process.env.DB_PASSWORD,
-  port: Number(process.env.DB_PORT),
-});
-
-export type User = z.infer<typeof validation.userSchema>;
-export type Course = z.infer<typeof validation.courseSchema>;
-export type Lecture = z.infer<typeof validation.lectureSchema>;
-export type LectureVideo = z.infer<typeof validation.lectureVideoSchema>;
-
-export async function getImageLink(name: string): Promise<string | null> {
-  const query = 'SELECT * FROM image_links WHERE name = $1';
-  const values = [name];
-
-  const res = await db.query(query, values);
-  if (res.rowCount && res.rowCount > 1) {
-    throw new NonUniqueDataError(res.rowCount);
-  }
-
-  const row = res.rows[0];
-
-  return row?.link ?? null;
+if (!process.env.DB_URL) {
+  throw new Error('DB_URL not set in .env');
 }
 
-export async function isUserFound(email: string): Promise<boolean> {
-  const query = 'SELECT 1 FROM users WHERE email = $1';
-  const values = [email];
+const db = drizzle(process.env.DB_URL!, {
+  schema: { ...schema, ...schemaRelations },
+});
 
-  const res = await db.query(query, values);
-  return res.rowCount != 0;
+export type SelectUser = typeof schema.users.$inferSelect;
+export type InsertUser = typeof schema.users.$inferInsert;
+
+export type SelectCourse = typeof schema.courses.$inferSelect;
+export type InsertCourse = typeof schema.courses.$inferInsert;
+
+export type SelectLecture = typeof schema.lectures.$inferSelect;
+export type InsertLecture = typeof schema.lectures.$inferInsert;
+
+export type SelectLectureVideo = typeof schema.lectureVideos.$inferSelect;
+export type InsertLectureVideo = typeof schema.lectureVideos.$inferInsert;
+
+export type SelectExam = typeof schema.exams.$inferSelect;
+export type InsertExam = typeof schema.exams.$inferInsert;
+
+export type SelectQuestion = typeof schema.questions.$inferSelect;
+export type InsertQuestion = typeof schema.questions.$inferInsert;
+
+export type SelectQuestionChoice = typeof schema.questionChoices.$inferSelect;
+export type InsertQuestionChoice = typeof schema.questionChoices.$inferInsert;
+
+export type SelectCourseEnrollment =
+  typeof schema.courseEnrollments.$inferSelect;
+export type InsertCourseEnrollment =
+  typeof schema.courseEnrollments.$inferInsert;
+
+export type SelectExamSubmission = typeof schema.examSubmissions.$inferSelect;
+export type InsertExamSubmission = typeof schema.examSubmissions.$inferInsert;
+
+export type SelectAnswerSubmission =
+  typeof schema.answerSubmissions.$inferSelect;
+export type InsertAnswerSubmission =
+  typeof schema.answerSubmissions.$inferInsert;
+
+export type SelectPaymentTransaction =
+  typeof schema.paymentTransactions.$inferSelect;
+export type InsertPaymentTransaction =
+  typeof schema.paymentTransactions.$inferInsert;
+
+export type RelationLecture = Awaited<
+  ReturnType<typeof getCourseLectures>
+>[number];
+
+export type RelationExamQuestions = Awaited<
+  ReturnType<typeof getExamQuestions>
+>[number];
+
+export type RelationUserLectures = Awaited<ReturnType<typeof getUserLectures>>;
+
+export async function isUserFound(email: string): Promise<boolean> {
+  const res = await db
+    .select()
+    .from(schema.users)
+    .where(eq(schema.users.email, email));
+
+  return res.length != 0;
 }
 
 export async function isStudentPhoneFound(phone: string): Promise<boolean> {
@@ -82,18 +115,29 @@ export async function isPhoneRegistered(phone: string): Promise<boolean> {
 export async function getUserByEmail(email: string): Promise<User> {
   const query = 'SELECT * FROM users WHERE email = $1';
   const values = [email];
+export async function getUserByEmail(email: string): Promise<SelectUser> {
+  const res = await db
+    .select()
+    .from(schema.users)
+    .where(eq(schema.users.email, email))
+    .limit(2); // We test for uniqueness only
 
-  const res = await db.query(query, values);
-  if (res.rowCount && res.rowCount > 1) {
-    throw new NonUniqueDataError(res.rowCount);
-  }
-  if (res.rowCount == 0) {
+  if (res.length == 0) {
     throw new RowNotFoundError(
       `المستخدم ذو البريد الإلكتروني ${email} غير موجود`,
     );
+  } else if (res.length > 1) {
+    throw new NonUniqueDataError(res.length);
   }
 
-  const row = res.rows[0];
+  return res[0];
+}
+
+export async function getUserById(id: number): Promise<SelectUser> {
+  const res = await db
+    .select()
+    .from(schema.users)
+    .where(eq(schema.users.id, id));
 
   const user: User = {
     id: Number(row.id),
@@ -163,8 +207,28 @@ export async function getUserByPhone(phone: string): Promise<User> {
     year: row.year,
     name: row.name,
   };
+  if (res.length == 0) {
+    throw new RowNotFoundError(`المستخدم ذو المعرف ${id} غير موجود`);
+  }
 
-  return user;
+  return res[0];
+}
+
+export async function insertUser(user: InsertUser) {
+  await db.insert(schema.users).values(user);
+}
+
+export async function getCourseById(id: number): Promise<SelectCourse> {
+  const res = await db
+    .select()
+    .from(schema.courses)
+    .where(eq(schema.courses.id, id));
+
+  if (res.length === 0) {
+    throw new RowNotFoundError(`الدورة التدريبية ذات المعرف ${id} غير موجودة`);
+  }
+
+  return res[0];
 }
 
 export async function getUserByIdentifier(identifier: string): Promise<User> {
@@ -198,91 +262,431 @@ export async function insertUser(user: User) {
     user.year,
     user.governorate,
   ];
+export async function getAllCourses(): Promise<SelectCourse[]> {
+  const res = await db.select().from(schema.courses);
 
-  await db.query(query, values);
+  return res;
 }
 
-export async function getCourseById(id: number): Promise<Course> {
-  const query = 'SELECT * FROM courses WHERE id = $1';
-  const values = [id];
+export async function getCourseLectures(courseId: number) {
+  const existsRes = await db
+    .select()
+    .from(schema.courses)
+    .where(eq(schema.courses.id, courseId));
 
-  const res = await db.query(query, values);
-  if (res.rowCount && res.rowCount > 1) {
-    throw new NonUniqueDataError(res.rowCount);
-  }
-  if (res.rowCount == 0) {
-    throw new RowNotFoundError(`الدورة التدريبية ذات المعرف ${id} غير موجودة`);
-  }
-
-  const row = res.rows[0];
-
-  validation.courseSchema.parse(row);
-
-  return row;
-}
-
-export async function getAllCourses(): Promise<Course[]> {
-  const query = 'SELECT * FROM courses';
-
-  const res = await db.query(query);
-  for (const course of res.rows) {
-    validation.courseSchema.parse(course);
-  }
-
-  return res.rows;
-}
-
-export async function getCourseLectures(courseId: number): Promise<Lecture[]> {
-  const existsQuery = 'SELECT 1 FROM courses WHERE id=$1';
-  const existsQueryValues = [courseId];
-
-  const existsRes = await db.query(existsQuery, existsQueryValues);
-  if (existsRes.rowCount == 0) {
+  if (existsRes.length == 0) {
     throw new RowNotFoundError(
       `الدورة التدريبية ذات المعرف ${courseId} غير موجودة`,
     );
   }
 
-  const schema = validation.lectureSchema.extend({
-    videos: z.array(
-      z.object({
-        title: z.string(),
-        video_id: z.string(),
-      }),
-    ),
+  const res = await db.query.lectures.findMany({
+    where: (lectures, { eq }) => eq(lectures.courseId, courseId),
+    with: {
+      lectureVideos: {
+        columns: {
+          id: true,
+          videoId: true,
+          title: true,
+        },
+      },
+      exams: {
+        columns: {
+          id: true,
+          title: true,
+        },
+      },
+    },
   });
 
-  const query = `SELECT l.*, json_agg(json_build_object('video_id', v.video_id, 'title', v.title)) AS videos FROM lectures AS l JOIN lecture_videos as v ON v.lecture_id = l.id WHERE l.course_id = $1 GROUP BY l.id;`;
-  const values = [courseId];
-
-  const res = await db.query(query, values);
-  for (const lecture of res.rows) {
-    schema.parse(lecture);
-  }
-
-  return res.rows;
+  return res;
 }
 
 export async function getLectureVideos(
   lectureId: number,
-): Promise<LectureVideo[]> {
-  const existsQuery = 'SELECT 1 FROM lectures WHERE id=$1';
-  const existsQueryValues = [lectureId];
+): Promise<SelectLectureVideo[]> {
+  const existsRes = await db
+    .select()
+    .from(schema.lectures)
+    .where(eq(schema.lectures.id, lectureId));
 
-  const existsRes = await db.query(existsQuery, existsQueryValues);
-  if (existsRes.rowCount == 0) {
+  if (existsRes.length == 0) {
     throw new RowNotFoundError(`المحاضرة ذات المعرف ${lectureId} غير موجودة`);
   }
 
-  const query = 'SELECT * FROM lecture_videos WHERE lecture_id=$1';
-  const values = [lectureId];
+  const res = await db
+    .select()
+    .from(schema.lectureVideos)
+    .where(eq(schema.lectureVideos.lectureId, lectureId));
 
-  const res = await db.query(query, values);
-  for (const video of res.rows) {
-    validation.lectureVideoSchema.parse(video);
+  return res;
+}
+
+export async function getExamQuestions(examId: number) {
+  const existsRes = await db
+    .select()
+    .from(schema.exams)
+    .where(eq(schema.exams.id, examId));
+
+  if (existsRes.length == 0) {
+    throw new RowNotFoundError(`الأمتحان ذو المعرف ${examId} غير موجود`);
   }
 
-  return res.rows;
+  const res = await db.query.questions.findMany({
+    where: (questions, { eq }) => eq(questions.examId, examId),
+    with: {
+      questionChoices: {
+        columns: {
+          id: true,
+          choiceText: true,
+        },
+      },
+    },
+  });
+
+  return res;
+}
+
+export async function getCourseEnrollments(userId: number) {
+  const res = await db.query.courseEnrollments.findMany({
+    where: (courseEnrollments, { eq }) =>
+      eq(courseEnrollments.studentId, userId),
+    columns: {
+      courseId: false,
+    },
+    with: {
+      course: {
+        columns: {
+          id: true,
+          title: true,
+          imageUrl: true,
+          createdAt: true,
+          price: true,
+          description: true,
+        },
+      },
+    },
+  });
+
+  return res;
+}
+
+export async function isUserEnrolled(userId: number, courseId: number) {
+  const res = await db
+    .select()
+    .from(schema.courseEnrollments)
+    .where(
+      and(
+        eq(schema.courseEnrollments.studentId, userId),
+        eq(schema.courseEnrollments.courseId, courseId),
+      ),
+    );
+
+  return res.length != 0;
+}
+
+export async function addCourseEnrollment(enrollment: InsertCourseEnrollment) {
+  await db.insert(schema.courseEnrollments).values(enrollment);
+}
+
+export async function getExam(examId: number): Promise<SelectExam> {
+  const res = await db
+    .select()
+    .from(schema.exams)
+    .where(eq(schema.exams.id, examId));
+
+  if (res.length === 0) {
+    throw new RowNotFoundError(`Exam with id ${examId} not found`);
+  }
+
+  return res[0];
+}
+
+export async function getLecture(lectureId: number): Promise<SelectLecture> {
+  const res = await db
+    .select()
+    .from(schema.lectures)
+    .where(eq(schema.lectures.id, lectureId));
+
+  if (res.length === 0) {
+    throw new RowNotFoundError(`Lecture with id ${lectureId} not found`);
+  }
+
+  return res[0];
+}
+
+export async function getQuestionChoice(
+  choiceId: number,
+): Promise<SelectQuestionChoice> {
+  const res = await db
+    .select()
+    .from(schema.questionChoices)
+    .where(eq(schema.questionChoices.id, choiceId));
+
+  if (res.length === 0) {
+    throw new RowNotFoundError(`Choice with id ${choiceId} not found`);
+  }
+
+  return res[0];
+}
+
+export async function addExamSubmission(
+  submission: InsertExamSubmission,
+): Promise<number> {
+  const [result] = await db
+    .insert(schema.examSubmissions)
+    .values(submission)
+    .returning({ id: schema.examSubmissions.id });
+
+  return result.id;
+}
+
+export async function addAnswerSubmissions(
+  answerSubmissions: InsertAnswerSubmission[],
+) {
+  await db.insert(schema.answerSubmissions).values(answerSubmissions);
+}
+
+// returns all the exam submissions a student has made
+export async function getStudentExamSubmissions(studentId: number) {
+  const res = await db.query.examSubmissions.findMany({
+    where: (examSubmissions, { and }) =>
+      and(eq(examSubmissions.studentId, studentId)),
+    columns: {
+      examId: false,
+    },
+    with: {
+      exam: {
+        columns: {
+          id: true,
+          title: true,
+        },
+      },
+      answerSubmissions: {
+        columns: {
+          questionId: false,
+          choiceId: false,
+          createdAt: false,
+        },
+        with: {
+          question: {
+            columns: {
+              examId: false,
+              createdAt: false,
+            },
+            with: {
+              correctChoices: {
+                where: eq(schema.questionChoices.isCorrect, true),
+                columns: {
+                  isCorrect: false,
+                  questionId: false,
+                  createdAt: false,
+                },
+              },
+            },
+          },
+          questionChoice: {
+            columns: {
+              questionId: false,
+              createdAt: false,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (res.length === 0) {
+    throw new RowNotFoundError(
+      `No exam submission for user with id ${studentId} found`,
+    );
+  }
+
+  return res;
+}
+
+// returns all the exam submissions a student has made for a specific exam
+export async function getExamSubmissions(studentId: number, examId: number) {
+  const exam = await db
+    .select()
+    .from(schema.exams)
+    .where(eq(schema.exams.id, examId));
+  if (exam.length === 0) {
+    throw new RowNotFoundError(`No exam with id ${examId} found`);
+  }
+
+  let subs = await db.query.examSubmissions.findMany({
+    where: (examSubmissions, { and }) =>
+      and(
+        eq(examSubmissions.studentId, studentId),
+        eq(examSubmissions.examId, examId),
+      ),
+    columns: {
+      examId: false,
+    },
+    with: {
+      answerSubmissions: {
+        columns: {
+          questionId: false,
+          choiceId: false,
+          createdAt: false,
+          studentId: false,
+        },
+        with: {
+          question: {
+            columns: {
+              examId: false,
+              createdAt: false,
+            },
+            with: {
+              correctChoices: {
+                where: eq(schema.questionChoices.isCorrect, true),
+                columns: {
+                  isCorrect: false,
+                  questionId: false,
+                  createdAt: false,
+                },
+              },
+            },
+          },
+          questionChoice: {
+            columns: {
+              questionId: false,
+              createdAt: false,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (subs.length === 0) {
+    throw new RowNotFoundError(
+      `No exam submission for user with id ${studentId} and exam with id ${examId} found`,
+    );
+  }
+
+  const res = {
+    exam: exam[0],
+    submissions: subs,
+  };
+
+  return res;
+}
+
+export async function isUserFoundById(userId: number): Promise<boolean> {
+  const res = await db
+    .select()
+    .from(schema.users)
+    .where(eq(schema.users.id, userId));
+
+  return res.length !== 0;
+}
+
+export async function isExamFound(examId: number): Promise<boolean> {
+  const res = await db
+    .select()
+    .from(schema.exams)
+    .where(eq(schema.exams.id, examId));
+
+  return res.length !== 0;
+}
+
+export async function getUserLectures(studentId: number, courseId: number) {
+  const course = await db
+    .select()
+    .from(schema.courses)
+    .where(eq(schema.courses.id, courseId));
+
+  if (course.length === 0) {
+    throw new RowNotFoundError(
+      `الدورة التدريبية ذات المعرف ${courseId} غير موجودة`,
+    );
+  }
+
+  const lectures = await db.query.lectures.findMany({
+    where: (lectures, { eq }) => eq(lectures.courseId, courseId),
+    columns: {
+      courseId: false,
+    },
+    with: {
+      exams: {
+        columns: {
+          lectureId: false,
+        },
+        with: {
+          examSubmissions: {
+            where: eq(schema.examSubmissions.studentId, studentId),
+            columns: {
+              examId: false,
+              studentId: false,
+            },
+          },
+        },
+      },
+      lectureVideos: {
+        columns: {
+          lectureId: false,
+        },
+        with: {
+          lectureVideoCompletions: {
+            where: eq(schema.lectureVideoCompletions.studentId, studentId),
+            columns: {
+              videoId: false,
+              studentId: false,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  return lectures;
+}
+
+export async function createPayment(): Promise<SelectPaymentTransaction> {
+  const [payment] = await db
+    .insert(schema.paymentTransactions)
+    .values({})
+    .returning();
+
+  return payment;
+}
+
+export async function addToWalletBalance(studentId: number, amount: number) {
+  if (!isUserFoundById(studentId)) {
+    throw new RowNotFoundError(`User with id ${studentId} does not exist`);
+  }
+
+  await db
+    .insert(schema.wallets)
+    .values({
+      studentId,
+      balance: amount,
+    })
+    .onConflictDoUpdate({
+      target: schema.wallets.studentId,
+      set: {
+        balance: sql`${schema.wallets.balance} + ${amount}`,
+      },
+    });
+}
+
+export async function getBalance(studentId: number): Promise<number> {
+  if (!isUserFoundById(studentId)) {
+    throw new RowNotFoundError(`User with id ${studentId} does not exist`);
+  }
+
+  const res = await db
+    .select()
+    .from(schema.wallets)
+    .where(eq(schema.wallets.studentId, studentId));
+
+  if (res.length === 0) {
+    throw new RowNotFoundError(`User with id ${studentId} has no wallet`);
+  }
+
+  return res[0].balance;
 }
 
 export default db;

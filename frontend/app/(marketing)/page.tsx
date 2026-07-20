@@ -1,21 +1,38 @@
 "use client";
-import { useAuth } from "../hooks/useAuth"
+import { useMe } from "../hooks/queries/useMe";
 import LandingHome from "../components/LandingHome";
-import StudentHome from "../components/StudentHome";
 import LoadingComp from "../components/LoadingComp";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+
 
 export default function Home() {
-  const { loggedIn, isLoading } = useAuth();
+  const [mounted, setMounted] = useState(false);
+  const { data: userData, isLoading } = useMe();
 
-  if ( isLoading ) return <LoadingComp />
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isUser = userData ? true : false;
+
+  if (isUser) {
+    const router = useRouter();
+    router.push("/home");
+  }
+
+  if (isLoading || !mounted) {
+    return <LoadingComp />;
+  }
+
+
+
 
   return (
-
     <div>
-      { loggedIn ? <StudentHome /> : <LandingHome /> }
+
+      <LandingHome />
     </div>
-    
-  )
+  );
+
 }
-
-

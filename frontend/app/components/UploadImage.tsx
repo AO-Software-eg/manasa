@@ -87,7 +87,7 @@ export default function UploadImage({ onUpload }: UploadImageProps) {
   return (
     <div className="my-4">
       <div
-        className={`w-full p-4 border-2 border-dashed border-gray-300 rounded-lg text-center cursor-pointer hover:border-gray-400 transition ${
+        className={`w-full p-4 border-2 border-dashed border-border rounded-lg text-center cursor-pointer hover:border-muted-foreground transition ${
           uploading ? "opacity-50" : ""
         }`}
         {...getRootProps()}
@@ -100,8 +100,8 @@ export default function UploadImage({ onUpload }: UploadImageProps) {
             اسحب وأسقط الصورة هنا أو <span className="font-bold">تصفح</span>
           </span>
         )}
-        {errors && <p className="text-red-500 mt-2">{errors}</p>}
-        {uploading && <p className="text-blue-500 mt-2">جاري الرفع...</p>}
+        {errors && <p className="text-destructive mt-2">{errors}</p>}
+        {uploading && <p className="text-primary mt-2">جاري الرفع...</p>}
       </div>
 
       {images.length > 0 && (
@@ -116,7 +116,7 @@ export default function UploadImage({ onUpload }: UploadImageProps) {
               />
               <button
                 onClick={() => deleteImage(file)}
-                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600"
+                className="absolute -top-2 -right-2 bg-destructive text-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-destructive/90"
               >
                 ×
               </button>
