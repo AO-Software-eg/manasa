@@ -90,7 +90,7 @@ function Page() {
   const onsubmit = async (data: Infer) => {
     setIsSubmitting(true);
     try {
-      const res = await api.post('/signup', data);
+      const res = await api.post('/auth/signup', data);
 
       toast.success('تم إنشاء الحساب بنجاح!');
       form.reset();
@@ -98,7 +98,7 @@ function Page() {
     } catch (err: AxiosError | any) {
       console.log(err.response?.data?.message);
 
-      const message = err.response?.data?.message || 'حدث خطأ أثناء الدخول';
+      const message = err.response?.data?.message || 'حدث خطأ أثناء التسجيل';
 
       toast.error(message);
     } finally {

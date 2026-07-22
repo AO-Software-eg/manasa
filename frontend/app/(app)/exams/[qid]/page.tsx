@@ -4,22 +4,25 @@ import { ChevronLeft, Send } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { useExams } from '@/app/hooks/queries/useExams';
-import { useParams } from 'next/navigation';
-import { useRouter } from 'next/navigation';
+import { useExams, useSubmitExam } from '@/app/hooks/queries/useExams';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import Timer from '@/app/components/Timer';
 import { ExamQuestion } from '@/types/exams';
 import PopUp from '@/app/components/PopUp';
 import { useMe } from '@/app/hooks/queries/useMe';
-import { useSubmitExam } from '@/app/hooks/queries/useExams';
 import { toast } from 'sonner';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { useLectureProgress } from '../../../hooks/queries/useLectures';
+import LoadingComp from '@/app/components/LoadingComp';
+import NotFound from '@/app/not-found';
 
 function Page() {
+  const searchParams = useSearchParams();
   const { qid } = useParams();
   const examId = qid ? Number(qid) : NaN;
   const router = useRouter();
+
   const [currentQuestion, setCurrentQuestion] = useState(1);
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [isQuestionVisited, setIsQuestionVisited] = useState<number[]>([1]);
@@ -27,20 +30,27 @@ function Page() {
   const [onOpenExit, setOpenOnExit] = useState(false);
   const [onSubmit, setOnSubmit] = useState(false);
   const [timeDone, setTimeDone] = useState(false);
-  const { data: userData } = useMe();
-  const SubmitExam = useSubmitExam();
 
-  // ----------------------------
-  // Helpers
-  // ----------------------------
+  const { data: userData } = useMe();
+  const submitExam = useSubmitExam();
+  const courseId = Number(searchParams.get('courseId'));
+
+  const { data: progress, isLoading: progressLoading } = useLectureProgress(
+    userData?.id,
+    courseId,
+  );
+
+  const examProgress = progress?.exams.find((e) => e.id === examId);
+  const canFetchExam =
+    !progressLoading && examProgress !== undefined && !examProgress.completed;
+
+  const { data, isLoading, error } = useExams(examId, canFetchExam);
 
   const markQuestionAsVisited = (questionNumber: number) => {
     setIsQuestionVisited((prev) =>
       prev.includes(questionNumber) ? prev : [...prev, questionNumber],
     );
   };
-
-  const { data, isLoading, error } = useExams(examId);
 
   const questionCount = data?.questions.length || 0;
 
@@ -54,23 +64,29 @@ function Page() {
       }),
     );
 
-    SubmitExam.mutate(
+    submitExam.mutate(
       {
         studentId: userData.id,
         examId,
         answers: formattedAnswers,
       },
       {
-        onSuccess: (data) => {
-          console.log('Exam submitted successfully:', data);
-          router.push(`/exams/${examId}/submitted`);
+        onSuccess: (submittedData) => {
+          console.log('Exam submitted successfully:', submittedData);
+          router.replace(`/exams/${examId}/submitted?courseId=${courseId}`);
         },
-        onError: (error) => {
-          console.error(error);
+        onError: (submitError) => {
+          console.error(submitError);
         },
-      }
+      },
     );
-  }, [answers, userData, examId,  router, SubmitExam]);
+  }, [answers, userData, examId, router, submitExam]);
+
+  useEffect(() => {
+    if (!courseId) {
+      router.replace('/home/courses');
+    }
+  }, [courseId, router]);
 
   useEffect(() => {
     if (onExit) {
@@ -82,11 +98,34 @@ function Page() {
   }, [onExit, router]);
 
   useEffect(() => {
+    if (examProgress?.completed) {
+      router.replace(`/exams/${examId}/submitted?courseId=${courseId}`);
+    }
+  }, [examProgress?.completed, examId, router]);
+
+  useEffect(() => {
     if (timeDone) {
       toast('انتهى الوقت المحدد للامتحان. سيتم تقديم إجاباتك الآن.');
       handleSubmitData();
     }
-  }, [timeDone]);
+  }, [handleSubmitData, timeDone]);
+
+  if (!courseId) {
+    return null;
+  }
+
+  if (progressLoading) {
+    return <LoadingComp />;
+  }
+
+  if (examProgress?.completed) {
+    return <LoadingComp />;
+  }
+
+  if (!examProgress) {
+    return <NotFound />;
+  }
+
   if (isLoading) {
     return (
       <div className="w-full min-h-screen bg-background flex items-center justify-center p-6 text-foreground">
@@ -112,30 +151,23 @@ function Page() {
       <div className="w-full min-h-screen bg-background flex items-center justify-center p-6 text-foreground">
         <Card className="w-full max-w-md bg-card border-destructive">
           <CardContent className="flex flex-col items-center gap-4 py-10">
-
-            <h2 className="text-2xl font-semibold text-destructive">
-              حدث خطأ
-            </h2>
+            <h2 className="text-2xl font-semibold text-destructive">حدث خطأ</h2>
 
             <p className="text-muted-foreground text-center">
               تعذر تحميل بيانات الامتحان
             </p>
 
-            <Button onClick={() => window.location.reload()} className="cursor-pointer">
+            <Button
+              onClick={() => window.location.reload()}
+              className="cursor-pointer"
+            >
               إعادة المحاولة
             </Button>
-
           </CardContent>
         </Card>
       </div>
     );
   }
-
-
-
-  // ----------------------------
-  // Navigation
-  // ----------------------------
 
   const nextQuestion = () => {
     setCurrentQuestion((prev) => {
@@ -158,10 +190,6 @@ function Page() {
     markQuestionAsVisited(questionNumber);
   };
 
-  // ----------------------------
-  // Answers
-  // ----------------------------
-
   const handleSelect = (optionId: number) => {
     const currentQuestionData = data?.questions[currentQuestion - 1];
     if (!currentQuestionData) return;
@@ -172,20 +200,13 @@ function Page() {
     }));
   };
 
-  // ----------------------------
-  // Current selected answer
-  // ----------------------------
-
   const currentQuestionData = data?.questions[currentQuestion - 1];
-
-
   const selectedOption: number | undefined = currentQuestionData
     ? answers[currentQuestionData.id]
     : undefined;
 
   return (
     <div className="max-w-full flex flex-col p-4 gap-4 min-h-screen bg-background text-foreground pt-28">
-      {/* Top Actions */}
       <div className="flex flex-row-reverse items-start my-4 p-4 justify-between w-full">
         <button
           className="flex items-center bg-destructive/10 border border-destructive/30 p-3 rounded-2xl flex-row-reverse gap-2 text-sm text-destructive hover:bg-destructive/25 transition cursor-pointer"
@@ -204,14 +225,10 @@ function Page() {
         </button>
       </div>
 
-      {/* Main Content */}
       <div className="flex-1 p-4 lg:h-[calc(102dvh-5rem)] lg:overflow-y-auto overflow-x-hidden">
-        {/* Question Navigation */}
         <div className="mb-10 w-full max-w-4xl mx-auto bg-card border border-border rounded-3xl p-6 shadow-xs">
-          {/* Timer */}
           <Timer timeDone={timeDone} setTimeDone={setTimeDone} />
 
-          {/* Header */}
           <div className="flex items-center justify-between mb-4">
             <p className="text-sm text-muted-foreground">
               السؤال {currentQuestion} من {questionCount}
@@ -221,7 +238,6 @@ function Page() {
             </p>
           </div>
 
-          {/* Progress Bar */}
           <div className="w-full h-2 bg-secondary rounded-full mb-6 overflow-hidden">
             <div
               className="h-full bg-primary transition-all duration-300"
@@ -231,7 +247,6 @@ function Page() {
             />
           </div>
 
-          {/* Navigation Buttons */}
           <div className="flex flex-wrap gap-3 justify-center">
             {Array(questionCount)
               .fill(0)
@@ -239,9 +254,10 @@ function Page() {
                 const questionNumber = index + 1;
                 const isCurrent = questionNumber === currentQuestion;
                 const questionId = data?.questions[questionNumber - 1]?.id;
-                const isAnswered = questionId !== undefined
-                  ? answers[questionId] !== undefined
-                  : false;
+                const isAnswered =
+                  questionId !== undefined
+                    ? answers[questionId] !== undefined
+                    : false;
                 const isVisited = isQuestionVisited.includes(questionNumber);
 
                 return (
@@ -251,13 +267,14 @@ function Page() {
                     className={`
                       w-12 h-12 rounded-2xl flex items-center justify-center
                       text-sm font-semibold transition-all duration-200 border cursor-pointer
-                      ${isCurrent
-                        ? 'bg-primary border-primary text-primary-foreground scale-110 shadow-md shadow-primary/30'
-                        : isAnswered
-                          ? 'bg-primary border-primary text-primary-foreground hover:scale-105 shadow-xs'
-                          : isVisited
-                            ? 'bg-secondary border-primary/40 text-foreground hover:scale-105 shadow-xs'
-                            : 'bg-secondary border-border text-foreground hover:bg-secondary/80 hover:scale-105'
+                      ${
+                        isCurrent
+                          ? 'bg-primary border-primary text-primary-foreground scale-110 shadow-md shadow-primary/30'
+                          : isAnswered
+                            ? 'bg-primary border-primary text-primary-foreground hover:scale-105 shadow-xs'
+                            : isVisited
+                              ? 'bg-secondary border-primary/40 text-foreground hover:scale-105 shadow-xs'
+                              : 'bg-secondary border-border text-foreground hover:bg-secondary/80 hover:scale-105'
                       }
                     `}
                   >
@@ -267,7 +284,6 @@ function Page() {
               })}
           </div>
 
-          {/* Legend */}
           <div className="flex flex-wrap justify-center gap-5 mt-6 text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 rounded bg-primary" />
@@ -296,7 +312,9 @@ function Page() {
                 {question.question}
               </h1>
               <RadioGroup
-                value={selectedOption !== undefined ? selectedOption.toString() : ''}
+                value={
+                  selectedOption !== undefined ? selectedOption.toString() : ''
+                }
                 className="w-full flex flex-col items-end gap-4"
                 onValueChange={(value) => {
                   handleSelect(Number(value));
@@ -308,9 +326,9 @@ function Page() {
                     className={`
                       flex flex-row-reverse items-center gap-3 w-full rounded-2xl transition-all border
                       ${
-                      selectedOption === option.id
-                        ? 'bg-primary/10 border-primary shadow-xs'
-                        : 'bg-card border-border hover:border-primary/50 hover:bg-secondary/40'
+                        selectedOption === option.id
+                          ? 'bg-primary/10 border-primary shadow-xs'
+                          : 'bg-card border-border hover:border-primary/50 hover:bg-secondary/40'
                       }
                     `}
                   >
@@ -333,7 +351,6 @@ function Page() {
         })}
       </div>
 
-      {/* Footer */}
       <div className="flex justify-between items-center p-4">
         <button
           className={`
@@ -377,12 +394,18 @@ function Page() {
         open={onSubmit}
         title="هل أنت متأكد أنك تريد تقديم الامتحان؟"
         description="تأكد من مراجعة إجاباتك قبل تقديم الامتحان."
-        confirmText={SubmitExam.isPending ? "جاري ارسال الاجابات" : SubmitExam.isSuccess ? "تم التقديم" : "تقديم الامتحان"}
+        confirmText={
+          submitExam.isPending
+            ? 'جاري ارسال الاجابات'
+            : submitExam.isSuccess
+              ? 'تم التقديم'
+              : 'تقديم الامتحان'
+        }
         confirmClassName="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
         onClose={() => setOnSubmit(false)}
         onConfirm={handleSubmitData}
-        pending={SubmitExam.isPending}
-        done={SubmitExam.isSuccess}
+        pending={submitExam.isPending}
+        done={submitExam.isSuccess}
       />
     </div>
   );

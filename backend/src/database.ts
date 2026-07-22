@@ -1,10 +1,9 @@
 import 'dotenv/config';
 import { drizzle } from 'drizzle-orm/node-postgres';
-import { eq, and, inArray, sql } from 'drizzle-orm';
+import { eq, and, or, sql } from 'drizzle-orm';
 
 import * as schema from '../drizzle/schema.ts';
 import * as schemaRelations from '../drizzle/relations.ts';
-import { PgBigInt53 } from 'drizzle-orm/pg-core';
 
 export class DataIntegrityError extends Error {
   constructor(message: string) {
@@ -88,6 +87,24 @@ export type RelationExamQuestions = Awaited<
 
 export type RelationUserLectures = Awaited<ReturnType<typeof getUserLectures>>;
 
+function normalizeEgyptPhone(phone: string): string {
+  phone = phone.replace(/\s+/g, "");
+
+  if (phone.startsWith("+20")) {
+    return phone;
+  }
+
+  if (phone.startsWith("0")) {
+    return `+20${phone.slice(1)}`;
+  }
+
+  if (phone.startsWith("20")) {
+    return `+${phone}`;
+  }
+
+  return phone;
+}
+
 export async function isUserFound(email: string): Promise<boolean> {
   const res = await db
     .select()
@@ -97,12 +114,37 @@ export async function isUserFound(email: string): Promise<boolean> {
   return res.length != 0;
 }
 
+export async function isStudentPhoneFound(phone: string): Promise<boolean> {
+  const normalizedPhone = normalizeEgyptPhone(phone);
+  const res = await db
+    .select()
+    .from(schema.users)
+    .where(eq(schema.users.studentPhone, normalizedPhone));
+
+  return res.length != 0;
+}
+
+export async function isPhoneRegistered(phone: string): Promise<boolean> {
+  const normalizedPhone = normalizeEgyptPhone(phone);
+  const res = await db
+    .select()
+    .from(schema.users)
+    .where(
+      or(
+        eq(schema.users.studentPhone, normalizedPhone),
+        eq(schema.users.parentPhone, normalizedPhone)
+      )
+    );
+
+  return res.length != 0;
+}
+
 export async function getUserByEmail(email: string): Promise<SelectUser> {
   const res = await db
     .select()
     .from(schema.users)
     .where(eq(schema.users.email, email))
-    .limit(2); // We test for uniqueness only
+    .limit(2);
 
   if (res.length == 0) {
     throw new RowNotFoundError(
@@ -128,8 +170,52 @@ export async function getUserById(id: number): Promise<SelectUser> {
   return res[0];
 }
 
+export async function getUserByPhone(phone: string): Promise<SelectUser> {
+  const normalizedPhone = normalizeEgyptPhone(phone);
+  
+  // First try to find a user with this phone as student_phone
+  let res = await db
+    .select()
+    .from(schema.users)
+    .where(eq(schema.users.studentPhone, normalizedPhone));
+
+  // If no user found, try parent_phone
+  if (res.length === 0) {
+    res = await db
+      .select()
+      .from(schema.users)
+      .where(eq(schema.users.parentPhone, normalizedPhone));
+  }
+
+  // If still no user found, throw RowNotFoundError
+  if (res.length === 0) {
+    throw new RowNotFoundError(
+      `المستخدم ذو رقم الهاتف ${phone} غير موجود`,
+    );
+  }
+
+  return res[0];
+}
+
+export async function getUserByIdentifier(identifier: string): Promise<SelectUser> {
+  // First try to find user by email
+  try {
+    return await getUserByEmail(identifier);
+  } catch (err) {
+    // If not found by email, try by phone
+    return await getUserByPhone(identifier);
+  }
+}
+
 export async function insertUser(user: InsertUser) {
   await db.insert(schema.users).values(user);
+}
+
+export async function updateUserPassword(userId: number, newPasswordHash: string) {
+  await db
+    .update(schema.users)
+    .set({ password: newPasswordHash })
+    .where(eq(schema.users.id, userId));
 }
 
 export async function getCourseById(id: number): Promise<SelectCourse> {

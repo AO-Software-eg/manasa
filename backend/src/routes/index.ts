@@ -1,18 +1,20 @@
 import express from 'express';
-import coursesRouter from './courses/routes.ts';
-import userRouter from './user/routes.ts';
-import videosRouter from './videos/routes.ts';
-import examsRouter from './exams/routes.ts';
-import lecturesRouter from './lectures/routes.ts';
-import paymentRouter from './payment/routes.ts';
+import authRouter from './auth/auth.routes.ts';
+import coursesRouter from './course/course.routes.ts';
+import userRouter from './user/user.routes.ts';
+import videoRouter from './video/video.routes.ts';
+import examsRouter from './exam/exam.routes.ts';
+import lecturesRouter from './lecture/lecture.routes.ts';
+import paymentRouter from './payment/payment.routes.ts';
 
 const router = express.Router();
 
 router.use('/payment', paymentRouter);
-router.use('/courses', coursesRouter);
-router.use('/videos', videosRouter);
-router.use('/lectures', lecturesRouter);
-router.use('/exams', examsRouter);
-router.use('/', userRouter);
+router.use('/course', coursesRouter);
+router.use('/video', videoRouter);
+router.use('/lecture', lecturesRouter);
+router.use('/exam', examsRouter);
+router.use('/user', userRouter);
+router.use('/auth', authRouter);
 
 export default router;

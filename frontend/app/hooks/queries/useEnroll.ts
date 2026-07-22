@@ -6,14 +6,13 @@ export const useEnroll = () => {
 
   return useMutation({
     mutationFn: async ({
-      studentId,
+
       courseId,
     }: {
       studentId: number;
       courseId: number;
     }) => {
-      const response = await api.post('/users/enroll', {
-        studentId,
+      const response = await api.post('/user/enroll', {
         courseId,
       });
 
@@ -22,20 +21,20 @@ export const useEnroll = () => {
 
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ['enrollments', variables.studentId.toString()],
+        queryKey: ['enrollments'],
       });
     },
   });
 };
 
-export const useGetEnrollments = (userId: string) => {
+export const useGetEnrollments = () => {
   return useQuery({
-    queryKey: ['enrollments', userId],
+    queryKey: ['enrollments'],
     queryFn: async () => {
-      const response = await api.get(`/users/${userId}/enrollments`);
+      const response = await api.get(`/user/enrollments`);
       return response.data;
     },
-    enabled: !!userId,
+    enabled: true,
     staleTime: 5 * 60 * 1000,
   });
 };

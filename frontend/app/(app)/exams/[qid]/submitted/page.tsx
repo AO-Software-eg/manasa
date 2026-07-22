@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 import { useMe } from '@/app/hooks/queries/useMe';
 import { useGetOnSubmit } from '@/app/hooks/queries/useExams';
@@ -22,10 +22,12 @@ import { Submissions } from '@/types';
 
 function Page() {
   const { data: user } = useMe();
+  const searchParams = useSearchParams();
+  const courseId = searchParams.get('courseId');
   const { qid, id } = useParams();
   const examId = Number(qid);
 
-  const { data, isLoading, isError } = useGetOnSubmit(examId, user?.id ?? '');
+  const { data, isLoading, isError } = useGetOnSubmit(examId);
 
   const queryClient = useQueryClient();
 
@@ -136,7 +138,9 @@ function Page() {
                         {formatDate(submission.createdAt)}
                       </TableCell>
                       <TableCell className="text-right">
-                        <Link href={`/home/history/exams_results/${submission.id}?examId=${examId}`}>
+                        <Link
+                          href={`/home/history/exams_results/${submission.id}?examId=${examId}`}
+                        >
                           <button className="bg-secondary text-secondary-foreground hover:bg-primary hover:text-primary-foreground px-4 py-2 rounded-xl transition-all duration-300 font-semibold cursor-pointer shadow-xs text-xs md:text-sm">
                             تصحيح الإجابات
                           </button>
@@ -162,7 +166,7 @@ function Page() {
 
       <div className="flex justify-start">
         <Button asChild className="rounded-xl px-6 cursor-pointer">
-          <Link href={`/home/courses/${id}/lectures`}>العودة للكورس</Link>
+          <Link href={`/home/courses/${courseId}/lectures`}>العودة للكورس</Link>
         </Button>
       </div>
     </div>

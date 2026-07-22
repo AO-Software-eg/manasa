@@ -10,7 +10,7 @@ export function useLectures(courseID: string) {
     enabled: !!courseID,
     staleTime: 1000 * 60 * 5,
     queryFn: async () => {
-      const res = await api.get(`/courses/${courseID}/lectures`);
+      const res = await api.get(`/course/${courseID}/lectures`);
       if (!res.data.data) throw new Error('لم يتم الحصول على محتوى الكورس');
       console.log(res.data.data)
       return res.data.data;
@@ -28,10 +28,10 @@ export function useVideo(
     staleTime: 1000 * 60 * 5,
     queryFn: async () => {
       const res = await api.get(
-        `/lectures/${lectureId}/videos`
+        `/lecture/${lectureId}/videos`
       );
 
-      const video = res.data.data.find(
+      const video = res.data.find(
         (v: lectureVideoSchema) => Number(v.id) === Number(videoRecordId)
       );
 
@@ -39,7 +39,7 @@ export function useVideo(
         throw new Error('لم يتم العثور على الفيديو');
       }
 
-      const vidRes = await api.get(`/videos/${video.videoId}`);
+      const vidRes = await api.get(`/video/${video.videoId}`);
 
       return {
         otp: vidRes.data.otp,
@@ -52,9 +52,9 @@ export function useLectureProgress(userId?: number, courseId?: number, enabled =
   return useQuery<progressSchema>({
     queryKey: ['progress', userId, courseId],
     enabled: enabled && !!userId && !!courseId,
-    staleTime: 1000 * 60 * 5,
+    staleTime: 0,
     queryFn: async () => {
-      const res = await api.get(`/users/${userId}/progress/${courseId}`);
+      const res = await api.get(`/user/progress/${courseId}`);
       console.log(res.data);
 
       if (!res.data) {

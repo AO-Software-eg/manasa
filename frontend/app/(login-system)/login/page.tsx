@@ -40,12 +40,12 @@ function LoginContent() {
     e.preventDefault();
     const data = new FormData(e.target as HTMLFormElement);
     const payload = {
-      email: data.get('email') as string,
+      identifier: data.get('identifier') as string,
       password: data.get('password') as string,
     };
 
     try {
-      const res = await api.post('/login', payload, { withCredentials: true });
+      const res = await api.post('/auth/login', payload, { withCredentials: true });
 
       toast.success('تم الدخول بنجاح!');
       await queryClient.invalidateQueries({
@@ -74,18 +74,17 @@ function LoginContent() {
         <h3 className="text-3xl text-center font-bold text-primary">
           تسجيل الدخول
         </h3>
-        <form onSubmit={onsubmit} className={`w-full ${cairo.className} space-y-5`}>
-          <div>
-            <label htmlFor="email" className="block text-sm font-semibold text-foreground/80 mb-2">
-              البريد الإلكتروني
+        <form onSubmit={onsubmit} className={`w-full ${cairo.className}`}>
+          <div className="mb-4">
+            <label htmlFor="identifier" className="block text-sm font-semibold text-foreground/80 mb-2">
+              البريد الإلكتروني أو رقم الهاتف
             </label>
             <input
-              type="email"
-              id="email"
-              name="email"
-              required
-              placeholder="name@example.com"
+              type="text"
+              id="identifier"
+              name="identifier"
               className="bg-secondary/20 rounded-xl w-full outline-none text-foreground placeholder:text-muted-foreground/60 border border-border focus:border-primary p-3 transition-colors placeholder:text-sm"
+              placeholder="أدخل بريدك الإلكتروني أو رقم هاتفك"
             />
           </div>
           <div>

@@ -14,9 +14,10 @@ import { useGetEnrollments } from '@/app/hooks/queries/useEnroll';
 import { toast } from 'sonner';
 import { usePayment } from '@/app/hooks/queries/usePayment';
 import { courses, Enrollment } from '@/types';
-import popups from '@/app/components/PopUp';
+import { useWalletPayment, useGetWallet } from '@/app/hooks/queries/usePayment';
 import PopUp from '@/app/components/PopUp';
-
+import axios from 'axios';
+import { useQueryClient } from '@tanstack/react-query';
 export default function CoursePage() {
   const params = useParams();
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
@@ -28,7 +29,9 @@ export default function CoursePage() {
   if (isError)
     return (
       <div className="flex flex-col items-center justify-center min-h-screen gap-4">
-        <p className="text-destructive font-medium">حدث خطأ أثناء تحميل الكورس</p>
+        <p className="text-destructive font-medium">
+          حدث خطأ أثناء تحميل الكورس
+        </p>
         <button
           onClick={() => refetch()}
           className="px-5 py-2 bg-primary text-primary-foreground rounded-xl font-semibold hover:bg-primary/90 transition-colors shadow-sm cursor-pointer"
@@ -38,7 +41,12 @@ export default function CoursePage() {
       </div>
     );
 
-  if (!data) return <h3 className="text-xl font-bold text-center mt-20">لم يتم العثور على الكورس</h3>;
+  if (!data)
+    return (
+      <h3 className="text-xl font-bold text-center mt-20">
+        لم يتم العثور على الكورس
+      </h3>
+    );
 
   return (
     <div className="max-w-4xl mx-auto p-4 text-foreground">
@@ -59,47 +67,81 @@ function CourseData({ course }: { course: courses }) {
   const enrollMutation = useEnroll();
   const router = useRouter();
   const paymentMutation = usePayment();
+  const walletPaymentMutation = useWalletPayment();
   const [isopen, setIsOpen] = useState(false);
   const isFree = course.price === 0;
-
+  const queryClient = useQueryClient();
 
   const handlePurchase = () => {
     if (!userData?.id) return router.push('/login');
-          paymentMutation.mutate(
-        {
-          itemId: Number(course.id),
-          phoneNumber: userData?.studentPhone,
+    paymentMutation.mutate(
+      {
+        itemId: Number(course.id),
+        phoneNumber: userData?.studentPhone,
+      },
+      {
+        onSuccess: (data) => {
+          queryClient.invalidateQueries({ queryKey: ['enrollments', userData?.id]});
+          setIsOpen(false);
+          const paymentKey = data.payment_keys[0].key;
+          const url = `https://accept.paymob.com/api/acceptance/iframes/1056311?payment_token=${paymentKey}`;
+          window.location.href = url;
         },
-        {
-          onSuccess: (data) => {
-            setIsOpen(false);
-            const paymentKey = data.payment_keys[0].key;
-            const url = `https://accept.paymob.com/api/acceptance/iframes/1056311?payment_token=${paymentKey}`;
-            window.location.href = url;
-          },
+      },
+    );
+  };
+
+  const handleWalletPayment = () => {
+    if (!userData?.id) return router.push('/login');
+    walletPaymentMutation.mutate(
+      {
+        itemId: Number(course.id),
+        phoneNumber: userData?.studentPhone,
+      },
+      {
+        onSuccess: (data) => {
+          queryClient.invalidateQueries({ queryKey: ['wallet'] });
+          queryClient.invalidateQueries({ queryKey: ['enrollments', userData?.id]});
+          setIsOpen(false);
+          toast.success('تم الدفع بنجاح');
+          router.push(`/home/courses/${course.id}/lectures`);
         },
-      );
-  }
+        onError: (error) => {
+          if (axios.isAxiosError(error)) {
+            console.error(
+              'Axios error during wallet payment:',
+              error.response?.data,
+              error.response?.status,
+            );
+            if (error.response?.status === 400) {
+              toast.error('رصيد المحفظة غير كافي لإتمام عملية الدفع');
+            }
+          }
+        },
+      },
+    );
+  };
 
   const handleEnroll = () => {
     if (!userData?.id) return router.push('/login');
-        enrollMutation.mutate(
-        {
-          studentId: Number(userData.id),
-          courseId: Number(course.id),
+    enrollMutation.mutate(
+      {
+        studentId: Number(userData.id),
+        courseId: Number(course.id),
+      },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ['enrollments', userData?.id]});
+          toast.success('تم الانضمام إلى الكورس بنجاح');
+          router.push(`/home/courses/${course.id}/lectures`);
         },
-        {
-          onSuccess: () => {
-            toast.success('تم الانضمام إلى الكورس بنجاح');
-            router.push(`/home/courses/${course.id}/lectures`);
-          },
-        },
-      );
-  }
+      },
+    );
+  };
 
-  const {
-    data: enrollments,
-  } = useGetEnrollments(userData?.id?.toString() ?? '');
+  const { data: enrollments } = useGetEnrollments(
+    userData?.id?.toString() ?? '',
+  );
 
   const enrolledCourseIds = new Set(
     enrollments?.map((e: Enrollment) => Number(e.course.id)) ?? [],
@@ -145,26 +187,38 @@ function CourseData({ course }: { course: courses }) {
               قم بشراء الكورس للوصول إلى جميع الدروس والمواد التعليمية.
             </p>
 
-  
-
-            <button onClick={() => isFree ? handleEnroll() : setIsOpen(true)} className="px-12 py-4 bg-primary text-primary-foreground hover:bg-primary/95 border-2 border-transparent font-bold text-lg rounded-full shadow-md hover:shadow-lg hover:scale-102 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
-              <div className='flex flex-col gap-1'>
-                   الانضمام للكورس
-              <span className='text-sm text-primary-foreground/70 font-semibold opacity-80'>
-                - {course.price > 0 ? ` بسعر ${course.price} جنيه` : ' مجاناً'} -
-              </span>
+            <button
+              onClick={() => (isFree ? handleEnroll() : setIsOpen(true))}
+              className="px-12 py-4 bg-primary text-primary-foreground hover:bg-primary/95 border-2 border-transparent font-bold text-lg rounded-full shadow-md hover:shadow-lg hover:scale-102 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            >
+              <div className="flex flex-col gap-1">
+                الانضمام للكورس
+                <span className="text-sm text-primary-foreground/70 font-semibold opacity-80">
+                  -{' '}
+                  {course.price > 0 ? ` بسعر ${course.price} جنيه` : ' مجاناً'}{' '}
+                  -
+                </span>
               </div>
             </button>
 
-            <PopUp open={isopen} title={` اختار طريقه الدفع لدفع ${course.price} ج`} onClose={() => setIsOpen(false)} description='اختر طريقة الدفع المناسبة لك'
+            <PopUp
+              open={isopen}
+              title={` اختار طريقه الدفع لدفع ${course.price} ج`}
+              onClose={() => setIsOpen(false)}
+              description="اختر طريقة الدفع المناسبة لك"
               buttons={
                 <div className="flex flex-col gap-4 mt-4">
-                  <button onClick={handlePurchase}
+                  <button
+                    onClick={handlePurchase}
                     disabled={enrollMutation.isPending}
-                    className="px-12 py-4 bg-primary text-primary-foreground hover:bg-primary/95 border-2 border-transparent font-bold text-lg rounded-full shadow-md hover:shadow-lg hover:scale-102 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
+                    className="px-12 py-4 bg-primary text-primary-foreground hover:bg-primary/95 border-2 border-transparent font-bold text-lg rounded-full shadow-md hover:shadow-lg hover:scale-102 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                  >
                     الدفع عن طريق بوابة الدفع
                   </button>
-                  <button className="px-12 py-4 bg-primary text-primary-foreground hover:bg-primary/95 border-2 border-transparent font-bold text-lg rounded-full shadow-md hover:shadow-lg hover:scale-102 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
+                  <button
+                    onClick={handleWalletPayment}
+                    className="px-12 py-4 bg-primary text-primary-foreground hover:bg-primary/95 border-2 border-transparent font-bold text-lg rounded-full shadow-md hover:shadow-lg hover:scale-102 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                  >
                     الدفع عن طريق رصيد المحفظة
                   </button>
                 </div>
@@ -172,7 +226,6 @@ function CourseData({ course }: { course: courses }) {
             />
           </>
         )}
-
       </div>
     </div>
   );
