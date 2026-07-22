@@ -5,6 +5,8 @@ if (!process.env.TOKEN_SECRET_KEY) {
 }
 
 const TOKEN_SECRET_KEY: string = process.env.TOKEN_SECRET_KEY;
+const ISSUER = 'manasa-backend';
+const AUDIENCE = 'manasa-client';
 
 export function signToken(
   payload: object,
@@ -12,6 +14,8 @@ export function signToken(
 ) {
   const options: jwt.SignOptions = {
     algorithm: 'HS256',
+    issuer: ISSUER,
+    audience: AUDIENCE,
   };
   if (expiresIn) {
     options.expiresIn = expiresIn as jwt.SignOptions['expiresIn'];
@@ -25,6 +29,8 @@ export function signToken(
 export function verifyToken(token: string) {
   const payload = jwt.verify(token, TOKEN_SECRET_KEY, {
     algorithms: ['HS256'],
+    issuer: ISSUER,
+    audience: AUDIENCE,
   });
 
   if (typeof payload === 'string') {
