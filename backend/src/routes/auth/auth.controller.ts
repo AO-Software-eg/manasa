@@ -24,10 +24,17 @@ export async function login(req: Request, res: Response) {
   if (!req.is('application/json')) {
     return res.status(415).send();
   }
+  if (!req.ip) {
+    throw new Error("Couldn't get request IP");
+  }
 
   const data = validation.loginSchema.parse(req.body);
 
-  const user_token = await service.login(data);
+  const sessionData: validation.SessionData = {
+    ip: req.ip,
+  };
+
+  const user_token = await service.login(data, sessionData);
   res.cookie('user_token', user_token, {
     httpOnly: true,
     sameSite: 'none',

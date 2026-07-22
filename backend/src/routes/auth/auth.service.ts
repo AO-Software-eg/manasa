@@ -6,10 +6,7 @@ import * as err from '../error.ts';
 
 import z from 'zod';
 
-type SignupData = z.infer<typeof validation.signupSchema>;
-type LoginData = z.infer<typeof validation.loginSchema>;
-
-export async function signup(data: SignupData) {
+export async function signup(data: validation.SignupData) {
   if (await db.isUserFound(data.email)) {
     throw new err.UserAlreadyExistsError();
   }
@@ -30,7 +27,10 @@ export async function signup(data: SignupData) {
 }
 
 // returns the JWT token
-export async function login(data: LoginData): Promise<string> {
+export async function login(
+  data: validation.LoginData,
+  sessionData: validation.SessionData,
+): Promise<string> {
   const user: db.SelectUser = await db.getUserByEmail(data.email);
 
   if ((await hash.verifyHash(user.password, data.password)) == false) {
@@ -41,6 +41,7 @@ export async function login(data: LoginData): Promise<string> {
     id: user.id,
     name: user.name,
     email: user.email,
+    ip_hash: await hash.hashString(sessionData.ip),
   });
 
   return token;
