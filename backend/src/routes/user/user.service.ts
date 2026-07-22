@@ -2,8 +2,13 @@ import * as db from '../../database.ts';
 import * as validation from './user.validation.ts';
 
 import * as progress from '../../progress.ts';
+import { UserUnauthorizedError } from '../error.ts';
 
 export async function getMe(userPayload: any) {
+  if (await db.isUserBanned(userPayload.id)) {
+    throw new UserUnauthorizedError();
+  }
+
   const user: db.SelectUser = await db.getUserById(userPayload.id);
   if (user.password) {
     user.password = '';
