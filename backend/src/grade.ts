@@ -1,5 +1,5 @@
 import * as db from './database.ts';
-import * as schema from './validation.ts';
+import * as schema from './routes/exam/exam.validation.ts';
 
 export type Grade = {
   grade: number;

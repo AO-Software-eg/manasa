@@ -3,16 +3,20 @@
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { api } from '@/app/hooks/api';
 import axios from 'axios';
-import { ExamQuestion, ExamQuestionChoice,ExamSubmissionResponse} from '@/types/exams';
+import {
+  ExamQuestion,
+  ExamQuestionChoice,
+  ExamSubmissionResponse,
+} from '@/types/exams';
 import { useRouter } from 'next/navigation';
 
-export const useExams = (examId: number , enabled: boolean) => {
+export const useExams = (examId: number, enabled: boolean) => {
   return useQuery({
     queryKey: ['exams', examId],
     enabled,
     queryFn: async () => {
-      const { data } = await api.get(`/exams/${examId}`);
-      const questions = Array.isArray(data) ? data : data.questions ?? [];
+      const { data } = await api.get(`/exam/${examId}`);
+      const questions = Array.isArray(data) ? data : (data.questions ?? []);
       return {
         questions: questions.map((question: ExamQuestion) => ({
           id: question.id,
@@ -35,7 +39,6 @@ export const useSubmitExam = () => {
   return useMutation({
     mutationFn: async ({
       examId,
-      studentId,
       answers,
     }: {
       examId: number;
@@ -46,9 +49,8 @@ export const useSubmitExam = () => {
       }[];
     }) => {
       try {
-        const response = await api.post('/exams/submit', {
+        const response = await api.post('/exam/submit', {
           examId,
-          studentId,
           answers,
         });
         return response.data;
@@ -61,8 +63,6 @@ export const useSubmitExam = () => {
       }
     },
 
-
-
     onError: (error: unknown) => {
       if (axios.isAxiosError(error)) {
         console.error('Submit error:', error.response?.data);
@@ -74,42 +74,35 @@ export const useSubmitExam = () => {
   });
 };
 
-export const useGetExamSubmissions = (userId: number) => {
+export const useGetExamSubmissions = () => {
   return useQuery({
-    queryKey: ["userId", userId],
-    enabled: !isNaN(userId),
+    queryKey: ['examSubmissions'],
+    enabled: true,
     queryFn: async () => {
-      const res = await api.get(`/users/${userId}/grades`);
+      const res = await api.get(`/user/grades`);
       if (!res.data) throw new Error('جدث خطأ اثناء تحميل الامتحانات');
-      return res.data
+      return res.data;
     },
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     staleTime: 10 * 60 * 1000,
-  })
-}
+  });
+};
 type UseGetOnSubmitOptions = {
   enabled?: boolean;
 };
 
-
-
 export const useGetOnSubmit = (
   examId: number,
-  userId?: number,
-  options?: UseGetOnSubmitOptions
+  options?: UseGetOnSubmitOptions,
 ) => {
   return useQuery<ExamSubmissionResponse>({
-    queryKey: ['exam', examId, userId],
-    enabled:
-      !isNaN(examId) &&
-      !!userId &&
-      (options?.enabled ?? true),
+    queryKey: ['exam', examId],
+
+    enabled: !isNaN(examId) && (options?.enabled ?? true),
 
     queryFn: async () => {
-      const res = await api.get(
-        `/users/${userId}/grades/${examId}`
-      );
+      const res = await api.get(`/user/grades/${examId}`);
 
       if (!res.data) {
         throw new Error('حدث خطأ أثناء تحميل التصحيح');

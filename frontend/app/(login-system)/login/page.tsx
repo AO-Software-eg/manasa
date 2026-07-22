@@ -45,7 +45,7 @@ function LoginContent() {
     };
 
     try {
-      const res = await api.post('/login', payload, { withCredentials: true });
+      const res = await api.post('/auth/login', payload, { withCredentials: true });
 
       toast.success('تم الدخول بنجاح!');
       await queryClient.invalidateQueries({

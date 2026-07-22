@@ -7,7 +7,7 @@ async function isLoggedIn(request: NextRequest): Promise<boolean> {
 
   if (sessionCookie) {
     try {
-      const res = await api.get('/me', {
+      const res = await api.get('/user/me', {
         headers: {
           Cookie: `user_token=${sessionCookie.value}`,
         },

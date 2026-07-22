@@ -1,10 +1,11 @@
-import express, { type Request, type Response } from 'express';
+import express from 'express';
 import { rateLimit } from 'express-rate-limit';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { scalarDocs } from './docs/scalar.ts';
 import apiRouter from './routes/index.ts';
 import jwt from 'jsonwebtoken';
+import { errorHandler } from './routes/error.ts';
 
 const app = express();
 app.use(express.json());
@@ -39,8 +40,8 @@ app.use('/', apiRouter);
 app.get('/auth/akedly/challenge', async (_req, res) => {
   const r = await fetch(
     `https://api.akedly.io/api/v1.2/transactions/challenge` +
-    `?APIKey=${process.env.AKEDLY_API_KEY}` +
-    `&pipelineID=${process.env.AKEDLY_PIPELINE_ID}`,
+      `?APIKey=${process.env.AKEDLY_API_KEY}` +
+      `&pipelineID=${process.env.AKEDLY_PIPELINE_ID}`,
   );
   res.status(r.status).json(await r.json());
 });
@@ -66,26 +67,21 @@ app.post('/auth/akedly/send', async (req, res) => {
       turnstileToken,
     }),
   });
-   const data = await r.json();
+  const data = await r.json();
 
   otpTransactions.set(data.data.transactionReqID, phoneNumber);
 
-  res.json(data);});
+  res.json(data);
+});
 
-
-
-
-app.post("/auth/akedly/verify", async (req, res) => {
+app.post('/auth/akedly/verify', async (req, res) => {
   const { transactionReqID, otp } = req.body;
 
-  const r = await fetch(
-    "https://api.akedly.io/api/v1.2/transactions/verify",
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ transactionReqID, otp }),
-    }
-  );
+  const r = await fetch('https://api.akedly.io/api/v1.2/transactions/verify', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ transactionReqID, otp }),
+  });
 
   const data = await r.json();
 
@@ -97,22 +93,28 @@ app.post("/auth/akedly/verify", async (req, res) => {
 
   if (!phoneNumber) {
     return res.status(400).json({
-      message: "Transaction not found",
+      message: 'Transaction not found',
     });
   }
 
   otpTransactions.delete(transactionReqID);
 
-  const resetToken = jwt.sign({
-    phone: phoneNumber,
-    purpose: "reset-password",
-  }, process.env.TOKEN_SECRET_KEY!, { expiresIn: '1h' });
+  const resetToken = jwt.sign(
+    {
+      phone: phoneNumber,
+      purpose: 'reset-password',
+    },
+    process.env.TOKEN_SECRET_KEY!,
+    { expiresIn: '1h' },
+  );
 
   return res.json({
-    status: "success",
+    status: 'success',
     resetToken,
   });
 });
+app.use(errorHandler);
+
 app.use('/docs', scalarDocs);
 
 export default app;
