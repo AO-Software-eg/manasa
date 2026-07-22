@@ -74,6 +74,9 @@ export type SelectPaymentTransaction =
 export type InsertPaymentTransaction =
   typeof schema.paymentTransactions.$inferInsert;
 
+export type SelectBan = typeof schema.bans.$inferSelect;
+export type InsertBan = typeof schema.bans.$inferInsert;
+
 export type RelationLecture = Awaited<
   ReturnType<typeof getCourseLectures>
 >[number];
@@ -653,6 +656,29 @@ export async function getBalance(studentId: number): Promise<number> {
   }
 
   return res[0].balance;
+}
+
+export async function banUser(studentId: number) {
+  if (!isUserFoundById(studentId)) {
+    throw new RowNotFoundError(`User with id ${studentId} does not exist`);
+  }
+
+  await db.insert(schema.bans).values({
+    studentId: studentId,
+  });
+}
+
+export async function isUserBanned(studentId: number): Promise<boolean> {
+  if (!isUserFoundById(studentId)) {
+    throw new RowNotFoundError(`User with id ${studentId} does not exist`);
+  }
+
+  const res = await db
+    .select()
+    .from(schema.bans)
+    .where(eq(schema.bans.studentId, studentId));
+
+  return res.length !== 0;
 }
 
 export default db;
