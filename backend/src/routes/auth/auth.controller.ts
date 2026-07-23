@@ -4,8 +4,14 @@ import * as service from './auth.service.ts';
 
 import * as validation from './auth.validation.ts';
 
+import * as auth from '../../auth.ts';
+
+import jwt from 'jsonwebtoken';
+
 import { ZodError } from 'zod';
 import { RowNotFoundError } from './../../database.ts';
+
+const otpTransactions = new Map<string, string>();
 
 export async function signup(req: Request, res: Response) {
   if (!req.is('application/json')) {
@@ -56,4 +62,78 @@ export async function logout(req: Request, res: Response) {
   });
 
   return res.status(200).send();
+}
+
+export async function akedlySend(req: Request, res: Response) {
+  const { phoneNumber, powSolution, turnstileToken } = req.body;
+
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    'x-end-user-ip': req.ip ?? '',
+  };
+
+  const r = await fetch('https://api.akedly.io/api/v1.2/transactions/send', {
+    method: 'POST',
+    headers: headers,
+    body: JSON.stringify({
+      APIKey: process.env.AKEDLY_API_KEY,
+      pipelineID: process.env.AKEDLY_PIPELINE_ID,
+      verificationAddress: { phoneNumber },
+      powSolution,
+      turnstileToken,
+    }),
+  });
+  const data = await r.json();
+
+  otpTransactions.set(data.data.transactionReqID, phoneNumber);
+
+  res.json(data);
+}
+
+export async function akedlyVerify(req: Request, res: Response) {
+  const { transactionReqID, otp } = req.body;
+
+  const r = await fetch('https://api.akedly.io/api/v1.2/transactions/verify', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ transactionReqID, otp }),
+  });
+
+  const data = await r.json();
+
+  if (!r.ok) {
+    return res.status(r.status).json(data);
+  }
+
+  const phoneNumber = otpTransactions.get(transactionReqID);
+
+  if (!phoneNumber) {
+    return res.status(400).json({
+      message: 'Transaction not found',
+    });
+  }
+
+  otpTransactions.delete(transactionReqID);
+
+  const resetToken = auth.signToken(
+    {
+      phone: phoneNumber,
+      purpose: 'reset-password',
+    },
+    '1h',
+  );
+
+  return res.json({
+    status: 'success',
+    resetToken,
+  });
+}
+
+export async function akedlyChallenge(req: Request, res: Response) {
+  const r = await fetch(
+    `https://api.akedly.io/api/v1.2/transactions/challenge` +
+      `?APIKey=${process.env.AKEDLY_API_KEY}` +
+      `&pipelineID=${process.env.AKEDLY_PIPELINE_ID}`,
+  );
+  res.status(r.status).json(await r.json());
 }
