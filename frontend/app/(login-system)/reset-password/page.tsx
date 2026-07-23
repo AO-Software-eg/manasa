@@ -15,11 +15,11 @@ const passwordSchema = z.object({
   password: z.string().min(6, 'كلمة المرور يجب أن تكون على الأقل 6 أحرف'),
 });
 
-const GOLD = '#e6d3a3';
-const BG = '#1C1C18';
+const inputCls =
+  'bg-secondary/20 rounded-xl w-full outline-none text-foreground placeholder:text-muted-foreground/60 border border-border focus:border-primary p-3 transition-colors placeholder:text-sm';
 
-const inputCls = `rounded-lg bg-[${BG}] w-full outline-none text-[${GOLD}] placeholder:text-[${GOLD}] border-2 border-[${GOLD}] p-2 placeholder:opacity-70`;
-const btnPrimaryCls = `bg-[${GOLD}] text-[${BG}] font-bold py-2 px-5 rounded-lg hover:bg-[#d4c090] transition duration-200`;
+const btnPrimaryCls =
+  'bg-primary text-primary-foreground rounded-xl font-bold py-3 px-4 hover:bg-primary/95 transition duration-200 cursor-pointer shadow-sm disabled:opacity-60 disabled:cursor-not-allowed';
 
 export default function ResetPasswordPage() {
   const router = useRouter();
@@ -44,11 +44,6 @@ export default function ResetPasswordPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    console.log('handleSubmit called');
-    console.log('password:', password);
-    console.log('confirmPassword:', confirmPassword);
-    console.log('token:', token);
 
     if (password !== confirmPassword) {
       setError('كلمات المرور غير متطابقة');
@@ -83,25 +78,25 @@ export default function ResetPasswordPage() {
     return (
       <div
         dir="rtl"
-        className={`min-h-screen flex items-center justify-center bg-[${BG}] text-[${GOLD}] p-6 ${cairo.className}`}
+        className={`min-h-screen flex items-center justify-center bg-background text-foreground p-6 ${cairo.className}`}
       >
-        <div className="w-full max-w-md space-y-6">
-          <div className="flex flex-col gap-4 items-center text-center py-2">
-            <div className="flex items-center gap-2 w-48 h-48">
-              <Lottie
-                animationData={require('../../../public/successAnim.json')}
-                loop
-                autoplay
-              />
-            </div>
-            <p className={`text-[${GOLD}] text-lg font-bold`}> تم إعادة تعيين كلمة المرور بنجاح!</p>
-            <button
-              onClick={() => router.push('/login')}
-              className={`${btnPrimaryCls} w-full`}
-            >
-              تسجيل الدخول
-            </button>
+        <div className="w-full max-w-md bg-card p-8 rounded-2xl border border-border shadow-md flex flex-col gap-4 items-center text-center">
+          <div className="flex items-center gap-2 w-48 h-48">
+            <Lottie
+              animationData={require('../../../public/successAnim.json')}
+              loop
+              autoplay
+            />
           </div>
+          <p className="text-primary text-lg font-bold">
+            تم إعادة تعيين كلمة المرور بنجاح!
+          </p>
+          <button
+            onClick={() => router.push('/login')}
+            className={`${btnPrimaryCls} w-full`}
+          >
+            تسجيل الدخول
+          </button>
         </div>
       </div>
     );
@@ -110,46 +105,42 @@ export default function ResetPasswordPage() {
   return (
     <div
       dir="rtl"
-      className={`min-h-screen mt-15 flex items-center justify-center bg-[${BG}] text-[${GOLD}] p-6 ${cairo.className}`}
+      className={`min-h-screen flex items-center justify-center bg-background text-foreground p-6 ${cairo.className}`}
     >
-      <div className="w-full max-w-md space-y-6">
-        <div
-          className={`bg-[${BG}] p-6 rounded-lg shadow-sm shadow-[${GOLD}] border-2 border-[${GOLD}] flex flex-col gap-6`}
-        >
-          <h2 className="text-2xl text-center font-bold text-[${GOLD}]">
-            إعادة تعيين كلمة المرور
-          </h2>
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <div>
-              <label className={`block text-[${GOLD}] mb-2`}>كلمة المرور الجديدة</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="أدخل كلمة المرور الجديدة"
-                className={inputCls}
-              />
-            </div>
-            <div>
-              <label className={`block text-[${GOLD}] mb-2`}>تأكيد كلمة المرور</label>
-              <input
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="أعد إدخال كلمة المرور"
-                className={inputCls}
-              />
-            </div>
-            {error && <p className="text-red-400 text-sm mt-1">{error}</p>}
-            <button
-              type="submit"
-              className={`${btnPrimaryCls} w-full`}
-              disabled={loading}
-            >
-              {loading ? 'جارٍ...' : 'إعادة تعيين كلمة المرور'}
-            </button>
-          </form>
-        </div>
+      <div className="w-full max-w-md bg-card p-8 rounded-2xl border border-border shadow-md flex flex-col gap-8">
+        <h2 className="text-3xl text-center font-bold text-primary">
+          إعادة تعيين كلمة المرور
+        </h2>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <div>
+            <label className="block text-sm font-semibold text-foreground/80 mb-2">
+              كلمة المرور الجديدة
+            </label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="أدخل كلمة المرور الجديدة"
+              className={inputCls}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-foreground/80 mb-2">
+              تأكيد كلمة المرور
+            </label>
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="أعد إدخال كلمة المرور"
+              className={inputCls}
+            />
+          </div>
+          {error && <p className="text-red-400 text-sm">{error}</p>}
+          <button type="submit" className={`${btnPrimaryCls} w-full mt-2`} disabled={loading}>
+            {loading ? 'جارٍ...' : 'إعادة تعيين كلمة المرور'}
+          </button>
+        </form>
       </div>
     </div>
   );

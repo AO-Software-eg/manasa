@@ -73,17 +73,17 @@ function LoginContent() {
       <div className="left-sec w-full max-w-md bg-card p-8 rounded-2xl border border-border shadow-md gap-8 flex flex-col transition-all duration-300">
         <h3 className="text-3xl text-center font-bold text-primary">
           تسجيل الدخول
-        </h1>
+        </h3>
         <form onSubmit={onsubmit} className={`w-full ${cairo.className}`}>
           <div className="mb-4">
-            <label htmlFor="identifier" className="block text-[#e6d3a3] mb-2">
+            <label htmlFor="identifier" className="block text-sm font-semibold text-foreground/80 mb-2">
               البريد الإلكتروني أو رقم الهاتف
             </label>
             <input
               type="text"
               id="identifier"
               name="identifier"
-              className="bg-[#1C1C18] rounded-lg  w-full outline-none  text-[#e6d3a3] placeholder:text-[#e6d3a3] border-2 border-[#e6d3a3]  p-2 placeholder:opacity-70"
+              className="bg-secondary/20 rounded-xl w-full outline-none text-foreground placeholder:text-muted-foreground/60 border border-border focus:border-primary p-3 transition-colors placeholder:text-sm"
               placeholder="أدخل بريدك الإلكتروني أو رقم هاتفك"
             />
           </div>
@@ -151,5 +151,4 @@ function LoginContent() {
     </section>
   );
 }
-
 

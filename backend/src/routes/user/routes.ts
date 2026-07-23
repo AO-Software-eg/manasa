@@ -203,9 +203,8 @@ router
         });
       }
 
-      const passwordHash = await hashPassword(data.password);
-      const user: db.User = {
-        id: 0,  // Doesn't matter, database creates the id
+      const passwordHash = await hashString(data.password);
+      const user: db.InsertUser = {  // Doesn't matter, database creates the id
         email: data.email,
         name: data.name,
         studentPhone: data.studentPhone,
@@ -241,7 +240,7 @@ router
       const data = req.body;
       validation.loginSchema.parse(data);
 
-      const user: db.User = await db.getUserByIdentifier(data.identifier);
+      const user: db.SelectUser = await db.getUserByIdentifier(data.identifier);
 
       if ((await verifyHash(user.password, data.password)) == false) {
         return res.status(400).json({
@@ -254,6 +253,7 @@ router
         name: user.name,
         email: user.email,
       });
+      console.log(auth.verifyToken(token));
 
       res.cookie('user_token', token, {
         httpOnly: true,
@@ -301,7 +301,7 @@ router.route('/me').get(async (req: Request, res: Response) => {
 
   try {
     const payload = auth.verifyToken(req.cookies.user_token);
-    if (!payload.id) {
+    if (payload.id === undefined) {
       return res.status(500).json({ message: 'ID not found in token' });
     }
 
@@ -322,7 +322,7 @@ router.route('/me').get(async (req: Request, res: Response) => {
   }
 });
 
-router.route('/reset-password/token').post(bodyParser.json(), async (req: Request, res: Response) => {
+router.route('/reset-password/token').post(bodyParser.json(), async (req: Request, res: Response) => { // token that expires in 10 minutes and can be used only once per phone number to reset password
   if (!req.is('application/json')) {
     return res.status(415).send();
   }
@@ -355,46 +355,39 @@ router.route('/reset-password/token').post(bodyParser.json(), async (req: Reques
   }
 });
 
-router.route('/reset-password').post(bodyParser.json(), async (req: Request, res: Response) => {
+router.route('/reset-password').post(bodyParser.json(), async (req, res) => { // depends on reset-password/token route
   if (!req.is('application/json')) {
     return res.status(415).send();
   }
 
   try {
     const { resetToken, newPassword } = req.body;
-    console.log('Received reset password request');
-    console.log('resetToken:', resetToken);
-    console.log('newPassword:', newPassword ? 'provided' : 'missing');
 
     const payload = auth.verifyToken(resetToken);
-    console.log('Decoded payload:', payload);
-
-    const user = await db.getUserByPhone(payload.phone);
-
-    const newPasswordHash = await hashPassword(newPassword);
-
-    await db.updateUserPassword(user.id, newPasswordHash);
 
     if (payload.purpose !== "reset-password") {
-      return res.status(400).json({ message: 'Invalid token purpose' });
-
+      return res.status(400).json({
+        message: "Invalid token purpose",
+      });
     }
 
-    
-    console.log('New password hash:', newPasswordHash);
+    const newPasswordHash = await hashString(newPassword);
 
     await db.updateUserPassword(payload.id as number, newPasswordHash);
 
-    return res.status(200).send();
+    return res.status(200).json({
+      message: "Password updated successfully",
+    });
   } catch (err: any) {
-    console.log('Reset password error:', err);
+    console.log(err);
+
     return res.status(500).json({
-      message: err instanceof Error ? err.message : 'حدث خطأ ما !',
+      message: err instanceof Error ? err.message : "حدث خطأ ما !",
     });
   }
 });
 
-router.route('/check-phone').post(bodyParser.json(), async (req: Request, res: Response) => {
+router.route('/check-phone').post(bodyParser.json(), async (req: Request, res: Response) => { // check if phone number is registered
   if (!req.is('application/json')) {
     return res.status(415).send();
   }
@@ -408,6 +401,8 @@ router.route('/check-phone').post(bodyParser.json(), async (req: Request, res: R
     return res.status(500).json({
       message: err instanceof Error ? err.message : 'حدث خطأ ما !',
     });
+  } 
+});
 router.route('/users/balance').get(async (req: Request, res: Response) => {
   if (!req.cookies.user_token) {
     return res.status(401).send();
@@ -415,7 +410,7 @@ router.route('/users/balance').get(async (req: Request, res: Response) => {
 
   try {
     const payload = auth.verifyToken(req.cookies.user_token);
-    if (!payload.id) {
+    if (payload.id === undefined) {
       return res.status(500).json({ message: 'ID not found in token' });
     }
 

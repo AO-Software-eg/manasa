@@ -1,7 +1,7 @@
 'use client';
 
 import { defineStepper } from '@stepperize/react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import { Cairo } from 'next/font/google';
 import { useRouter } from 'next/navigation';
@@ -14,7 +14,7 @@ import {
 import { solvePow, getTurnstileToken } from "@akedly/shield";
 import { api } from "@/app/hooks/api";
 import dynamic from 'next/dynamic';
-import { ArrowRight, CheckCircle2, PhoneCall } from 'lucide-react';
+import { ArrowRight, PhoneCall } from 'lucide-react';
 
 const Lottie = dynamic(() => import('lottie-react'), { ssr: false });
 
@@ -130,9 +130,7 @@ export default function Page() {
               {stepper.state.current.data.id === 'enter-number' &&
                 'سنرسل رمز تحقق إلى هاتفك لإعادة تعيين كلمة المرور'}
               {stepper.state.current.data.id === 'enter-code' &&
-                'أدخل الرمز المكون من 4 أرقام الذي وصلك'}
-              {stepper.state.current.data.id === 'done' &&
-                'يمكنك الآن العودة لتسجيل الدخول'}
+                'أدخل الرمز المكون من 6 أرقام الذي وصلك'}
             </p>
           </div>
 
@@ -160,10 +158,12 @@ function EnterNumber({ stepper, phone, transactionReqID, setPhone, setTransactio
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleNext = async () => {
+    setIsSubmitting(true);
     const result = phoneSchema.safeParse({ phone: normalizeEgyptPhone(phone) });
 
     if (!result.success) {
       setError(result.error.issues[0].message);
+      setIsSubmitting(false);
       return;
     }
 
@@ -177,6 +177,7 @@ function EnterNumber({ stepper, phone, transactionReqID, setPhone, setTransactio
 
       if (!checkPhoneRes.data.exists) {
         setError("رقم الهاتف هذا غير مسجل");
+        setIsSubmitting(false);
         return;
       }
 
@@ -218,6 +219,8 @@ function EnterNumber({ stepper, phone, transactionReqID, setPhone, setTransactio
     } catch (err) {
       console.error(err);
       setError("تعذر إرسال رمز التحقق");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -266,6 +269,7 @@ function EnterCode({ stepper, phone, transactionReqID, router, setTransactionReq
   const timerDef = 60 * 3; // 3 mins
   const [timer, setTimer] = useState<number>(timerDef); // 3 mins
   const [isResending, setIsResending] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [resetKey, setResetKey] = useState(0); // To reset timer effect
 
   // Format timer as MM:SS
@@ -330,9 +334,11 @@ function EnterCode({ stepper, phone, transactionReqID, router, setTransactionReq
   };
 
   const handleNext = async () => {
+    setIsSubmitting(true);
     const result = codeSchema.safeParse({ code });
     if (!result.success) {
       setError(result.error.issues[0].message);
+      setIsSubmitting(false);
       return;
     }
     setError('');
@@ -352,6 +358,8 @@ function EnterCode({ stepper, phone, transactionReqID, router, setTransactionReq
       );
     } catch {
       setError("رمز التحقق غير صحيح");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -363,21 +371,14 @@ function EnterCode({ stepper, phone, transactionReqID, router, setTransactionReq
         </label>
         
         <div className="flex items-center justify-between mb-3">
-          <span className="text-[#e6d3a3] text-sm">
+          <span className="text-muted-foreground text-sm">
           {formatTime(timer)}
           </span>
-          <button 
-            onClick={handleResend}
-            disabled={timer > 0 || isResending}
-            className={`text-sm ${timer > 0 || isResending ? 'text-[#e6d3a3]/50 cursor-not-allowed' : 'text-[#e6d3a3] underline hover:text-[#d4c090]'}`}
-          >
-            {isResending ? 'جارٍ الإرسال...' : timer > 0 ? 'إعادة إرسال' : 'إعادة إرسال'}
-          </button>
         </div>
 
         <div className="flex justify-center [&_[data-slot]]:bg-secondary/20 [&_[data-slot]]:border-border [&_[data-slot]]:text-foreground [&_[data-slot]]:rounded-lg [&_[data-slot]]:text-lg [&_[data-slot]]:font-bold [&_[data-slot][data-active]]:ring-2 [&_[data-slot][data-active]]:ring-primary [&_[data-slot][data-active]]:border-primary">
           <InputOTP
-            maxLength={4}
+            maxLength={6}
             value={code}
             onChange={(value) => {
               setCode(value);
@@ -398,17 +399,18 @@ function EnterCode({ stepper, phone, transactionReqID, router, setTransactionReq
         {error && <p className={`${errorCls} text-center`}>{error}</p>}
 
         <div className="text-center mt-3">
-          {secondsLeft > 0 ? (
+          {timer > 0 ? (
             <span className="text-xs text-muted-foreground">
-              يمكنك إعادة الإرسال خلال {secondsLeft} ثانية
+              يمكنك إعادة الإرسال خلال {timer} ثانية
             </span>
           ) : (
             <button
               type="button"
               onClick={handleResend}
-              className="text-xs text-primary hover:underline font-semibold"
+              disabled={isResending}
+              className="text-xs text-primary hover:underline font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              إعادة إرسال الرمز
+              {isResending ? 'جارٍ الإرسال...' : 'إعادة إرسال الرمز'}
             </button>
           )}
         </div>
@@ -416,7 +418,7 @@ function EnterCode({ stepper, phone, transactionReqID, router, setTransactionReq
 
       <button
         onClick={handleNext}
-        disabled={isSubmitting || code.length < 4}
+        disabled={isSubmitting || code.length < 6}
         className={btnPrimaryCls}
       >
         {isSubmitting ? 'جارِ التحقق...' : 'تحقق'}
