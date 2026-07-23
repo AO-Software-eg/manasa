@@ -11,6 +11,10 @@ export async function signup(data: validation.SignupData) {
     throw new err.UserAlreadyExistsError();
   }
 
+  if (await db.isStudentPhoneFound(data.studentPhone)) {
+    throw new err.UserAlreadyExistsError();
+  }
+
   const passwordHash = await hash.hashString(data.password);
   const user: db.InsertUser = {
     email: data.email,
