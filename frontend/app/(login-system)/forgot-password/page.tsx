@@ -11,8 +11,8 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from '@/components/ui/input-otp';
-import { solvePow, getTurnstileToken } from "@akedly/shield";
-import { api } from "@/app/hooks/api";
+import { solvePow, getTurnstileToken } from '@akedly/shield';
+import { api } from '@/app/hooks/api';
 import dynamic from 'next/dynamic';
 import { ArrowRight, PhoneCall } from 'lucide-react';
 
@@ -49,19 +49,18 @@ const btnPrimaryCls =
 const btnSecondCls =
   'border border-border text-foreground font-semibold py-3 px-4 rounded-xl hover:bg-secondary/20 transition duration-200 cursor-pointer';
 
-
 function normalizeEgyptPhone(phone: string) {
-  phone = phone.replace(/\s+/g, "");
+  phone = phone.replace(/\s+/g, '');
 
-  if (phone.startsWith("+20")) {
+  if (phone.startsWith('+20')) {
     return phone;
   }
 
-  if (phone.startsWith("0")) {
+  if (phone.startsWith('0')) {
     return `+20${phone.slice(1)}`;
   }
 
-  if (phone.startsWith("20")) {
+  if (phone.startsWith('20')) {
     return `+${phone}`;
   }
 
@@ -72,8 +71,8 @@ function normalizeEgyptPhone(phone: string) {
 
 export default function Page() {
   const stepper = useStepper();
-  const [phone, setPhone] = useState("");
-  const [transactionReqID, setTransactionReqID] = useState("");
+  const [phone, setPhone] = useState('');
+  const [transactionReqID, setTransactionReqID] = useState('');
   const router = useRouter();
 
   return (
@@ -135,14 +134,33 @@ export default function Page() {
           </div>
 
           {stepper.flow.switch({
-            'enter-number': () => <EnterNumber stepper={stepper} phone={phone} transactionReqID={transactionReqID} setPhone={setPhone} setTransactionReqID={setTransactionReqID} />,
-            'enter-code': () => <EnterCode stepper={stepper} phone={phone} transactionReqID={transactionReqID} router={router} setTransactionReqID={setTransactionReqID} />,
+            'enter-number': () => (
+              <EnterNumber
+                stepper={stepper}
+                phone={phone}
+                transactionReqID={transactionReqID}
+                setPhone={setPhone}
+                setTransactionReqID={setTransactionReqID}
+              />
+            ),
+            'enter-code': () => (
+              <EnterCode
+                stepper={stepper}
+                phone={phone}
+                transactionReqID={transactionReqID}
+                router={router}
+                setTransactionReqID={setTransactionReqID}
+              />
+            ),
           })}
         </div>
 
         <p className="text-sm text-muted-foreground text-center">
           تذكرت كلمة المرور؟{' '}
-          <Link href="/login" className="text-primary hover:underline font-semibold">
+          <Link
+            href="/login"
+            className="text-primary hover:underline font-semibold"
+          >
             تسجيل الدخول
           </Link>
         </p>
@@ -153,7 +171,19 @@ export default function Page() {
 
 /* ---------------- Steps ---------------- */
 
-function EnterNumber({ stepper, phone, transactionReqID, setPhone, setTransactionReqID }: { stepper: StepperType; phone: string; transactionReqID: string; setPhone: (phone: string) => void; setTransactionReqID: (transactionReqID: string) => void }) {
+function EnterNumber({
+  stepper,
+  phone,
+  transactionReqID,
+  setPhone,
+  setTransactionReqID,
+}: {
+  stepper: StepperType;
+  phone: string;
+  transactionReqID: string;
+  setPhone: (phone: string) => void;
+  setTransactionReqID: (transactionReqID: string) => void;
+}) {
   const [error, setError] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -167,42 +197,37 @@ function EnterNumber({ stepper, phone, transactionReqID, setPhone, setTransactio
       return;
     }
 
-    setError("");
+    setError('');
 
     try {
       // Check if phone is registered first
-      const checkPhoneRes = await api.post("/check-phone", {
+      const checkPhoneRes = await api.post('/auth/check-phone', {
         phone: normalizeEgyptPhone(phone),
       });
 
       if (!checkPhoneRes.data.exists) {
-        setError("رقم الهاتف هذا غير مسجل");
+        setError('رقم الهاتف هذا غير مسجل');
         setIsSubmitting(false);
         return;
       }
 
       // 1. Get challenge
-      const challengeRes = await api.get("/auth/akedly/challenge");
+      const challengeRes = await api.get('/auth/akedly/challenge');
 
       const data = challengeRes.data.data;
 
       // 2. Solve Proof of Work
-      const { nonce } = await solvePow(
-        data.challenge,
-        data.difficulty
-      );
+      const { nonce } = await solvePow(data.challenge, data.difficulty);
 
       // 3. Get Turnstile token if required
       let turnstileToken;
 
       if (data.turnstile?.required) {
-        turnstileToken = await getTurnstileToken(
-          data.turnstile.siteKey
-        );
+        turnstileToken = await getTurnstileToken(data.turnstile.siteKey);
       }
 
       // 4. Send OTP
-      const sendRes = await api.post("/auth/akedly/send", {
+      const sendRes = await api.post('/auth/akedly/send', {
         phoneNumber: normalizeEgyptPhone(phone),
         powSolution: {
           challengeToken: data.challengeToken,
@@ -211,14 +236,12 @@ function EnterNumber({ stepper, phone, transactionReqID, setPhone, setTransactio
         turnstileToken,
       });
 
-      setTransactionReqID(
-        sendRes.data.data.transactionReqID
-      );
+      setTransactionReqID(sendRes.data.data.transactionReqID);
 
       stepper.navigation.next();
     } catch (err) {
       console.error(err);
-      setError("تعذر إرسال رمز التحقق");
+      setError('تعذر إرسال رمز التحقق');
     } finally {
       setIsSubmitting(false);
     }
@@ -263,7 +286,19 @@ function EnterNumber({ stepper, phone, transactionReqID, setPhone, setTransactio
   );
 }
 
-function EnterCode({ stepper, phone, transactionReqID, router, setTransactionReqID }: { stepper: StepperType; phone: string; transactionReqID: string; router: ReturnType<typeof useRouter>; setTransactionReqID: (transactionReqID: string) => void }) {
+function EnterCode({
+  stepper,
+  phone,
+  transactionReqID,
+  router,
+  setTransactionReqID,
+}: {
+  stepper: StepperType;
+  phone: string;
+  transactionReqID: string;
+  router: ReturnType<typeof useRouter>;
+  setTransactionReqID: (transactionReqID: string) => void;
+}) {
   const [code, setCode] = useState('');
   const [error, setError] = useState<string>('');
   const timerDef = 60 * 3; // 3 mins
@@ -274,7 +309,9 @@ function EnterCode({ stepper, phone, transactionReqID, router, setTransactionReq
 
   // Format timer as MM:SS
   const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
+    const mins = Math.floor(seconds / 60)
+      .toString()
+      .padStart(2, '0');
     const secs = (seconds % 60).toString().padStart(2, '0');
     return `${mins}:${secs}`;
   };
@@ -292,7 +329,9 @@ function EnterCode({ stepper, phone, transactionReqID, router, setTransactionReq
       });
     }, 1000);
 
-    return () => { if (timerId) window.clearInterval(timerId); };
+    return () => {
+      if (timerId) window.clearInterval(timerId);
+    };
   }, [resetKey]); // Depends on resetKey
 
   const handleResend = async () => {
@@ -300,7 +339,7 @@ function EnterCode({ stepper, phone, transactionReqID, router, setTransactionReq
     setError('');
     try {
       // 1. Get challenge
-      const challengeRes = await api.get("/auth/akedly/challenge");
+      const challengeRes = await api.get('/auth/akedly/challenge');
       const data = challengeRes.data.data;
 
       // 2. Solve Proof of Work
@@ -313,7 +352,7 @@ function EnterCode({ stepper, phone, transactionReqID, router, setTransactionReq
       }
 
       // 4. Send OTP again
-      const sendRes = await api.post("/auth/akedly/send", {
+      const sendRes = await api.post('/auth/akedly/send', {
         phoneNumber: normalizeEgyptPhone(phone),
         powSolution: {
           challengeToken: data.challengeToken,
@@ -324,10 +363,10 @@ function EnterCode({ stepper, phone, transactionReqID, router, setTransactionReq
 
       setTransactionReqID(sendRes.data.data.transactionReqID);
       setTimer(timerDef); // Reset timer value
-      setResetKey(prev => prev + 1); // Trigger timer restart
+      setResetKey((prev) => prev + 1); // Trigger timer restart
     } catch (err) {
       console.error(err);
-      setError("تعذر إعادة إرسال رمز التحقق");
+      setError('تعذر إعادة إرسال رمز التحقق');
     } finally {
       setIsResending(false);
     }
@@ -343,21 +382,21 @@ function EnterCode({ stepper, phone, transactionReqID, router, setTransactionReq
     }
     setError('');
     try {
-      await api.post("/auth/akedly/verify", {
+      await api.post('/auth/akedly/verify', {
         transactionReqID,
         otp: code,
       });
 
       // Get reset token
-      const tokenRes = await api.post("/reset-password/token", {
+      const tokenRes = await api.post('auth/reset-password/token', {
         phone: normalizeEgyptPhone(phone),
       });
 
       router.push(
-        `/reset-password?token=${encodeURIComponent(tokenRes.data.resetToken)}`
+        `reset-password?token=${encodeURIComponent(tokenRes.data.resetToken)}`,
       );
     } catch {
-      setError("رمز التحقق غير صحيح");
+      setError('رمز التحقق غير صحيح');
     } finally {
       setIsSubmitting(false);
     }
@@ -369,10 +408,10 @@ function EnterCode({ stepper, phone, transactionReqID, router, setTransactionReq
         <label className={`${labelCls} text-center`}>
           أدخل الرمز المرسل إلى هاتفك
         </label>
-        
+
         <div className="flex items-center justify-between mb-3">
           <span className="text-muted-foreground text-sm">
-          {formatTime(timer)}
+            {formatTime(timer)}
           </span>
         </div>
 

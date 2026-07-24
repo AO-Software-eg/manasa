@@ -14,12 +14,10 @@ import { Suspense } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 
-
 const cairo = Cairo({
   subsets: ['arabic'],
   weight: ['400', '700'],
 });
-
 
 export default function LoginPage() {
   return (
@@ -45,7 +43,9 @@ function LoginContent() {
     };
 
     try {
-      const res = await api.post('/auth/login', payload, { withCredentials: true });
+      const res = await api.post('/auth/login', payload, {
+        withCredentials: true,
+      });
 
       toast.success('تم الدخول بنجاح!');
       await queryClient.invalidateQueries({
@@ -76,7 +76,10 @@ function LoginContent() {
         </h3>
         <form onSubmit={onsubmit} className={`w-full ${cairo.className}`}>
           <div className="mb-4">
-            <label htmlFor="identifier" className="block text-sm font-semibold text-foreground/80 mb-2">
+            <label
+              htmlFor="identifier"
+              className="block text-sm font-semibold text-foreground/80 mb-2"
+            >
               البريد الإلكتروني أو رقم الهاتف
             </label>
             <input
@@ -88,7 +91,10 @@ function LoginContent() {
             />
           </div>
           <div>
-            <label htmlFor="password" className="block text-sm font-semibold text-foreground/80 mb-2">
+            <label
+              htmlFor="password"
+              className="block text-sm font-semibold text-foreground/80 mb-2"
+            >
               كلمة المرور
             </label>
             <div className="relative">
@@ -117,7 +123,10 @@ function LoginContent() {
 
             <span className="text-xs text-muted-foreground mt-2 block">
               هل نسيت كلمة السر ؟{' '}
-              <Link href="/forgot-password" className="text-primary hover:underline font-semibold">
+              <Link
+                href="/forgot-password"
+                className="text-primary hover:underline font-semibold"
+              >
                 إعادة تعيين
               </Link>
             </span>
@@ -129,10 +138,13 @@ function LoginContent() {
           >
             تسجيل الدخول
           </button>
-          
+
           <span className="text-sm text-muted-foreground text-center mt-4 block">
             ليس لديك حساب؟{' '}
-            <Link href="/signup" className="text-primary hover:underline font-semibold">
+            <Link
+              href="/signup"
+              className="text-primary hover:underline font-semibold"
+            >
               إنشاء حساب جديد
             </Link>
           </span>
@@ -151,5 +163,3 @@ function LoginContent() {
     </section>
   );
 }
-
-
