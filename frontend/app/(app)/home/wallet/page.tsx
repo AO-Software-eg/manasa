@@ -56,7 +56,7 @@ function WalletPage() {
           <CardLayout classname="col-span-1 lg:col-span-3 backdrop-blur-sm border-border/60">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
               <div>
-                <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent drop-shadow-lg mb-2">
+                <h1 className="text-4xl font-bold bg-linear-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent drop-shadow-lg mb-2">
                   المحفظة
                 </h1>
                 <p className="text-primary/80 text-lg">
@@ -88,7 +88,7 @@ function WalletPage() {
               <div className="text-sm text-primary/80">الحد الأدنى ٥٠ ج.م</div>
             </div>
 
-            <div className="mt-10 p-6 bg-gradient-to-r from-secondary/70 to-card/70 rounded-2xl border border-border/60">
+            <div className="mt-10 p-6 bg-linear-to-r from-secondary/70 to-card/70 rounded-2xl border border-border/60">
               <div className="flex flex-col lg:flex-row gap-6 items-start lg:items-center justify-between">
                 <div className="flex items-center gap-3">
                   <h3 className="text-lg font-semibold text-primary">
@@ -115,7 +115,7 @@ function WalletPage() {
                 <button
                   onClick={handleWalletDeposit}
                   disabled={numericAmount < 50}
-                  className="px-12 py-4 bg-gradient-to-r disabled:opacity-50 disabled:pointer-events-none from-primary to-primary/80 text-primary-foreground font-semibold rounded-xl hover:from-primary/90 hover:to-primary/70 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1 whitespace-nowrap ml-auto"
+                  className="px-12 py-4 bg-linear-to-r disabled:opacity-50 disabled:pointer-events-none from-primary to-primary/80 text-primary-foreground font-semibold rounded-xl hover:from-primary/90 hover:to-primary/70 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1 whitespace-nowrap ml-auto"
                 >
                   شحن الآن
                 </button>
