@@ -35,3 +35,11 @@ export const loginSchema = z.object({
   email: z.email(),
   password: z.string().min(MIN_PASSWORD_LENGTH),
 });
+
+export const sessionSchema = z.object({
+  ip: z.string()
+});
+
+export type SessionData = z.infer<typeof sessionSchema>;
+export type SignupData = z.infer<typeof signupSchema>;
+export type LoginData = z.infer<typeof loginSchema>;
