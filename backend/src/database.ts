@@ -74,6 +74,9 @@ export type SelectPaymentTransaction =
 export type InsertPaymentTransaction =
   typeof schema.paymentTransactions.$inferInsert;
 
+export type SelectBan = typeof schema.bans.$inferSelect;
+export type InsertBan = typeof schema.bans.$inferInsert;
+
 export type RelationLecture = Awaited<
   ReturnType<typeof getCourseLectures>
 >[number];
@@ -85,17 +88,17 @@ export type RelationExamQuestions = Awaited<
 export type RelationUserLectures = Awaited<ReturnType<typeof getUserLectures>>;
 
 function normalizeEgyptPhone(phone: string): string {
-  phone = phone.replace(/\s+/g, "");
+  phone = phone.replace(/\s+/g, '');
 
-  if (phone.startsWith("+20")) {
+  if (phone.startsWith('+20')) {
     return phone;
   }
 
-  if (phone.startsWith("0")) {
+  if (phone.startsWith('0')) {
     return `+20${phone.slice(1)}`;
   }
 
-  if (phone.startsWith("20")) {
+  if (phone.startsWith('20')) {
     return `+${phone}`;
   }
 
@@ -129,8 +132,8 @@ export async function isPhoneRegistered(phone: string): Promise<boolean> {
     .where(
       or(
         eq(schema.users.studentPhone, normalizedPhone),
-        eq(schema.users.parentPhone, normalizedPhone)
-      )
+        eq(schema.users.parentPhone, normalizedPhone),
+      ),
     );
 
   return res.length != 0;
@@ -169,7 +172,7 @@ export async function getUserById(id: number): Promise<SelectUser> {
 
 export async function getUserByPhone(phone: string): Promise<SelectUser> {
   const normalizedPhone = normalizeEgyptPhone(phone);
-  
+
   // First try to find a user with this phone as student_phone
   let res = await db
     .select()
@@ -186,29 +189,20 @@ export async function getUserByPhone(phone: string): Promise<SelectUser> {
 
   // If still no user found, throw RowNotFoundError
   if (res.length === 0) {
-    throw new RowNotFoundError(
-      `المستخدم ذو رقم الهاتف ${phone} غير موجود`,
-    );
+    throw new RowNotFoundError(`المستخدم ذو رقم الهاتف ${phone} غير موجود`);
   }
 
   return res[0];
-}
-
-export async function getUserByIdentifier(identifier: string): Promise<SelectUser> {
-  // First try to find user by email
-  try {
-    return await getUserByEmail(identifier);
-  } catch (err) {
-    // If not found by email, try by phone
-    return await getUserByPhone(identifier);
-  }
 }
 
 export async function insertUser(user: InsertUser) {
   await db.insert(schema.users).values(user);
 }
 
-export async function updateUserPassword(userId: number, newPasswordHash: string) {
+export async function updateUserPassword(
+  userId: number,
+  newPasswordHash: string,
+) {
   await db
     .update(schema.users)
     .set({ password: newPasswordHash })
@@ -653,6 +647,29 @@ export async function getBalance(studentId: number): Promise<number> {
   }
 
   return res[0].balance;
+}
+
+export async function banUser(studentId: number) {
+  if (!isUserFoundById(studentId)) {
+    throw new RowNotFoundError(`User with id ${studentId} does not exist`);
+  }
+
+  await db.insert(schema.bans).values({
+    studentId: studentId,
+  });
+}
+
+export async function isUserBanned(studentId: number): Promise<boolean> {
+  if (!isUserFoundById(studentId)) {
+    throw new RowNotFoundError(`User with id ${studentId} does not exist`);
+  }
+
+  const res = await db
+    .select()
+    .from(schema.bans)
+    .where(eq(schema.bans.studentId, studentId));
+
+  return res.length !== 0;
 }
 
 export default db;

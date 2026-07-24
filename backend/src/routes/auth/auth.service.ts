@@ -11,6 +11,10 @@ export async function signup(data: validation.SignupData) {
     throw new err.UserAlreadyExistsError();
   }
 
+  if (await db.isStudentPhoneFound(data.studentPhone)) {
+    throw new err.UserAlreadyExistsError();
+  }
+
   const passwordHash = await hash.hashString(data.password);
   const user: db.InsertUser = {
     email: data.email,
@@ -31,7 +35,12 @@ export async function login(
   data: validation.LoginData,
   sessionData: validation.SessionData,
 ): Promise<string> {
-  const user: db.SelectUser = await db.getUserByEmail(data.email);
+  let user: db.SelectUser;
+  if (data.identifier.includes('@')) {
+    user = await db.getUserByEmail(data.identifier);
+  } else {
+    user = await db.getUserByPhone(data.identifier);
+  }
 
   if ((await hash.verifyHash(user.password, data.password)) == false) {
     throw new err.InvalidCredentialsError();
@@ -45,4 +54,32 @@ export async function login(
   });
 
   return token;
+}
+
+export async function resetPassword(
+  data: validation.ResetPasswordData,
+  userId: number,
+) {
+  const newPasswordHash = await hash.hashString(data.newPassword);
+  await db.updateUserPassword(userId, newPasswordHash);
+}
+
+export async function resetPasswordToken(
+  data: validation.ResetPasswordTokenData,
+) {
+  const user = await db.getUserByPhone(data.phone);
+
+  const resetToken = auth.signToken(
+    {
+      id: user.id,
+      purpose: 'reset-password',
+    },
+    '10m',
+  );
+
+  return resetToken;
+}
+
+export async function checkPhone(data: validation.checkPhoneData) {
+  return await db.isPhoneRegistered(data.phone);
 }

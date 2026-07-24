@@ -1,4 +1,4 @@
- 'use client';
+'use client';
 import Image from 'next/image';
 import { useState, useRef, useEffect } from 'react';
 import { Menu, Origami } from 'lucide-react';
@@ -51,7 +51,10 @@ function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const path = usePathname() ?? '';
-  const isUserPage = path.startsWith('/home') || path.startsWith('/exams') || path.startsWith('/videos');
+  const isUserPage =
+    path.startsWith('/home') ||
+    path.startsWith('/exams') ||
+    path.startsWith('/videos');
   const { data: userData } = useMe();
   const [isMounted, setIsMounted] = useState(false);
 
@@ -104,8 +107,12 @@ function Header() {
                 <ThemeToggle />
                 {!isMounted ? (
                   <>
-                    <button className="px-4 py-2 text-sm opacity-0 pointer-events-none">تسجيل الدخول</button>
-                    <button className="px-4 py-2 bg-primary text-primary-foreground rounded-xl font-semibold opacity-0 pointer-events-none">إنشاء حساب</button>
+                    <button className="px-4 py-2 text-sm opacity-0 pointer-events-none">
+                      تسجيل الدخول
+                    </button>
+                    <button className="px-4 py-2 bg-primary text-primary-foreground rounded-xl font-semibold opacity-0 pointer-events-none">
+                      إنشاء حساب
+                    </button>
                   </>
                 ) : userData ? (
                   <>
@@ -114,10 +121,10 @@ function Header() {
                         اذهب إلى التطبيق
                       </button>
                     </Link>
-                    <button 
+                    <button
                       className="px-4 py-2 bg-transparent border border-border text-foreground rounded-xl hover:bg-secondary transition-all duration-300"
                       onClick={() => {
-                        api.post('/logout', {}).then(() => {
+                        api.post('/auth/logout', {}).then(() => {
                           window.location.href = '/';
                         });
                         setIsMenuOpen(false);
@@ -128,18 +135,12 @@ function Header() {
                   </>
                 ) : (
                   <>
-                    <Link
-                      href={'/login'}
-                      onClick={() => setIsMenuOpen(false)}
-                    >
+                    <Link href={'/login'} onClick={() => setIsMenuOpen(false)}>
                       <button className="px-4 py-2 text-sm hover:text-primary transition-colors">
                         تسجيل الدخول
                       </button>
                     </Link>
-                    <Link
-                      href={'/signup'}
-                      onClick={() => setIsMenuOpen(false)}
-                    >
+                    <Link href={'/signup'} onClick={() => setIsMenuOpen(false)}>
                       <button className="px-4 py-2 bg-primary text-primary-foreground rounded-xl font-semibold hover:bg-primary/95 transition-all duration-300 shadow-sm">
                         إنشاء حساب
                       </button>
@@ -151,7 +152,11 @@ function Header() {
 
             <div className="flex items-center gap-2 md:hidden">
               <ThemeToggle />
-              <button onClick={toggleMenu} className="p-1" aria-label="Toggle menu">
+              <button
+                onClick={toggleMenu}
+                className="p-1"
+                aria-label="Toggle menu"
+              >
                 <Menu className="text-foreground h-6 w-6" />
               </button>
             </div>
@@ -181,8 +186,12 @@ function Header() {
                 <div className="flex flex-col gap-3 pt-3 border-t border-border">
                   {!isMounted ? (
                     <>
-                      <button className="w-full px-4 py-3 opacity-0 pointer-events-none">تسجيل الدخول</button>
-                      <button className="w-full px-5 py-3 opacity-0 pointer-events-none">إنشاء حساب</button>
+                      <button className="w-full px-4 py-3 opacity-0 pointer-events-none">
+                        تسجيل الدخول
+                      </button>
+                      <button className="w-full px-5 py-3 opacity-0 pointer-events-none">
+                        إنشاء حساب
+                      </button>
                     </>
                   ) : userData ? (
                     <>
@@ -191,10 +200,10 @@ function Header() {
                           اذهب إلى التطبيق
                         </button>
                       </Link>
-                      <button 
+                      <button
                         className="w-full px-4 py-3 border border-border text-foreground rounded-xl hover:bg-secondary transition-colors"
                         onClick={() => {
-                          api.post('/logout', {}).then(() => {
+                          api.post('/auth/logout', {}).then(() => {
                             window.location.href = '/';
                           });
                           setIsMenuOpen(false);
@@ -205,12 +214,18 @@ function Header() {
                     </>
                   ) : (
                     <>
-                      <Link href={'/login'} onClick={() => setIsMenuOpen(false)}>
+                      <Link
+                        href={'/login'}
+                        onClick={() => setIsMenuOpen(false)}
+                      >
                         <button className="w-full px-4 py-3 text-right text-foreground hover:text-primary transition-colors">
                           تسجيل الدخول
                         </button>
                       </Link>
-                      <Link href={'/signup'} onClick={() => setIsMenuOpen(false)}>
+                      <Link
+                        href={'/signup'}
+                        onClick={() => setIsMenuOpen(false)}
+                      >
                         <button className="w-full px-5 py-3 bg-primary text-primary-foreground rounded-xl font-semibold shadow-sm">
                           إنشاء حساب
                         </button>

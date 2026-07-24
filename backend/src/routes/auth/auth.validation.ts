@@ -3,6 +3,7 @@ import z from 'zod';
 const MIN_PASSWORD_LENGTH = 6;
 const MIN_NAME_LENGTH = 2;
 const EGYPT_MOBILE_REGEX = /^\+201[0125]\d{8}$/;
+const RAW_EGYPT_MOBILE_REGEX = /^01[0125]\d{8}$/;
 
 export const signupSchema = z
   .object({
@@ -32,14 +33,43 @@ export const signupSchema = z
   });
 
 export const loginSchema = z.object({
-  email: z.email(),
+  identifier: z.email().or(
+    z
+      .string()
+      .trim()
+      .regex(RAW_EGYPT_MOBILE_REGEX, 'Invalid egyptian mobile phone number.')
+      // Automatically convert 01xxxxxxxxx to +201xxxxxxxxx
+      .transform((val) => `+20${val.slice(1)}`),
+  ),
   password: z.string().min(MIN_PASSWORD_LENGTH),
 });
 
 export const sessionSchema = z.object({
-  ip: z.string()
+  ip: z.string(),
 });
 
-export type SessionData = z.infer<typeof sessionSchema>;
+export const resetPasswordSchema = z.object({
+  resetToken: z.string(),
+  newPassword: z.string().min(MIN_PASSWORD_LENGTH, 'Password is too short'),
+});
+
+export const resetPasswordTokenSchema = z.object({
+  phone: z
+    .string()
+    .trim()
+    .regex(EGYPT_MOBILE_REGEX, 'Invalid egyptian mobile phone number.'),
+});
+
+export const checkPhoneSchema = z.object({
+  phone: z
+    .string()
+    .trim()
+    .regex(EGYPT_MOBILE_REGEX, 'Invalid egyptian mobile phone number.'),
+});
+
 export type SignupData = z.infer<typeof signupSchema>;
 export type LoginData = z.infer<typeof loginSchema>;
+export type SessionData = z.infer<typeof sessionSchema>;
+export type ResetPasswordData = z.infer<typeof resetPasswordSchema>;
+export type ResetPasswordTokenData = z.infer<typeof resetPasswordTokenSchema>;
+export type checkPhoneData = z.infer<typeof checkPhoneSchema>;

@@ -60,7 +60,8 @@ export default function ResetPasswordPage() {
     setLoading(true);
 
     try {
-      const response = await api.post('/reset-password', {
+      console.log(token);
+      const response = await api.post('auth/reset-password', {
         resetToken: token,
         newPassword: password,
       });
@@ -137,7 +138,11 @@ export default function ResetPasswordPage() {
             />
           </div>
           {error && <p className="text-red-400 text-sm">{error}</p>}
-          <button type="submit" className={`${btnPrimaryCls} w-full mt-2`} disabled={loading}>
+          <button
+            type="submit"
+            className={`${btnPrimaryCls} w-full mt-2`}
+            disabled={loading}
+          >
             {loading ? 'جارٍ...' : 'إعادة تعيين كلمة المرور'}
           </button>
         </form>
