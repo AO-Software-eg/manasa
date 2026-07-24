@@ -50,3 +50,11 @@ export async function login(
 
   return token;
 }
+
+export async function resetPassword(
+  data: validation.ResetPasswordData,
+  userId: number,
+) {
+  const newPasswordHash = await hash.hashString(data.newPassword);
+  await db.updateUserPassword(userId, newPasswordHash);
+}

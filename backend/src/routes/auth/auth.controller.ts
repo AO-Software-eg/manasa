@@ -6,10 +6,8 @@ import * as validation from './auth.validation.ts';
 
 import * as auth from '../../auth.ts';
 
-import jwt from 'jsonwebtoken';
-
-import { ZodError } from 'zod';
-import { RowNotFoundError } from './../../database.ts';
+import * as hash from '../../hash.ts';
+import { getUserPayload } from '../util.ts';
 
 const otpTransactions = new Map<string, string>();
 
@@ -60,6 +58,22 @@ export async function logout(req: Request, res: Response) {
     expires: new Date(0),
     path: '/',
   });
+
+  return res.status(200).send();
+}
+
+export async function resetPassword(req: Request, res: Response) {
+  const data = validation.resetPasswordSchema.parse(req.body);
+
+  const tokenPayload = auth.verifyToken(data.resetToken);
+
+  if (tokenPayload.purpose != 'reset-password') {
+    return res.status(400).send();
+  }
+
+  const userPayload = getUserPayload(req);
+
+  await service.resetPassword(data, userPayload.id);
 
   return res.status(200).send();
 }

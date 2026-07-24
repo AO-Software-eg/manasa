@@ -40,6 +40,12 @@ export const sessionSchema = z.object({
   ip: z.string(),
 });
 
+export const resetPasswordSchema = z.object({
+  resetToken: z.string(),
+  newPassword: z.string().min(MIN_PASSWORD_LENGTH, 'Password is too short'),
+});
+
 export type SignupData = z.infer<typeof signupSchema>;
 export type LoginData = z.infer<typeof loginSchema>;
 export type SessionData = z.infer<typeof sessionSchema>;
+export type ResetPasswordData = z.infer<typeof resetPasswordSchema>;
