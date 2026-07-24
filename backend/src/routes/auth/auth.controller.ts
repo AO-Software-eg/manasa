@@ -32,6 +32,7 @@ export async function login(req: Request, res: Response) {
     throw new Error("Couldn't get request IP");
   }
 
+  console.log(req.body);
   const data = validation.loginSchema.parse(req.body);
 
   const sessionData: validation.SessionData = {

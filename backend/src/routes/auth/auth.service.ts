@@ -35,7 +35,12 @@ export async function login(
   data: validation.LoginData,
   sessionData: validation.SessionData,
 ): Promise<string> {
-  const user: db.SelectUser = await db.getUserByEmail(data.email);
+  let user: db.SelectUser;
+  if (data.identifier.includes('@')) {
+    user = await db.getUserByEmail(data.identifier);
+  } else {
+    user = await db.getUserByPhone(data.identifier);
+  }
 
   if ((await hash.verifyHash(user.password, data.password)) == false) {
     throw new err.InvalidCredentialsError();

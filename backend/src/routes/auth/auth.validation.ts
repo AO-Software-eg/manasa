@@ -3,6 +3,7 @@ import z from 'zod';
 const MIN_PASSWORD_LENGTH = 6;
 const MIN_NAME_LENGTH = 2;
 const EGYPT_MOBILE_REGEX = /^\+201[0125]\d{8}$/;
+const RAW_EGYPT_MOBILE_REGEX = /^01[0125]\d{8}$/;
 
 export const signupSchema = z
   .object({
@@ -32,7 +33,14 @@ export const signupSchema = z
   });
 
 export const loginSchema = z.object({
-  email: z.email(),
+  identifier: z.email().or(
+    z
+      .string()
+      .trim()
+      .regex(RAW_EGYPT_MOBILE_REGEX, 'Invalid egyptian mobile phone number.')
+      // Automatically convert 01xxxxxxxxx to +201xxxxxxxxx
+      .transform((val) => `+20${val.slice(1)}`),
+  ),
   password: z.string().min(MIN_PASSWORD_LENGTH),
 });
 
