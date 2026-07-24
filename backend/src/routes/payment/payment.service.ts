@@ -5,7 +5,42 @@ import * as util from '../util.ts';
 import * as err from '../error.ts';
 
 import * as validation from './payment.validation.ts';
+async function addItem(buyData: validation.buyItemData, user: db.SelectUser) {
+  switch (buyData.itemType) {
+    case 'course': {
+      const courseEnrollment: db.InsertCourseEnrollment = {
+        studentId: user.id,
+        courseId: buyData.itemId,
+      };
 
+      try {
+        await db.addCourseEnrollment(courseEnrollment);
+      } catch (error: any) {
+        if (error instanceof db.NonUniqueDataError) {
+          throw new err.ItemAlreadyOwnedError();
+        }
+
+        throw error;
+      }
+      break;
+    }
+    default: {
+      throw new err.NotPurchasableYetError();
+    }
+  }
+}
+
+async function getItemPrice(buyData: validation.buyItemData): Promise<number> {
+  switch (buyData.itemType) {
+    case 'course': {
+      const course: db.SelectCourse = await db.getCourseById(buyData.itemId);
+      return course.price;
+    }
+    default: {
+      throw new err.NotPurchasableYetError();
+    }
+  }
+}
 export const billDataSchema = z.object({
   amount: z.number().positive(),
   phoneNumber: z
@@ -160,4 +195,24 @@ export async function depositWallet(
   const user = await db.getUserByEmail(billData.email);
 
   await db.addToWalletBalance(user.id, buyData.amount);
+}
+
+
+export async function buyItemWithWallet(
+  userId: number,
+  buyData: validation.buyItemData,
+) {
+  const user = await db.getUserById(userId);
+
+  const price = await getItemPrice(buyData);
+
+  const balance = await db.getBalance(user.id);
+
+  if (balance < price) {
+    throw new err.InsufficientFundsError();
+  }
+
+  await addItem(buyData, user);
+
+  await db.addToWalletBalance(user.id, -price);
 }

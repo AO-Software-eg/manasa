@@ -47,6 +47,12 @@ export class NotPurchasableYetError extends Error {
   }
 }
 
+export class InsufficientFundsError extends Error {
+  constructor() {
+    super('Insufficient funds in the wallet to complete the payment');
+  }
+}
+
 export function errorHandler(
   err: Error,
   req: Request,
@@ -74,6 +80,10 @@ export function errorHandler(
   }
 
   if (err instanceof JsonWebTokenError) {
+    res.status(401);
+  }
+
+  if (err instanceof InsufficientFundsError) {
     res.status(401);
   }
 

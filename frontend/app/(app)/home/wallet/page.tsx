@@ -10,7 +10,7 @@ function WalletPage() {
   const { data: userData } = useMe();
   const walletMutation = useWallet();
   const { data: walletData } = useGetWallet();
-  const balance = walletData?.balance || 0;
+  const balance = walletData || 0;
   const numericAmount = Number(amount);
 
   const balanceData = [
