@@ -52,8 +52,16 @@ export const resetPasswordTokenSchema = z.object({
     .regex(EGYPT_MOBILE_REGEX, 'Invalid egyptian mobile phone number.'),
 });
 
+export const checkPhoneSchema = z.object({
+  phone: z
+    .string()
+    .trim()
+    .regex(EGYPT_MOBILE_REGEX, 'Invalid egyptian mobile phone number.'),
+});
+
 export type SignupData = z.infer<typeof signupSchema>;
 export type LoginData = z.infer<typeof loginSchema>;
 export type SessionData = z.infer<typeof sessionSchema>;
 export type ResetPasswordData = z.infer<typeof resetPasswordSchema>;
 export type ResetPasswordTokenData = z.infer<typeof resetPasswordTokenSchema>;
+export type checkPhoneData = z.infer<typeof checkPhoneSchema>;

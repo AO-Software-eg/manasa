@@ -74,3 +74,7 @@ export async function resetPasswordToken(
 
   return resetToken;
 }
+
+export async function checkPhone(data: validation.checkPhoneData) {
+  return await db.isPhoneRegistered(data.phone);
+}

@@ -71,9 +71,7 @@ export async function resetPassword(req: Request, res: Response) {
     return res.status(400).send();
   }
 
-  const userPayload = getUserPayload(req);
-
-  await service.resetPassword(data, userPayload.id);
+  await service.resetPassword(data, tokenPayload.id);
 
   return res.status(200).send();
 }
@@ -81,9 +79,19 @@ export async function resetPassword(req: Request, res: Response) {
 export async function resetPasswordToken(req: Request, res: Response) {
   const data = validation.resetPasswordTokenSchema.parse(req.body);
 
-  const resetToken = service.resetPasswordToken(data);
+  const resetToken = await service.resetPasswordToken(data);
+
+  console.log(resetToken);
 
   return res.status(200).json({ resetToken });
+}
+
+export async function checkPhone(req: Request, res: Response) {
+  const exists = await service.checkPhone(
+    validation.checkPhoneSchema.parse(req.body),
+  );
+
+  return res.status(200).json({ exists });
 }
 
 export async function akedlySend(req: Request, res: Response) {
