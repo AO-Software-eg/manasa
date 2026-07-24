@@ -78,6 +78,14 @@ export async function resetPassword(req: Request, res: Response) {
   return res.status(200).send();
 }
 
+export async function resetPasswordToken(req: Request, res: Response) {
+  const data = validation.resetPasswordTokenSchema.parse(req.body);
+
+  const resetToken = service.resetPasswordToken(data);
+
+  return res.status(200).json({ resetToken });
+}
+
 export async function akedlySend(req: Request, res: Response) {
   const { phoneNumber, powSolution, turnstileToken } = req.body;
 

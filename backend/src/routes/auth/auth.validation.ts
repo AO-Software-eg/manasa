@@ -45,7 +45,15 @@ export const resetPasswordSchema = z.object({
   newPassword: z.string().min(MIN_PASSWORD_LENGTH, 'Password is too short'),
 });
 
+export const resetPasswordTokenSchema = z.object({
+  phone: z
+    .string()
+    .trim()
+    .regex(EGYPT_MOBILE_REGEX, 'Invalid egyptian mobile phone number.'),
+});
+
 export type SignupData = z.infer<typeof signupSchema>;
 export type LoginData = z.infer<typeof loginSchema>;
 export type SessionData = z.infer<typeof sessionSchema>;
 export type ResetPasswordData = z.infer<typeof resetPasswordSchema>;
+export type ResetPasswordTokenData = z.infer<typeof resetPasswordTokenSchema>;

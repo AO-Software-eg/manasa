@@ -58,3 +58,19 @@ export async function resetPassword(
   const newPasswordHash = await hash.hashString(data.newPassword);
   await db.updateUserPassword(userId, newPasswordHash);
 }
+
+export async function resetPasswordToken(
+  data: validation.ResetPasswordTokenData,
+) {
+  const user = await db.getUserByPhone(data.phone);
+
+  const resetToken = auth.signToken(
+    {
+      id: user.id,
+      purpose: 'reset-password',
+    },
+    '10m',
+  );
+
+  return resetToken;
+}
