@@ -1,5 +1,3 @@
-
-
 import * as service from './payment.service.ts';
 import * as validation from './payment.validation.ts';
 
@@ -10,7 +8,6 @@ import { ZodError } from 'zod';
 
 import * as db from '../../database.ts';
 import * as err from '../error.ts';
-
 
 export async function buyItem(req: Request, res: Response) {
   const payload = getUserPayload(req);
@@ -59,45 +56,14 @@ export async function paymobCallback(req: Request, res: Response) {
   return res.status(200).send();
 }
 
-
 export async function buyItemWithWallet(req: Request, res: Response) {
-  try {
-    const payload = getUserPayload(req);
+  const payload = getUserPayload(req);
 
-    const data = validation.buyItemSchema.parse(req.body);
+  const data = validation.buyItemSchema.parse(req.body);
 
-    await service.buyItemWithWallet(payload.id, data);
+  await service.buyItemWithWallet(payload.id, data);
 
-    return res.status(200).json({
-      message: 'Item purchased successfully',
-    });
-  } catch (error: any) {
-    if (error instanceof ZodError) {
-      return res.status(400).json({
-        error: 'Bad Request',
-        message: 'Invalid request data',
-        details: error,
-      });
-    }
-
-    if (error instanceof db.RowNotFoundError) {
-      return res.status(400).json({
-        error: 'Bad Request',
-        message: error.message,
-      });
-    }
-
-    if (error instanceof err.InsufficientFundsError) {
-      return res.status(401).json({
-        error: 'Insufficient Funds',
-        message: error.message,
-      });
-    }
-
-    console.error(error);
-
-    return res.status(500).json({
-      message: 'Internal Server Error',
-    });
-  }
+  return res.status(200).json({
+    message: 'Item purchased successfully',
+  });
 }
