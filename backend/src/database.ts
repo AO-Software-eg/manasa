@@ -13,10 +13,8 @@ export class DataIntegrityError extends Error {
 }
 
 export class NonUniqueDataError extends DataIntegrityError {
-  constructor(resultCount: number) {
-    super(
-      `متوقع نتيجة واحدة أو لا شيء من الاستعلام، ولكن تم العثور على ${resultCount}`,
-    );
+  constructor() {
+    super('Expected one or none rows');
   }
 }
 
@@ -154,7 +152,7 @@ export async function getUserByEmail(email: string): Promise<SelectUser> {
       `المستخدم ذو البريد الإلكتروني ${email} غير موجود`,
     );
   } else if (res.length > 1) {
-    throw new NonUniqueDataError(res.length);
+    throw new NonUniqueDataError();
   }
 
   return res[0];
