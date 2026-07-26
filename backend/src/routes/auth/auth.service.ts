@@ -4,7 +4,7 @@ import * as auth from '../../auth.ts';
 import * as hash from '../../hash.ts';
 import * as err from '../error.ts';
 
-import z from 'zod';
+import { createHash } from 'crypto';
 
 export async function signup(data: validation.SignupData) {
   if (await db.isUserFound(data.email)) {
@@ -46,11 +46,30 @@ export async function login(
     throw new err.InvalidCredentialsError();
   }
 
+  const ip_hash = createHash('sha256').update(sessionData.ip).digest('hex');
+
+  try {
+    // Generate session
+    const session_id = crypto.randomUUID();
+    const device_id = ip_hash;
+    await db.createUserSession({
+      userId: user.id,
+      sessionId: session_id,
+      deviceId: device_id,
+    });
+  } catch (err: any) {
+    throw new Error('User session creation failed');
+  }
+
+  const session = await db.getUserSession(user.id);
+  if (!session) {
+    throw new Error('User session creation failed');
+  }
   const token = auth.signToken({
     id: user.id,
     name: user.name,
     email: user.email,
-    ip_hash: await hash.hashString(sessionData.ip),
+    sessionId: session.sessionId,
   });
 
   return token;
