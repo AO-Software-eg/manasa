@@ -84,7 +84,7 @@ export function errorHandler(
   }
 
   if (err instanceof InsufficientFundsError) {
-    res.status(401);
+    res.status(402);
   }
 
   if (err instanceof ZodError) {
