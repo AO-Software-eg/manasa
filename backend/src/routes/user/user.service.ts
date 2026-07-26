@@ -9,6 +9,14 @@ export async function getMe(userPayload: any) {
     throw new UserUnauthorizedError();
   }
 
+  const session = await db.getUserSession(userPayload.id);
+  if (!session) {
+    throw new UserUnauthorizedError();
+  }
+  if (session.sessionId != userPayload.sessionId) {
+    throw new UserUnauthorizedError();
+  }
+
   const user: db.SelectUser = await db.getUserById(userPayload.id);
   if (user.password) {
     user.password = '';
