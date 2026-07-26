@@ -33,7 +33,7 @@ export async function signup(data: validation.SignupData) {
 // returns the JWT token
 export async function login(
   data: validation.LoginData,
-  sessionData: validation.SessionData,
+  deviceId: string,
 ): Promise<string> {
   let user: db.SelectUser;
   if (data.identifier.includes('@')) {
@@ -46,16 +46,13 @@ export async function login(
     throw new err.InvalidCredentialsError();
   }
 
-  const ip_hash = createHash('sha256').update(sessionData.ip).digest('hex');
-
   try {
     // Generate session
-    const session_id = crypto.randomUUID();
-    const device_id = ip_hash;
+    const sessionId = crypto.randomUUID();
     await db.createUserSession({
       userId: user.id,
-      sessionId: session_id,
-      deviceId: device_id,
+      sessionId: sessionId,
+      deviceId: deviceId,
     });
   } catch (err: any) {
     throw new Error('User session creation failed');
