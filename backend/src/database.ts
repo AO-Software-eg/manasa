@@ -617,7 +617,7 @@ export async function createPayment(): Promise<SelectPaymentTransaction> {
 }
 
 export async function addToWalletBalance(studentId: number, amount: number) {
-  if (!isUserFoundById(studentId)) {
+  if (!(await isUserFoundById(studentId))) {
     throw new RowNotFoundError(`User with id ${studentId} does not exist`);
   }
 
@@ -636,7 +636,7 @@ export async function addToWalletBalance(studentId: number, amount: number) {
 }
 
 export async function getBalance(studentId: number): Promise<number> {
-  if (!isUserFoundById(studentId)) {
+  if (!(await isUserFoundById(studentId))) {
     throw new RowNotFoundError(`User with id ${studentId} does not exist`);
   }
 
@@ -653,7 +653,7 @@ export async function getBalance(studentId: number): Promise<number> {
 }
 
 export async function banUser(studentId: number) {
-  if (!isUserFoundById(studentId)) {
+  if (!(await isUserFoundById(studentId))) {
     throw new RowNotFoundError(`User with id ${studentId} does not exist`);
   }
 
@@ -663,7 +663,7 @@ export async function banUser(studentId: number) {
 }
 
 export async function isUserBanned(studentId: number): Promise<boolean> {
-  if (!isUserFoundById(studentId)) {
+  if (!(await isUserFoundById(studentId))) {
     throw new RowNotFoundError(`User with id ${studentId} does not exist`);
   }
 
