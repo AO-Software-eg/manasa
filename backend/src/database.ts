@@ -685,10 +685,11 @@ export async function createUserSession(session: InsertUserSession) {
       target: schema.userSessions.userId,
 
       set: {
-        sessionId: sql`CASE 
-          WHEN user_sessions.device_id = ${session.deviceId} THEN user_sessions.session_id 
-          ELSE ${session.sessionId} 
-        END`,
+        // sessionId: sql`CASE
+        //   WHEN user_sessions.device_id = ${session.deviceId} THEN user_sessions.session_id
+        //   ELSE ${session.sessionId}
+        // END`,
+        sessionId: session.sessionId,
         deviceId: session.deviceId,
         createdAt: sql`now()`,
       },
