@@ -77,6 +77,9 @@ export type InsertPaymentTransaction =
 export type SelectBan = typeof schema.bans.$inferSelect;
 export type InsertBan = typeof schema.bans.$inferInsert;
 
+export type SelectUserSession = typeof schema.userSessions.$inferSelect;
+export type InsertUserSession = typeof schema.userSessions.$inferInsert;
+
 export type RelationLecture = Awaited<
   ReturnType<typeof getCourseLectures>
 >[number];
@@ -673,3 +676,32 @@ export async function isUserBanned(studentId: number): Promise<boolean> {
 }
 
 export default db;
+
+export async function createUserSession(session: InsertUserSession) {
+  await db
+    .insert(schema.userSessions)
+    .values(session)
+    .onConflictDoUpdate({
+      target: schema.userSessions.userId,
+
+      set: {
+        sessionId: sql`CASE 
+          WHEN user_sessions.device_id = ${session.deviceId} THEN user_sessions.session_id 
+          ELSE ${session.sessionId} 
+        END`,
+        deviceId: session.deviceId,
+        createdAt: sql`now()`,
+      },
+    });
+}
+
+export async function getUserSession(
+  userId: number,
+): Promise<SelectUserSession | undefined> {
+  const res = await db
+    .select()
+    .from(schema.userSessions)
+    .where(eq(schema.userSessions.userId, userId));
+
+  return res[0];
+}
