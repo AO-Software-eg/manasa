@@ -2,7 +2,7 @@ import * as db from '../../database.ts';
 import * as validation from './user.validation.ts';
 
 import * as progress from '../../progress.ts';
-import { UserUnauthorizedError } from '../error.ts';
+import { UserSessionInvalidError, UserUnauthorizedError } from '../error.ts';
 
 export async function getMe(userPayload: any) {
   if (await db.isUserBanned(userPayload.id)) {
@@ -11,10 +11,10 @@ export async function getMe(userPayload: any) {
 
   const session = await db.getUserSession(userPayload.id);
   if (!session) {
-    throw new UserUnauthorizedError();
+    throw new UserSessionInvalidError();
   }
   if (session.sessionId != userPayload.sessionId) {
-    throw new UserUnauthorizedError();
+    throw new UserSessionInvalidError();
   }
 
   const user: db.SelectUser = await db.getUserById(userPayload.id);

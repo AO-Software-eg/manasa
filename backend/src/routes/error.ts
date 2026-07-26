@@ -17,6 +17,12 @@ export class UserTokenNotFoundError extends Error {
   }
 }
 
+export class UserSessionInvalidError extends Error {
+  constructor() {
+    super('User session invalid');
+  }
+}
+
 export class UserUnauthorizedError extends Error {
   constructor() {
     super('User is not authorized to access this resource');
@@ -67,6 +73,10 @@ export function errorHandler(
 
   if (err instanceof UserUnauthorizedError) {
     res.status(403);
+  }
+
+  if (err instanceof UserSessionInvalidError) {
+    res.status(401);
   }
 
   if (err instanceof RowNotFoundError) {
