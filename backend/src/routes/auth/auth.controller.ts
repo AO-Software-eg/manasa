@@ -6,8 +6,7 @@ import * as validation from './auth.validation.ts';
 
 import * as auth from '../../auth.ts';
 
-import * as hash from '../../hash.ts';
-import { getUserPayload } from '../util.ts';
+import * as fingerprint from '../../fingerprint.ts';
 
 const otpTransactions = new Map<string, string>();
 
@@ -32,14 +31,11 @@ export async function login(req: Request, res: Response) {
     throw new Error("Couldn't get request IP");
   }
 
-  console.log(req.body);
   const data = validation.loginSchema.parse(req.body);
 
-  const sessionData: validation.SessionData = {
-    ip: req.ip,
-  };
+  const deviceId = fingerprint.computeDeviceFingerprint(req);
 
-  const user_token = await service.login(data, sessionData);
+  const user_token = await service.login(data, deviceId);
   res.cookie('user_token', user_token, {
     httpOnly: true,
     sameSite: 'none',

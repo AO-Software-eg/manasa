@@ -4,7 +4,7 @@ import * as auth from '../../auth.ts';
 import * as hash from '../../hash.ts';
 import * as err from '../error.ts';
 
-import z from 'zod';
+import { createHash } from 'crypto';
 
 export async function signup(data: validation.SignupData) {
   if (await db.isUserFound(data.email)) {
@@ -33,7 +33,7 @@ export async function signup(data: validation.SignupData) {
 // returns the JWT token
 export async function login(
   data: validation.LoginData,
-  sessionData: validation.SessionData,
+  deviceId: string,
 ): Promise<string> {
   let user: db.SelectUser;
   if (data.identifier.includes('@')) {
@@ -46,11 +46,27 @@ export async function login(
     throw new err.InvalidCredentialsError();
   }
 
+  try {
+    // Generate session
+    const sessionId = crypto.randomUUID();
+    await db.createUserSession({
+      userId: user.id,
+      sessionId: sessionId,
+      deviceId: deviceId,
+    });
+  } catch (err: any) {
+    throw new Error('User session creation failed');
+  }
+
+  const session = await db.getUserSession(user.id);
+  if (!session) {
+    throw new Error('User session creation failed');
+  }
   const token = auth.signToken({
     id: user.id,
     name: user.name,
     email: user.email,
-    ip_hash: await hash.hashString(sessionData.ip),
+    sessionId: session.sessionId,
   });
 
   return token;
