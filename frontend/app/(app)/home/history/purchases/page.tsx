@@ -3,7 +3,7 @@
 import { useGetEnrollments } from '@/app/hooks/queries/useEnroll';
 import { useMe } from '@/app/hooks/queries/useMe';
 
-import { courses } from '@/types';
+import { courses } from '@manasa/shared';
 
 
 type Enrollment = {
@@ -12,8 +12,7 @@ type Enrollment = {
 };
 
 export default function HistoryPage() {
-  const {data: userData } = useMe()
-  const { data: enrollments, isLoading, isError } = useGetEnrollments(userData?.id ?? '');
+  const { data: enrollments, isLoading, isError } = useGetEnrollments();
 
   if (isLoading) {
     return (

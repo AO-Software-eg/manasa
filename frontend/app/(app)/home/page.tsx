@@ -4,7 +4,7 @@ import { useGetEnrollments } from '@/app/hooks/queries/useEnroll';
 import { useMe } from '@/app/hooks/queries/useMe';
 import CardLayout from '@/app/components/CardLayout';
 import { ChevronLeft } from 'lucide-react';
-import { courses } from '@/types';
+import { courses } from '@manasa/shared';
 import Link from 'next/link';
 
 type Enrollment = {
@@ -13,7 +13,7 @@ type Enrollment = {
 
 export default function page() {
   const { data: userData } = useMe();
-  const { data: subscribedCourses } = useGetEnrollments(userData?.id ?? '');
+  const { data: subscribedCourses } = useGetEnrollments();
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-1 col-span-1 gap-4 w-full p-4">

@@ -5,7 +5,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
-import { lecture ,getExamStatus } from '@/types';
+import { lecture ,getExamStatus } from '@manasa/shared';
 import VideoButton from './VideoButton';
 import ExamItem from './ExamItem';
 

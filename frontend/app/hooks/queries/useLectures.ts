@@ -1,7 +1,7 @@
 import { api } from '@/app/hooks/api';
 import { useQuery } from '@tanstack/react-query';
-import { lectureVideoSchema } from '@/types/lecture';
-import { progressSchema } from '@/types';
+import { lectureVideoSchema , progressSchema} from '@manasa/shared';
+
 
 
 export function useLectures(courseID: string) {

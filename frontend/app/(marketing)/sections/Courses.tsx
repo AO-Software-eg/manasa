@@ -2,10 +2,9 @@
 import CourseComp from '../../components/CourseComp';
 import { useCourses } from '../../hooks/queries/useCourses';
 import CoursesLoading from '@/app/components/CoursesLoading';
-import { courses } from '@/types';
 import { useMe } from '@/app/hooks/queries/useMe';
 import { useGetEnrollments } from '@/app/hooks/queries/useEnroll';
-import { Enrollment } from '@/types';
+import { Enrollment, courses } from '@manasa/shared';
 import { useEffect, useState } from 'react';
 
 export default function Courses() {
@@ -17,7 +16,7 @@ export default function Courses() {
     data: enrollments,
     isLoading: enrollLoading,
     isError: enrollError,
-  } = useGetEnrollments(userData?.id?.toString() ?? '');
+  } = useGetEnrollments();
 
   const enrolledCourseIds = new Set<number>(
     enrollments?.map((e: Enrollment) => Number(e.course.id)) ?? [],

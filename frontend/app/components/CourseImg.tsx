@@ -1,6 +1,6 @@
 'use client';
 import Image from 'next/image';
-import { courses } from '@/types';
+import { courses } from '@manasa/shared';
 import { useCourses } from '../hooks/queries/useCourses';
 
 export default function CourseImage({ title }: { title: string }) {

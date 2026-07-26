@@ -93,7 +93,7 @@ function SideNav({
   const userName = loggedIn && userData ? userData.name : '...';
   const { data: coursesData } = useCourses();
   const coursesCount = coursesData?.length || 0;
-  const { data: enrollments, isLoading } = useGetEnrollments(userData?.id ?? '');
+  const { data: enrollments, isLoading } = useGetEnrollments();
   const enrollmentCount = enrollments?.length || 0;
 
 

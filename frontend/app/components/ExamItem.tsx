@@ -1,4 +1,4 @@
-import { lecture ,ExamStatus, EXAM_STATUS_LABEL} from '@/types';
+import { lecture ,ExamStatus, EXAM_STATUS_LABEL} from '@manasa/shared';
 import PopUp from '@/app/components/PopUp';
 
 interface ExamItemProps {

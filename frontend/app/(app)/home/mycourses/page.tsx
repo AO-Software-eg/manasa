@@ -2,7 +2,7 @@
 import { useGetEnrollments } from '@/app/hooks/queries/useEnroll';
 import { useMe } from '@/app/hooks/queries/useMe';
 import CourseComp from '@/app/components/CourseComp';
-import { courses } from '@/types';
+import { courses } from '@manasa/shared';
 import CoursesLoading from '@/app/components/CoursesLoading';
 
 type Enrollment = {
@@ -17,7 +17,7 @@ function page() {
     isError,
     error ,
     refetch
-  } = useGetEnrollments(userData?.id ?? '');
+  } = useGetEnrollments();
 
 
   if (enrollments?.length < 1) {

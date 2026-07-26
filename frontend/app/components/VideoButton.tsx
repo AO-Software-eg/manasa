@@ -1,4 +1,4 @@
-import { lecture } from '@/types';
+import { lecture } from '@manasa/shared';
 
 interface VideoButtonProps {
   video: lecture['lectureVideos'][0];

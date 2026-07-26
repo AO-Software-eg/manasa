@@ -4,10 +4,13 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { scalarDocs } from './docs/scalar.ts';
 import apiRouter from './routes/index.ts';
-import jwt from 'jsonwebtoken';
 import { errorHandler } from './routes/error.ts';
+import * as trpcExpress from "@trpc/server/adapters/express";
+import { appRouter } from "./trpc/routers/index.ts";
 
-const app = express();
+const app: express.Express = express();
+
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -34,6 +37,14 @@ app.use(
     credentials: true,
   }),
 );
+
+app.use(
+  "/trpc",
+  trpcExpress.createExpressMiddleware({
+    router: appRouter,
+  })
+);
+
 
 app.use('/', apiRouter);
 

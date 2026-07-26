@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { userData } from '@/types';
+import { userData } from '@manasa/shared';
 
 type Props = {
   id: number;

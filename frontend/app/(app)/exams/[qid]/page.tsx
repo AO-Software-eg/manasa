@@ -7,7 +7,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useExams, useSubmitExam } from '@/app/hooks/queries/useExams';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import Timer from '@/app/components/Timer';
-import { ExamQuestion } from '@/types/exams';
+import { ExamQuestion } from '@manasa/shared';
 import PopUp from '@/app/components/PopUp';
 import { useMe } from '@/app/hooks/queries/useMe';
 import { toast } from 'sonner';

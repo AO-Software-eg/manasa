@@ -1,0 +1,10 @@
+packages:
+  - "frontend"
+  - "backend"
+  - "packages/*"
+allowBuilds:
+  argon2: true
+  esbuild: true
+  sharp: true
+  unrs-resolver: true
+  vue-demi: true

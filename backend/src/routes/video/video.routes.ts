@@ -1,10 +1,9 @@
-import express, { type Request, type Response } from 'express';
-import bodyParser from 'body-parser';
+import express, { type Request, type Response, type Router } from 'express';
 
 import * as controller from './video.controller.ts';
 
-const router = express.Router();
+const router: Router = express.Router();
 
-router.route('/:videoId').get(controller.getVideo);
+router.route('/:videoId').get(express.json(), controller.getVideo);
 
 export default router;

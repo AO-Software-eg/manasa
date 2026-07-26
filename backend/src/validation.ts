@@ -5,7 +5,7 @@ export const MIN_NAME_LENGTH = 2;
 export const EGYPT_MOBILE_REGEX = /^\+201[0125]\d{8}$/;
 
 export const userSchema = z.object({
-  id: z.number(),
+  id: z.string(),
   email: z.string(),
   name: z.string(),
   studentPhone: z.string(),
@@ -47,22 +47,13 @@ export const lectureSchema = z.object({
   course_id: z.string(),
   title: z.string(),
 });
-export const examSubmissionSchema = z.object({
-  studentId: z.number(),
-  examId: z.number(),
-  answers: z.array(
-    z.object({
-      questionId: z.number(),
-      choiceId: z.number(),
-    }),
-  ),
-});
 
-export type examSubmissionData = z.infer<typeof examSubmissionSchema>;
-
-export const enrollSchema = z.object({
-  courseId: z.number(),
-  studentId: z.number(),
+// Lecture videos table in db
+export const lectureVideoSchema = z.object({
+  id: z.string(),
+  lecture_id: z.string(),
+  title: z.string(),
+  video_id: z.string(),
 });
 
 export const loginSchema = z.object({
@@ -82,9 +73,9 @@ export const signupSchema = z
       .string()
       .trim()
       .regex(EGYPT_MOBILE_REGEX, 'Invalid egyptian mobile phone number.'),
-    specialization: z.string().optional().nullable(),
+    specialization: z.string().optional(),
     governorate: z.string('Governorate must be picked.'),
-    year: z.string('School Year must be picked.'),
+    YearCombo: z.string('School Year must be picked.'),
     password: z.string().min(MIN_PASSWORD_LENGTH, 'Password is too short.'),
     confirmPassword: z
       .string()

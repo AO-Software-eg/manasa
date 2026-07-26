@@ -18,7 +18,7 @@ import {
 import { useQueryClient } from '@tanstack/react-query';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Submissions } from '@/types';
+import { Submissions } from '@manasa/shared';
 
 function Page() {
   const { data: user } = useMe();

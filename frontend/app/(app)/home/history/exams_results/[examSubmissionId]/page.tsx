@@ -13,7 +13,7 @@ import { useGetOnSubmit } from '@/app/hooks/queries/useExams';
 import {
   AnswerGrade,
   Submissions,
-} from '@/types';
+} from '@manasa/shared';
 
 export default function Page() {
   const router = useRouter();

@@ -5,7 +5,7 @@ import { Suspense, useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useGetEnrollments } from '@/app/hooks/queries/useEnroll';
 import { useMe } from '@/app/hooks/queries/useMe';
-import { Enrollment } from '@/types';
+import { Enrollment } from '@manasa/shared';
 import CardLayout from '@/app/components/CardLayout';
 
 const MAX_POLL_ATTEMPTS = 6; // ~ 6 * 2.5s = 15s of grace for webhook lag
@@ -27,7 +27,7 @@ function PaymentResultInner() {
     isLoading: enrollmentsLoading,
     isError: enrollmentsError,
     refetch,
-  } = useGetEnrollments(me?.id?.toString() ?? '');
+  } = useGetEnrollments();
 
   const attemptsRef = useRef(0);
   const [failedTimeout, setFailedTimeout] = useState(false);

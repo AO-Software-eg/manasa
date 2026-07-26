@@ -6,8 +6,9 @@ import videoRouter from './video/video.routes.ts';
 import examsRouter from './exam/exam.routes.ts';
 import lecturesRouter from './lecture/lecture.routes.ts';
 import paymentRouter from './payment/payment.routes.ts';
+import { type Router } from 'express';
 
-const router = express.Router();
+const router: Router = express.Router();
 
 router.use('/payment', paymentRouter);
 router.use('/course', coursesRouter);

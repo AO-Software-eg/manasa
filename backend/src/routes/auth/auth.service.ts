@@ -4,7 +4,11 @@ import * as auth from '../../auth.ts';
 import * as hash from '../../hash.ts';
 import * as err from '../error.ts';
 
-import { createHash } from 'crypto';
+import crypto from 'crypto';
+import { type Request, type Response } from 'express';
+
+const otpTransactions = new Map<string, string>();
+
 
 export async function signup(data: validation.SignupData) {
   if (await db.isUserFound(data.email)) {
@@ -47,6 +51,7 @@ export async function login(
   }
 
   try {
+    
     // Generate session
     const sessionId = crypto.randomUUID();
     await db.createUserSession({
@@ -99,3 +104,79 @@ export async function resetPasswordToken(
 export async function checkPhone(data: validation.checkPhoneData) {
   return await db.isPhoneRegistered(data.phone);
 }
+
+
+export async function akedlySend(req: Request, res: Response) {
+  const { phoneNumber, powSolution, turnstileToken } = req.body;
+
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    'x-end-user-ip': req.ip ?? '',
+  };
+
+  const r = await fetch('https://api.akedly.io/api/v1.2/transactions/send', {
+    method: 'POST',
+    headers: headers,
+    body: JSON.stringify({
+      APIKey: process.env.AKEDLY_API_KEY,
+      pipelineID: process.env.AKEDLY_PIPELINE_ID,
+      verificationAddress: { phoneNumber },
+      powSolution,
+      turnstileToken,
+    }),
+  });
+  const data = await r.json();
+
+  otpTransactions.set(data.data.transactionReqID, phoneNumber);
+
+  res.json(data);
+}
+
+export async function akedlyVerify(req: Request, res: Response) {
+  const { transactionReqID, otp } = req.body;
+
+  const r = await fetch('https://api.akedly.io/api/v1.2/transactions/verify', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ transactionReqID, otp }),
+  });
+
+  const data = await r.json();
+
+  if (!r.ok) {
+    return res.status(r.status).json(data);
+  }
+
+  const phoneNumber = otpTransactions.get(transactionReqID);
+
+  if (!phoneNumber) {
+    return res.status(400).json({
+      message: 'Transaction not found',
+    });
+  }
+
+  otpTransactions.delete(transactionReqID);
+
+  const resetToken = auth.signToken(
+    {
+      phone: phoneNumber,
+      purpose: 'reset-password',
+    },
+    '1h',
+  );
+
+  return res.json({
+    status: 'success',
+    resetToken,
+  });
+}
+
+export async function akedlyChallenge(req: Request, res: Response) {
+  const r = await fetch(
+    `https://api.akedly.io/api/v1.2/transactions/challenge` +
+      `?APIKey=${process.env.AKEDLY_API_KEY}` +
+      `&pipelineID=${process.env.AKEDLY_PIPELINE_ID}`,
+  );
+  res.status(r.status).json(await r.json());
+}
+

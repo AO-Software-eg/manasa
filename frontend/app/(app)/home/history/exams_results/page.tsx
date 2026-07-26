@@ -26,9 +26,7 @@ type Submission = {
 };
 
 export default function Page() {
-    const { data: userData } = useMe();
-    const userId = userData?.id;
-    const { data: submissions } = useGetExamSubmissions(userId);
+    const { data: submissions } = useGetExamSubmissions();
 
     const formatDate = (dateString: string) => {
         return new Intl.DateTimeFormat('ar-EG', {

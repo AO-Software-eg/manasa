@@ -7,7 +7,7 @@ import {
   ExamQuestion,
   ExamQuestionChoice,
   ExamSubmissionResponse,
-} from '@/types/exams';
+} from '@manasa/shared';
 import { useRouter } from 'next/navigation';
 
 export const useExams = (examId: number, enabled: boolean) => {

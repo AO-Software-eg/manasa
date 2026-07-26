@@ -1,5 +1,5 @@
 import { api } from '@/app/hooks/api';
-import { courses } from '@/types';
+import { courses } from '@manasa/shared';
 import { useQuery } from '@tanstack/react-query';
 
 export function useCourses() {
