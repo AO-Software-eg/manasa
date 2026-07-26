@@ -347,6 +347,9 @@ export async function isUserEnrolled(userId: number, courseId: number) {
 }
 
 export async function addCourseEnrollment(enrollment: InsertCourseEnrollment) {
+  if (await isUserEnrolled(enrollment.studentId, enrollment.courseId)) {
+    throw new NonUniqueDataError();
+  }
   await db.insert(schema.courseEnrollments).values(enrollment);
 }
 
