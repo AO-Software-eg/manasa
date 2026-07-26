@@ -1,9 +1,13 @@
-import { type Request, type Response } from 'express';
-
 import * as service from './payment.service.ts';
 import * as validation from './payment.validation.ts';
 
 import { isNumberParameter, getUserPayload } from '../util.ts';
+
+import { type Request, type Response } from 'express';
+import { ZodError } from 'zod';
+
+import * as db from '../../database.ts';
+import * as err from '../error.ts';
 
 export async function buyItem(req: Request, res: Response) {
   const payload = getUserPayload(req);
@@ -50,4 +54,16 @@ export async function paymobCallback(req: Request, res: Response) {
   }
 
   return res.status(200).send();
+}
+
+export async function buyItemWithWallet(req: Request, res: Response) {
+  const payload = getUserPayload(req);
+
+  const data = validation.buyItemSchema.parse(req.body);
+
+  await service.buyItemWithWallet(payload.id, data);
+
+  return res.status(200).json({
+    message: 'Item purchased successfully',
+  });
 }

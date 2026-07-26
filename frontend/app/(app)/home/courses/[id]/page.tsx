@@ -139,9 +139,7 @@ function CourseData({ course }: { course: courses }) {
     );
   };
 
-  const { data: enrollments } = useGetEnrollments(
-    userData?.id?.toString() ?? '',
-  );
+  const { data: enrollments } = useGetEnrollments();
 
   const enrolledCourseIds = new Set(
     enrollments?.map((e: Enrollment) => Number(e.course.id)) ?? [],

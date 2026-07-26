@@ -10,4 +10,7 @@ router
   .route('/paymob-callback')
   .post(bodyParser.json(), controller.paymobCallback);
 
+router
+  .route('/buy-item-wallet')
+  .post(bodyParser.json(), controller.buyItemWithWallet);
 export default router;
