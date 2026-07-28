@@ -6,6 +6,8 @@ import * as err from '../error.ts';
 
 import { createHash } from 'crypto';
 
+import crypto from 'crypto';
+
 export async function signup(data: validation.SignupData) {
   if (await db.isUserFound(data.email)) {
     throw new err.UserAlreadyExistsError();
@@ -30,11 +32,16 @@ export async function signup(data: validation.SignupData) {
   await db.insertUser(user);
 }
 
+export type userTokens = {
+  accessToken: string;
+  refreshToken: string;
+};
+
 // returns the JWT token
 export async function login(
   data: validation.LoginData,
   deviceId: string,
-): Promise<string> {
+): Promise<userTokens> {
   let user: db.SelectUser;
   if (data.identifier.includes('@')) {
     user = await db.getUserByEmail(data.identifier);
@@ -62,14 +69,19 @@ export async function login(
   if (!session) {
     throw new Error('User session creation failed');
   }
-  const token = auth.signToken({
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    sessionId: session.sessionId,
-  });
+  const accessToken = auth.signToken(
+    {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      sessionId: session.sessionId,
+      jti: crypto.randomUUID(),
+    },
+    '15m',
+  );
 
-  return token;
+  return { accessToken: accessToken, refreshToken: session.sessionId };
+}
 }
 
 export async function resetPassword(

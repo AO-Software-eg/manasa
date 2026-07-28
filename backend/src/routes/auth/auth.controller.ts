@@ -35,12 +35,19 @@ export async function login(req: Request, res: Response) {
 
   const deviceId = fingerprint.computeDeviceFingerprint(req);
 
-  const user_token = await service.login(data, deviceId);
-  res.cookie('user_token', user_token, {
+  const tokens: service.userTokens = await service.login(data, deviceId);
+  res.cookie('access_token', tokens.accessToken, {
     httpOnly: true,
     sameSite: 'none',
     secure: true,
-    expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+    maxAge: 15 * 60 * 1000,
+  });
+
+  res.cookie('refresh_token', tokens.refreshToken, {
+    httpOnly: true,
+    sameSite: 'none',
+    secure: true,
+    maxAge: 3 * 24 * 60 * 60 * 1000,
   });
 
   return res.status(200).send();

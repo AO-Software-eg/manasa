@@ -36,7 +36,7 @@ export const openApiDocument = {
       CookieAuth: {
         type: 'apiKey',
         in: 'cookie',
-        name: 'user_token',
+        name: 'access_token',
         description: 'JWT authentication cookie',
       },
       bearerAuth: {

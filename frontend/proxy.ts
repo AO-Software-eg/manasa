@@ -3,13 +3,13 @@ import type { NextRequest } from 'next/server';
 import { api } from './app/hooks/api';
 
 async function isLoggedIn(request: NextRequest): Promise<boolean> {
-  const sessionCookie = request.cookies.get('user_token');
+  const sessionCookie = request.cookies.get('access_token');
 
   if (sessionCookie) {
     try {
       const res = await api.get('/user/me', {
         headers: {
-          Cookie: `user_token=${sessionCookie.value}`,
+          Cookie: `access_token=${sessionCookie.value}`,
         },
       });
 
