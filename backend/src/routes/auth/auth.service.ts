@@ -82,6 +82,10 @@ export async function login(
 
   return { accessToken: accessToken, refreshToken: session.sessionId };
 }
+
+export async function logout(sid: string) {
+  await db.deleteUserSession(sid);
+}
 }
 
 export async function resetPassword(

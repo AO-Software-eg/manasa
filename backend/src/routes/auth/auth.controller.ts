@@ -54,11 +54,14 @@ export async function login(req: Request, res: Response) {
 }
 
 export async function logout(req: Request, res: Response) {
-  if (!req.cookies.user_token) {
-    return res.status(200).send();
-  }
+  await service.logout(req.cookies.refresh_token);
 
-  res.cookie('user_token', '', {
+  res.cookie('access_token', '', {
+    expires: new Date(0),
+    path: '/',
+  });
+
+  res.cookie('refresh_token', '', {
     expires: new Date(0),
     path: '/',
   });
