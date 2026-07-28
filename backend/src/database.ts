@@ -703,3 +703,8 @@ export async function getUserSession(
 
   return res[0];
 }
+export async function deleteUserSession(sid: string) {
+  await db
+    .delete(schema.userSessions)
+    .where(eq(schema.userSessions.sessionId, sid));
+}
