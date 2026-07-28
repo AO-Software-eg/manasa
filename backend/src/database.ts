@@ -703,6 +703,18 @@ export async function getUserSession(
 
   return res[0];
 }
+
+export async function getUserSessionById(
+  sid: string,
+): Promise<SelectUserSession | undefined> {
+  const res = await db
+    .select()
+    .from(schema.userSessions)
+    .where(eq(schema.userSessions.sessionId, sid));
+
+  return res[0];
+}
+
 export async function deleteUserSession(sid: string) {
   await db
     .delete(schema.userSessions)

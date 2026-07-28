@@ -69,6 +69,22 @@ export async function logout(req: Request, res: Response) {
   return res.status(200).send();
 }
 
+export async function refresh(req: Request, res: Response) {
+  if (!req.cookies.refresh_token) {
+    return res.status(401).send();
+  }
+
+  const accessToken = await service.refresh(req.cookies.refresh_token);
+  res.cookie('access_token', accessToken, {
+    httpOnly: true,
+    sameSite: 'none',
+    secure: true,
+    maxAge: 15 * 60 * 1000,
+  });
+
+  return res.status(200).json(accessToken);
+}
+
 export async function resetPassword(req: Request, res: Response) {
   const data = validation.resetPasswordSchema.parse(req.body);
 
