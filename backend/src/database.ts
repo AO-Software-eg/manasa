@@ -686,10 +686,6 @@ export async function createUserSession(session: InsertUserSession) {
       target: schema.userSessions.userId,
 
       set: {
-        // sessionId: sql`CASE
-        //   WHEN user_sessions.device_id = ${session.deviceId} THEN user_sessions.session_id
-        //   ELSE ${session.sessionId}
-        // END`,
         sessionId: session.sessionId,
         deviceId: session.deviceId,
         createdAt: sql`now()`,
@@ -706,4 +702,21 @@ export async function getUserSession(
     .where(eq(schema.userSessions.userId, userId));
 
   return res[0];
+}
+
+export async function getUserSessionById(
+  sid: string,
+): Promise<SelectUserSession | undefined> {
+  const res = await db
+    .select()
+    .from(schema.userSessions)
+    .where(eq(schema.userSessions.sessionId, sid));
+
+  return res[0];
+}
+
+export async function deleteUserSession(sid: string) {
+  await db
+    .delete(schema.userSessions)
+    .where(eq(schema.userSessions.sessionId, sid));
 }

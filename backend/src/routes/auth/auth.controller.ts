@@ -35,28 +35,54 @@ export async function login(req: Request, res: Response) {
 
   const deviceId = fingerprint.computeDeviceFingerprint(req);
 
-  const user_token = await service.login(data, deviceId);
-  res.cookie('user_token', user_token, {
+  const tokens: service.userTokens = await service.login(data, deviceId);
+  res.cookie('access_token', tokens.accessToken, {
     httpOnly: true,
     sameSite: 'none',
     secure: true,
-    expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+    maxAge: 15 * 60 * 1000,
+  });
+
+  res.cookie('refresh_token', tokens.refreshToken, {
+    httpOnly: true,
+    sameSite: 'none',
+    secure: true,
+    maxAge: 3 * 24 * 60 * 60 * 1000,
   });
 
   return res.status(200).send();
 }
 
 export async function logout(req: Request, res: Response) {
-  if (!req.cookies.user_token) {
-    return res.status(200).send();
-  }
+  await service.logout(req.cookies.refresh_token);
 
-  res.cookie('user_token', '', {
+  res.cookie('access_token', '', {
+    expires: new Date(0),
+    path: '/',
+  });
+
+  res.cookie('refresh_token', '', {
     expires: new Date(0),
     path: '/',
   });
 
   return res.status(200).send();
+}
+
+export async function refresh(req: Request, res: Response) {
+  if (!req.cookies.refresh_token) {
+    return res.status(401).send();
+  }
+
+  const accessToken = await service.refresh(req.cookies.refresh_token);
+  res.cookie('access_token', accessToken, {
+    httpOnly: true,
+    sameSite: 'none',
+    secure: true,
+    maxAge: 15 * 60 * 1000,
+  });
+
+  return res.status(200).json(accessToken);
 }
 
 export async function resetPassword(req: Request, res: Response) {

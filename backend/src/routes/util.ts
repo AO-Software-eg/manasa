@@ -15,11 +15,11 @@ export function isNumberParameter(param: string | string[]): param is string {
 }
 
 export function getUserPayload(req: Request) {
-  if (!req.cookies.user_token) {
+  if (!req.cookies.access_token) {
     throw new err.UserTokenNotFoundError();
   }
 
-  const userPayload = auth.verifyToken(req.cookies.user_token);
+  const userPayload = auth.verifyToken(req.cookies.access_token);
 
   if (!userPayload.id) {
     throw new Error("Malformed token: payload missing 'id' field");

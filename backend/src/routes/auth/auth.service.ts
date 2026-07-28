@@ -6,6 +6,8 @@ import * as err from '../error.ts';
 
 import { createHash } from 'crypto';
 
+import crypto from 'crypto';
+
 export async function signup(data: validation.SignupData) {
   if (await db.isUserFound(data.email)) {
     throw new err.UserAlreadyExistsError();
@@ -30,11 +32,16 @@ export async function signup(data: validation.SignupData) {
   await db.insertUser(user);
 }
 
+export type userTokens = {
+  accessToken: string;
+  refreshToken: string;
+};
+
 // returns the JWT token
 export async function login(
   data: validation.LoginData,
   deviceId: string,
-): Promise<string> {
+): Promise<userTokens> {
   let user: db.SelectUser;
   if (data.identifier.includes('@')) {
     user = await db.getUserByEmail(data.identifier);
@@ -62,14 +69,50 @@ export async function login(
   if (!session) {
     throw new Error('User session creation failed');
   }
-  const token = auth.signToken({
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    sessionId: session.sessionId,
-  });
+  const accessToken = auth.signToken(
+    {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      sessionId: session.sessionId,
+      jti: crypto.randomUUID(),
+    },
+    '15m',
+  );
 
-  return token;
+  return { accessToken: accessToken, refreshToken: session.sessionId };
+}
+
+export async function logout(sid: string) {
+  await db.deleteUserSession(sid);
+}
+
+export async function refresh(sid: string): Promise<string> {
+  const session = await db.getUserSessionById(sid);
+  if (!session) {
+    throw new err.UserUnauthorizedError();
+  }
+
+  const created = new Date(session.createdAt);
+  const now = new Date();
+  const elapsed = created.getTime() - now.getTime();
+  if (elapsed > 3 * 24 * 60 * 60 * 1000) {
+    throw new err.UserUnauthorizedError();
+  }
+
+  const user: db.SelectUser = await db.getUserById(session.userId);
+  const accessToken = auth.signToken(
+    {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      sessionId: session.sessionId,
+      jti: crypto.randomUUID(),
+    },
+    '15m',
+  );
+
+  return accessToken;
 }
 
 export async function resetPassword(

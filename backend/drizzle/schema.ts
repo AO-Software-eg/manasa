@@ -1,7 +1,15 @@
-import { pgTable, foreignKey, unique, bigint, timestamp, text, uniqueIndex, boolean, integer, primaryKey } from "drizzle-orm/pg-core"
+import { pgTable, bigint, timestamp, text, foreignKey, unique, uniqueIndex, boolean, integer, primaryKey } from "drizzle-orm/pg-core"
 import { sql } from "drizzle-orm"
 
 
+
+export const userSessions = pgTable("user_sessions", {
+	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
+	userId: bigint("user_id", { mode: "number" }).primaryKey().generatedByDefaultAsIdentity({ name: "user_sessions_user_id_seq", startWith: 1, increment: 1, minValue: 1, maxValue: 9223372036854775807, cache: 1 }),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+	sessionId: text("session_id").notNull(),
+	deviceId: text("device_id").notNull(),
+});
 
 export const lectureVideos = pgTable("lecture_videos", {
 	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
@@ -19,14 +27,6 @@ export const lectureVideos = pgTable("lecture_videos", {
 		}).onUpdate("cascade"),
 	unique("lecture_videos_video_id_key").on(table.videoId),
 ]);
-
-export const userSessions = pgTable("user_sessions", {
-	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
-	userId: bigint("user_id", { mode: "number" }).primaryKey().generatedByDefaultAsIdentity({ name: "user_sessions_user_id_seq", startWith: 1, increment: 1, minValue: 1, maxValue: 9223372036854775807, cache: 1 }),
-	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
-	sessionId: text("session_id").notNull(),
-	deviceId: text("device_id").notNull(),
-});
 
 export const exams = pgTable("exams", {
 	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
@@ -82,6 +82,28 @@ export const users = pgTable("users", {
 	unique("users_email_key").on(table.email),
 ]);
 
+export const courseEnrollments = pgTable("course_enrollments", {
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
+	studentId: bigint("student_id", { mode: "number" }).notNull(),
+	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
+	courseId: bigint("course_id", { mode: "number" }).notNull(),
+	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
+	id: bigint({ mode: "number" }).generatedByDefaultAsIdentity({ name: "course_enrollments_id_seq", startWith: 1, increment: 1, minValue: 1, maxValue: 9223372036854775807, cache: 1 }),
+}, (table) => [
+	foreignKey({
+			columns: [table.courseId],
+			foreignColumns: [courses.id],
+			name: "course_enrollments_course_id_fkey"
+		}).onUpdate("cascade").onDelete("cascade"),
+	foreignKey({
+			columns: [table.studentId],
+			foreignColumns: [users.id],
+			name: "course_enrollments_student_id_fkey"
+		}).onUpdate("cascade").onDelete("cascade"),
+	unique("course_enrollments_id_key").on(table.id),
+]);
+
 export const questions = pgTable("questions", {
 	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
 	id: bigint({ mode: "number" }).primaryKey().generatedByDefaultAsIdentity({ name: "questions_id_seq", startWith: 1, increment: 1, minValue: 1, maxValue: 9223372036854775807, cache: 1 }),
@@ -96,6 +118,19 @@ export const questions = pgTable("questions", {
 			name: "questions_exam_id_fkey"
 		}).onUpdate("cascade"),
 ]);
+
+export const courses = pgTable("courses", {
+	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
+	id: bigint({ mode: "number" }).primaryKey().generatedByDefaultAsIdentity({ name: "courses_id_seq", startWith: 1, increment: 1, minValue: 1, maxValue: 9223372036854775807, cache: 1 }),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+	title: text().notNull(),
+	imageUrl: text("image_url").notNull(),
+	price: integer().notNull(),
+	year: text().notNull(),
+	specialization: text(),
+	description: text(),
+	tags: text(),
+});
 
 export const examSubmissions = pgTable("exam_submissions", {
 	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
@@ -126,19 +161,6 @@ export const examSubmissions = pgTable("exam_submissions", {
 			name: "exam_submissions_student_id_fkey"
 		}).onUpdate("cascade").onDelete("cascade"),
 ]);
-
-export const courses = pgTable("courses", {
-	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
-	id: bigint({ mode: "number" }).primaryKey().generatedByDefaultAsIdentity({ name: "courses_id_seq", startWith: 1, increment: 1, minValue: 1, maxValue: 9223372036854775807, cache: 1 }),
-	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
-	title: text().notNull(),
-	imageUrl: text("image_url").notNull(),
-	price: integer().notNull(),
-	year: text().notNull(),
-	specialization: text(),
-	description: text(),
-	tags: text(),
-});
 
 export const lectures = pgTable("lectures", {
 	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
@@ -188,29 +210,6 @@ export const lectureVideoCompletions = pgTable("lecture_video_completions", {
 			name: "lecture_videos_watched_video_id_fkey"
 		}),
 	primaryKey({ columns: [table.studentId, table.videoId], name: "lecture_videos_watched_pkey"}),
-]);
-
-export const courseEnrollments = pgTable("course_enrollments", {
-	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
-	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
-	studentId: bigint("student_id", { mode: "number" }).notNull(),
-	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
-	courseId: bigint("course_id", { mode: "number" }).notNull(),
-	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
-	id: bigint({ mode: "number" }).generatedByDefaultAsIdentity({ name: "course_enrollments_id_seq", startWith: 1, increment: 1, minValue: 1, maxValue: 9223372036854775807, cache: 1 }),
-}, (table) => [
-	foreignKey({
-			columns: [table.courseId],
-			foreignColumns: [courses.id],
-			name: "course_enrollments_course_id_fkey"
-		}).onUpdate("cascade").onDelete("cascade"),
-	foreignKey({
-			columns: [table.studentId],
-			foreignColumns: [users.id],
-			name: "course_enrollments_student_id_fkey"
-		}).onUpdate("cascade").onDelete("cascade"),
-	primaryKey({ columns: [table.studentId, table.courseId, table.id], name: "course_enrollments_pkey"}),
-	unique("course_enrollments_id_key").on(table.id),
 ]);
 
 export const wallets = pgTable("wallets", {

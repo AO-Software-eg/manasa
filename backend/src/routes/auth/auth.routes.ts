@@ -8,6 +8,7 @@ const router = express.Router();
 router.route('/signup').post(bodyParser.json(), controller.signup);
 router.route('/login').post(bodyParser.json(), controller.login);
 router.route('/logout').post(bodyParser.json(), controller.logout);
+router.route('/refresh').post(bodyParser.json(), controller.refresh);
 
 router.route('/check-phone').post(bodyParser.json(), controller.checkPhone);
 

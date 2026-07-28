@@ -4,8 +4,7 @@ import { examsPaths } from './paths/exams.ts';
 import { usersPaths } from './paths/user.ts';
 import { videosPaths } from './paths/videos.ts';
 import { paymentPaths } from './paths/payment.ts';
-import * as schemas from './schemas/index.ts'
-
+import * as schemas from './schemas/index.ts';
 
 export const openApiDocument = {
   openapi: '3.1.0',
@@ -36,7 +35,7 @@ export const openApiDocument = {
       CookieAuth: {
         type: 'apiKey',
         in: 'cookie',
-        name: 'user_token',
+        name: 'access_token',
         description: 'JWT authentication cookie',
       },
       bearerAuth: {
