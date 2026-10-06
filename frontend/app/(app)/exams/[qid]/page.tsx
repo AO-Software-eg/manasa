@@ -216,13 +216,6 @@ function Page() {
           الخروج من الامتحان
         </button>
 
-        <button
-          className="flex items-center bg-primary hover:bg-primary/95 text-primary-foreground p-3 rounded-2xl flex-row-reverse gap-2 text-sm transition shadow-sm cursor-pointer"
-          onClick={() => setOnSubmit(true)}
-        >
-          <Send size={16} />
-          إرسال الإجابات
-        </button>
       </div>
 
       <div className="flex-1 p-4 lg:h-[calc(102dvh-5rem)] lg:overflow-y-auto overflow-x-hidden">
@@ -367,7 +360,7 @@ function Page() {
 
         <button
           className={`
-            ${currentQuestion === questionCount ? 'opacity-50 cursor-not-allowed' : 'bg-primary text-primary-foreground hover:bg-primary/90'}
+            ${currentQuestion === questionCount ? 'hidden cursor-not-allowed' : 'bg-primary text-primary-foreground hover:bg-primary/90'}
             px-5 py-3 rounded-2xl flex items-center gap-2 flex-row-reverse transition cursor-pointer font-semibold
           `}
           onClick={() => nextQuestion()}
@@ -375,6 +368,17 @@ function Page() {
         >
           <ChevronLeft size={16} />
           التالي
+        </button>
+        <button
+          className={`
+            ${currentQuestion !== questionCount ? 'hidden cursor-not-allowed' : 'flex items-center bg-primary hover:bg-primary/95 text-primary-foreground p-3 rounded-2xl flex-row-reverse gap-2 text-sm transition shadow-sm cursor-pointer'}
+            
+          `}
+          onClick={() => setOnSubmit(true)}
+          
+        >
+          <Send size={16} />
+          تسليم الامتحان
         </button>
       </div>
 

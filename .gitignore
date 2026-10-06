@@ -1,6 +1,0 @@
-/.next
-/backend/node_modules
-/frontend/node_modules
-next-env.d.ts
-backend/.env
-backend/bodyDebug.txt

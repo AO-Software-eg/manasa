@@ -17,7 +17,7 @@ export default function Courses() {
     data: enrollments,
     isLoading: enrollLoading,
     isError: enrollError,
-  } = useGetEnrollments(userData?.id?.toString() ?? '');
+  } = useGetEnrollments();
 
   const enrolledCourseIds = new Set<number>(
     enrollments?.map((e: Enrollment) => Number(e.course.id)) ?? [],
